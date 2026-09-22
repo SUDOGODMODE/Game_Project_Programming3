@@ -1,0 +1,80 @@
+Rohausgabe von server.py, client.py und test_angriff.py
+==========================================================
+
+Real ausgefuehrt am 22.09.2026, drei getrennte Sitzungen, jeweils gegen
+einen frisch gestarteten Server. Hinweis zum Port: der committete Code
+verwendet wie vorgegeben Port 5000; auf diesem Testrechner (macOS) belegt
+der AirPlay-Empfaenger Port 5000 dauerhaft, deshalb zeigt diese Ausgabe
+Port 5095 als lokalen Ersatz. Interpretation und Kriterien-Tabelle stehen
+in 01_client_server_output.md.
+
+===== Testlauf 1: einzelner Beitritt =====
+$ python3 src/client.py
+  -> {'type': 'join', 'player': 'Alice'}
+  <- {'type': 'welcome', 'slot': 'A', 'player': 'Alice', 'phase': 'waiting'}
+--- Server-Terminal ---
+Server wartet auf Port 5095
+verbunden: ('127.0.0.1', 50100)
+  <- [('127.0.0.1', 50100)] {'type': 'join', 'player': 'Alice'}
+  -> [('127.0.0.1', 50100)] {'type': 'welcome', 'slot': 'A', 'player': 'Alice', 'phase': 'waiting'}
+getrennt: ('127.0.0.1', 50100)
+
+===== Testlauf 2: zweiter Beitritt bekommt slot B =====
+$ python3 src/client.py  (erster Aufruf)
+  -> {'type': 'join', 'player': 'Alice'}
+  <- {'type': 'welcome', 'slot': 'A', 'player': 'Alice', 'phase': 'waiting'}
+$ python3 src/client.py  (zweiter Aufruf)
+  -> {'type': 'join', 'player': 'Alice'}
+  <- {'type': 'welcome', 'slot': 'B', 'player': 'Alice', 'phase': 'placing'}
+--- Server-Terminal ---
+Server wartet auf Port 5095
+verbunden: ('127.0.0.1', 50101)
+  <- [('127.0.0.1', 50101)] {'type': 'join', 'player': 'Alice'}
+  -> [('127.0.0.1', 50101)] {'type': 'welcome', 'slot': 'A', 'player': 'Alice', 'phase': 'waiting'}
+getrennt: ('127.0.0.1', 50101)
+verbunden: ('127.0.0.1', 50102)
+  <- [('127.0.0.1', 50102)] {'type': 'join', 'player': 'Alice'}
+  -> [('127.0.0.1', 50102)] {'type': 'welcome', 'slot': 'B', 'player': 'Alice', 'phase': 'placing'}
+getrennt: ('127.0.0.1', 50102)
+
+===== Testlauf 3: boeser Client, danach normaler Client =====
+$ python3 src/test_angriff.py
+  -> {'type': 'nonsense'}
+  <- {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: nonsense'}
+  -> {'player': 'Alice'}
+  <- {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: None'}
+  -> {'type': 'join'}
+  <- {'type': 'error', 'code': 'MISSING_PLAYER', 'message': 'Name fehlt'}
+  -> {'type': 'join', 'player': 'Bob'}
+  <- {'type': 'welcome', 'slot': 'A', 'player': 'Bob', 'phase': 'waiting'}
+  -> {'type': 'join', 'player': 'Bob'}
+  <- {'type': 'error', 'code': 'ALREADY_JOINED', 'message': 'diese Verbindung ist bereits einem Spieler zugeordnet'}
+  -> das ist kein json
+  <- {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+  -> [1,2,3]
+  <- {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+$ python3 src/client.py  (normaler Client danach)
+  -> {'type': 'join', 'player': 'Alice'}
+  <- {'type': 'welcome', 'slot': 'B', 'player': 'Alice', 'phase': 'placing'}
+--- Server-Terminal ---
+Server wartet auf Port 5095
+verbunden: ('127.0.0.1', 50103)
+  <- [('127.0.0.1', 50103)] {'type': 'nonsense'}
+  -> [('127.0.0.1', 50103)] {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: nonsense'}
+  <- [('127.0.0.1', 50103)] {'player': 'Alice'}
+  -> [('127.0.0.1', 50103)] {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: None'}
+  <- [('127.0.0.1', 50103)] {'type': 'join'}
+  -> [('127.0.0.1', 50103)] {'type': 'error', 'code': 'MISSING_PLAYER', 'message': 'Name fehlt'}
+  <- [('127.0.0.1', 50103)] {'type': 'join', 'player': 'Bob'}
+  -> [('127.0.0.1', 50103)] {'type': 'welcome', 'slot': 'A', 'player': 'Bob', 'phase': 'waiting'}
+  <- [('127.0.0.1', 50103)] {'type': 'join', 'player': 'Bob'}
+  -> [('127.0.0.1', 50103)] {'type': 'error', 'code': 'ALREADY_JOINED', 'message': 'diese Verbindung ist bereits einem Spieler zugeordnet'}
+  <- [('127.0.0.1', 50103)] {'type': 'broken'}
+  -> [('127.0.0.1', 50103)] {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+  <- [('127.0.0.1', 50103)] {'type': 'broken'}
+  -> [('127.0.0.1', 50103)] {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+getrennt: ('127.0.0.1', 50103)
+verbunden: ('127.0.0.1', 50104)
+  <- [('127.0.0.1', 50104)] {'type': 'join', 'player': 'Alice'}
+  -> [('127.0.0.1', 50104)] {'type': 'welcome', 'slot': 'B', 'player': 'Alice', 'phase': 'placing'}
+getrennt: ('127.0.0.1', 50104)

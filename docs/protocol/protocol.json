@@ -1,0 +1,140 @@
+{
+  "protocol": "BattleshipGame",
+  "version": "0.3",
+  "status": "Alle sieben Nachrichten sind implementiert und ueber eine vollstaendige, automatisiert gespielte Partie verifiziert (siehe docs/evidence/01_client_server_output.md). Offen: ein interaktiver Konsolenclient zum manuellen Mitspielen (client.py deckt bisher nur den Beitritt ab) und die Reconnect-Frist bei Verbindungsabbruch. Begriffe (Nachrichtentypen, Felder, Fehlercodes) sind Englisch, Erklaerungen bleiben Deutsch.",
+
+  "rules": {
+    "grid": "10x10, Felder als Buchstabe+Zahl, z.B. \"C5\" (Spalte A-J, Zeile 1-10)",
+    "players": "genau 2, vom Server als \"A\" und \"B\" bezeichnet (Feld slot), Reihenfolge nach Zeitpunkt des Beitritts - der Client kann sich seinen slot nicht aussuchen",
+    "hiddenInformation": "jeder Client sieht nur sein eigenes Raster mit eigenen Schiffen sowie die Ergebnisse seiner eigenen Schuesse auf den Gegner (miss/hit/sunk); die Schiffspositionen des Gegners werden nie verschickt",
+    "phases": ["waiting", "placing", "shooting", "finished"]
+  },
+
+  "fleet": {
+    "note": "Im Spielekatalog nicht mit exakten Zahlen vorgegeben (siehe openQuestions); dies ist die klassische Battleship-Flotte, angelehnt an die zwei Schiffstypen aus dem eigenen Formular (Auftrag 1, Punkt 2: Schlachtschiff/Battleship 4 Felder, Zerstoerer/Destroyer 2 Felder) und um die drei ueblichen weiteren Typen ergaenzt. Wird von board.py als einzig gueltige Flotte durchgesetzt (siehe validate_placement); Zusammensetzung selbst noch nicht gegen den Spielekatalog bestaetigt.",
+    "ships": [
+      {"type": "Carrier", "size": 5, "count": 1},
+      {"type": "Battleship", "size": 4, "count": 1},
+      {"type": "Cruiser", "size": 3, "count": 1},
+      {"type": "Submarine", "size": 3, "count": 1},
+      {"type": "Destroyer", "size": 2, "count": 1}
+    ],
+    "totalCells": 17
+  },
+
+  "stateExample": {
+    "phase": "shooting",
+    "turn": "A",
+    "players": {
+      "A": {
+        "connected": true,
+        "fleetPlaced": true,
+        "ships": [
+          {"type": "Battleship", "cells": ["A1", "A2", "A3", "A4"], "hits": ["A1"]},
+          {"type": "Destroyer", "cells": ["C5", "D5"], "hits": []}
+        ],
+        "shotsAtOpponent": {"B4": "miss", "B7": "hit"}
+      },
+      "B": {
+        "connected": true,
+        "fleetPlaced": true,
+        "ships": [
+          {"type": "Cruiser", "cells": ["F2", "F3", "F4"], "hits": []}
+        ],
+        "shotsAtOpponent": {"A1": "hit"}
+      }
+    },
+    "winner": null
+  },
+
+  "messages": {
+
+    "join": {
+      "from": "Client -> Server",
+      "purpose": "Spieler verbindet sich und meldet sich mit einem Namen an. Der Server weist den slot (A oder B) selbst zu, nie der Client - siehe Regel 2 im ersten Meilenstein.",
+      "request": {"type": "join", "player": "Alice"},
+      "successResponse": {"type": "welcome", "slot": "A", "player": "Alice", "phase": "waiting"},
+      "errorResponse": {"type": "error", "code": "GAME_FULL", "message": "es sind bereits zwei Spieler verbunden"},
+      "implementedIn": "server.py, client.py (Meilenstein 'Der erste Handschlag')"
+    },
+
+    "place": {
+      "from": "Client -> Server",
+      "purpose": "Einmal zu Beginn schickt jeder Client die Position seiner gesamten Flotte.",
+      "request": {
+        "type": "place",
+        "ships": [
+          {"type": "Destroyer", "start": "B2", "direction": "h"}
+        ]
+      },
+      "successResponse": {"type": "placeAck", "phase": "placing"},
+      "errorResponse": {"type": "error", "code": "INVALID_PLACEMENT", "message": "Schiffe ueberlappen oder ragen ueber den Rand"},
+      "note": "player wird nicht mitgeschickt - der Server kennt ihn aus der Verbindung (siehe join). phase in der Antwort bleibt 'placing', bis auch der zweite Spieler platziert hat, dann wechselt sie fuer beide zu 'shooting'.",
+      "implementedIn": "board.py (validate_placement, build_ships), server.py"
+    },
+
+    "shoot": {
+      "from": "Client -> Server",
+      "purpose": "Der Spieler am Zug schiesst auf ein gegnerisches Feld - haeufigste Nachricht im Spiel.",
+      "request": {"type": "shoot", "field": "C5"},
+      "successResponse": {"type": "result", "field": "C5", "result": "hit", "sunk": null, "turn": "B"},
+      "errorResponse": {"type": "error", "code": "NOT_YOUR_TURN", "message": "Spieler B ist nicht am Zug"},
+      "note": "result ist eines von miss | hit | sunk; sunk enthaelt den Schiffstyp, wenn dadurch ein ganzes Schiff getroffen wurde, sonst null. turn zeigt den naechsten Spieler, oder null, wenn dieser Schuss das Spiel beendet hat.",
+      "implementedIn": "board.py (apply_shot, all_sunk), server.py"
+    },
+
+    "getState": {
+      "from": "Client -> Server",
+      "purpose": "Client fragt seinen eigenen, gefilterten Zustand ab, z.B. nach einer Wiederverbindung.",
+      "request": {"type": "getState"},
+      "successResponse": {"type": "state", "phase": "shooting", "turn": "A", "ownShips": [], "shotsAtOpponent": {}, "winner": null},
+      "note": "enthaelt NIE die Schiffspositionen des Gegners",
+      "implementedIn": "server.py"
+    },
+
+    "leave": {
+      "from": "Client -> Server, oder der Server erkennt den Verbindungsabbruch selbst",
+      "purpose": "Spieler verlaesst das Spiel oder die Verbindung bricht ab. Der Server wartet eine kurze Frist (Vorschlag: 30s) auf eine Wiederverbindung, danach gilt die Partie per Aufgabe (forfeit) als entschieden.",
+      "request": {"type": "leave"},
+      "note": "keine Antwort vorgesehen",
+      "status": "Das Markieren als getrennt ist implementiert; die Reconnect-Frist und automatische Aufgabe danach noch nicht."
+    },
+
+    "gameOver": {
+      "from": "Server -> der jeweils andere Client (Broadcast)",
+      "purpose": "Sobald alle Schiffe eines Spielers versenkt sind oder ein Spieler aufgibt, gibt der Server den Gewinner bekannt. Ein Unentschieden gibt es bei diesem Spiel nicht.",
+      "example": {"type": "gameOver", "winner": "A", "reason": "sunk"},
+      "note": "reason ist eines von sunk | forfeit. Nur der Gegner bekommt diese Nachricht aktiv geschickt - der Spieler, dessen Schuss das Spiel beendet, erkennt das Ende bereits an seiner eigenen shoot-Antwort (sunk gesetzt, turn: null) und muesste sonst zwei Nachrichten in nicht vorhersagbarer Reihenfolge auf demselben Socket lesen.",
+      "implementedIn": "server.py (send_to bei Sieg)"
+    },
+
+    "error": {
+      "from": "Server -> Client",
+      "purpose": "Allgemeine Ablehnung einer ungueltigen Anfrage. Der Server prueft jeden Zug selbst und vertraut dem Client nichts.",
+      "example": {"type": "error", "code": "?", "message": "?"},
+      "codes": [
+        "GAME_FULL - ein dritter Spieler versucht beizutreten",
+        "ALREADY_JOINED - diese Verbindung hat schon einen Spieler zugeordnet",
+        "MISSING_PLAYER - beim Beitritt fehlt ein gueltiger Name",
+        "NOT_JOINED - Nachricht verlangt einen Spieler, aber diese Verbindung hat noch nicht 'join' geschickt",
+        "NOT_YOUR_TURN - der sendende Spieler ist gerade nicht am Zug",
+        "CELL_OUT_OF_BOUNDS - das Feld liegt ausserhalb des 10x10-Rasters",
+        "DUPLICATE_SHOT - auf dieses Feld wurde bereits geschossen",
+        "WRONG_PHASE - die Aktion passt nicht zur aktuellen Phase (z.B. shoot, waehrend noch placing laeuft, oder ein zweites place vom selben Spieler)",
+        "INVALID_PLACEMENT - Schiffe ueberlappen, ragen ueber den Rand, oder Flotte stimmt nicht mit fleet ueberein",
+        "PLAYER_SPOOFING - durch das Design ausgeschlossen statt eigens geprueft: keine Nachricht enthaelt ein Spieler-Feld, der Server liest den Spieler immer aus der Verbindung selbst, ein Client kann sich also gar nicht erst als jemand anderes ausgeben",
+        "INVALID_JSON - die Zeile liess sich nicht als JSON lesen",
+        "UNKNOWN_TYPE - das Feld type enthaelt keinen bekannten Nachrichtennamen"
+      ],
+      "implementedIn": "server.py (alle Codes ausser PLAYER_SPOOFING, das strukturell nie auftreten kann)"
+    }
+  },
+
+  "hardestPart": "Die verborgene Information sauber zu trennen (siehe Auftrag 1, Formular Punkt 8): Der Server muss jedem Client einen gefilterten Zustand schicken, damit die gegnerische Flotte nie durchsickert. Ein naiver Server, der einfach den ganzen Spielstand an beide sendet, verraet sofort alle Schiffe. Dazu kommt die Pruefung des Platzierens (keine Ueberlappung, kein Ueberstand, richtige Flotte) und dass der Server bei jedem Schuss selbst hit und sunk bestimmt und einem luegenden Client nicht glaubt.",
+
+  "openQuestions": [
+    "fleet ist noch nicht gegen den Spielekatalog bestaetigt (die Datei Spielkatalog_Programming3.docx enthaelt aktuell nur das leere Auftrag-1-Formular, keine Vergleichstabelle mit Schiffstypen)",
+    "Reconnect-Frist von 30s ist ein Vorschlag, noch nicht implementiert",
+    "client.py deckt bisher nur den Beitritt ab, nicht das eigentliche Mitspielen (platzieren/schiessen von Hand); dafuer fehlt noch ein interaktiver Client"
+  ]
+}
