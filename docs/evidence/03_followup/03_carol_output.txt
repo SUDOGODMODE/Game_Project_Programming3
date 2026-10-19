@@ -1,0 +1,5 @@
+$ /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/.venv/bin/python -u /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/client.py 127.0.0.1 Carol --port 61885
+-> {'type': 'join', 'player': 'Carol'}
+Enter q zum Beenden.
+<- {'type': 'error', 'code': 'GAME_FULL', 'message': 'es sind bereits zwei Spieler verbunden'}
+Verbindung beendet

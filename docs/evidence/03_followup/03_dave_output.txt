@@ -1,0 +1,5 @@
+$ /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/.venv/bin/python -u /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/client.py 127.0.0.1 Dave --port 61885
+-> {'type': 'join', 'player': 'Dave'}
+Enter q zum Beenden.
+<- {'type': 'welcome', 'slot': 'B', 'player': 'Dave', 'phase': 'placing'}
+<- {'type': 'gameStart', 'phase': 'placing', 'players': [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Dave'}]}

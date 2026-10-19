@@ -1,0 +1,10 @@
+$ /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/.venv/bin/python -u /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/client.py 127.0.0.1 Alice --port 61885
+-> {'type': 'join', 'player': 'Alice'}
+Enter q zum Beenden.
+<- {'type': 'welcome', 'slot': 'A', 'player': 'Alice', 'phase': 'waiting'}
+<- {'type': 'waiting', 'reason': 'warte auf Gegner'}
+<- {'type': 'gameStart', 'phase': 'placing', 'players': [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Bob'}]}
+<- {'type': 'opponentLeft', 'slot': 'B', 'player': 'Bob'}
+<- {'type': 'gameStart', 'phase': 'placing', 'players': [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Dave'}]}
+<- {'type': 'opponentLeft', 'slot': 'B', 'player': 'Dave'}
+Verbindung beendet

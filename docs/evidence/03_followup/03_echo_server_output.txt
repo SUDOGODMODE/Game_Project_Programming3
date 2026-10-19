@@ -1,0 +1,8 @@
+$ /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/.venv/bin/python -u /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/echo_server.py --host 127.0.0.1 --port 0
+warte auf Port 61892 ...
+verbunden mit ('127.0.0.1', 61894)
+Gegenseite hat geschlossen
+verbunden mit ('127.0.0.1', 61895)
+Gegenseite hat geschlossen
+
+Echo-Server beendet.

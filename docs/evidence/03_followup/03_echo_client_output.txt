@@ -1,0 +1,5 @@
+$ /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/.venv/bin/python src/echo_client.py 127.0.0.1 hallo netz --port 61892
+Antwort: HALLO NETZ
+
+$ /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/.venv/bin/python src/echo_client.py 127.0.0.1 zweiter client --port 61892
+Antwort: ZWEITER CLIENT

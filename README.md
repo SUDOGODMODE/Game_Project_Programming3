@@ -1,123 +1,115 @@
 # Schiffe versenken
 
-Ein verteiltes Schiffe-versenken für zwei Spieler — Projektarbeit im Modul *Programming 3* an der HFTM, Aufgabe «Verteiltes Spiel» (Einzelarbeit, Max Rufener).
+Projekt im Modul Programming 3 an der HFTM, Max Rufener. Zwei Spieler verbinden sich mit einem zentralen Server. Der Server prüft alle Aktionen; jeder Client erhält nur seine eigene Spielersicht.
 
-Der Server hält den gesamten Spielstand und ist die einzige Wahrheit im Spiel. Die Clients zeigen nur an und schicken Wünsche — sie entscheiden nichts selbst und wissen nie mehr, als sie dürfen.
+## Stand
 
-## Inhalt
+Schiffe versenken ist als Spielwahl freigegeben. Der aktuelle Kursmeilenstein **«Zwei Spieler, ein Tisch»** ist lokal umgesetzt und geprüft. Die Versuche mit fremden Rechnern und das Gegenlesen stehen noch aus.
 
-- [Stand des Projekts](#stand-des-projekts)
-- [Wie das Spiel abläuft](#wie-das-spiel-abläuft)
-- [Protokoll und Code](#protokoll-und-code)
-- [Projektstruktur](#projektstruktur)
-- [Ausführen](#ausführen)
-- [Getestet](#getestet)
-- [Was noch fehlt](#was-noch-fehlt)
+Die Unterlagen verwenden zwei Nummerierungen: Im [Projektablauf](docs/assignments/project_flow.txt) bedeutet M3 «Das Protokoll». Die einzelne [Kursaufgabe 3](docs/assignments/03_two_players.txt) verlangt zwei gleichzeitig verbundene Spieler. Der [Anforderungsabgleich](docs/status/03_requirements.md) berücksichtigt beide.
 
-## Stand des Projekts
+| Projektphase | Stand |
+|---|---|
+| M0 · Werkzeuge / Echo | Repository, virtuelle Umgebung und lokal getestete Echo-Programme vorhanden; Netzwerkversuch mit Rollenwechsel offen |
+| M1 · Spielwahl / Regeln | Spielwahl freigegeben, Formular vorhanden; [Regelblatt und Oberflächenskizze](REGELN.md) ergänzt, Gegenlesen offen |
+| M2 · Kern ohne Netz | `BattleshipGame`, Tests und `local_game.py` vorhanden; vollständige Partie mit zwei Personen noch durchzuführen |
+| M3 · Protokoll | 14 Nachrichtentypen mit Feldern, Beispielen und vollständigem Partieablauf; Gegenlesen offen |
+| Kursaufgabe 2 · Handschlag | Eigene Beitrittsnachrichten und Angriffstest geprüft; Versuch mit fremdem Rechner und Rollenwechsel offen |
+| Kursaufgabe 3 · Zwei Spieler | Warten, Spielstart, Ablehnung des dritten Spielers, Abbruch und Ersatzbeitritt lokal geprüft; Schulnetz-Nachweis offen |
+| M4–M5 · Server / Robustheit | Spielserver, Konsolenclient und Angriffstests bereits vorhanden; Zustandsmeldungen nach jedem Spielzug fehlen noch |
+| M6–M8 · Oberfläche / Fremdtest / Abgabe | offen; Einzelaufgaben im Anforderungsabgleich |
 
-| Meilenstein | Ziel | Stand |
-|---|---|---|
-| M1 · Spielwahl | ein freigegebenes Spiel | erledigt — Formular in `Projekt/Dokumente/Auftrag1_Spielwahl_ausgefuellt.pdf` |
-| M2 · Spielkern ohne Netz | getestete Klasse, am Tisch spielbar | `board.py` steht und ist einzeln getestet (`test_board.py`) |
-| M3 · Das Protokoll | ein Nachrichtenkatalog, den Fremde lesen können | vollständig, alle sieben Nachrichten implementiert |
-| M4 · Der Server | zwei Konsolenclients, die eine Partie spielen | Server spielt eine komplette Partie korrekt durch; `client.py` selbst kann bisher nur beitreten, nicht mitspielen |
-| M5 · Client und Robustheit | Server, der den bösen Client übersteht | Server läuft mit Threading, übersteht kaputte Nachrichten (`test_angriff.py`); Reconnect nach Verbindungsabbruch fehlt |
-| M6 · Die Oberfläche | grafischer Client | offen |
-| M7 · Härtung und Fremdtest | Partie über das Schulnetz | offen |
-| M8 · Abgabe und Demo | Vorführung, Bericht, Reflexion | offen |
+Bis M3 fehlen noch diese praktischen Nachweise:
 
-Erstwunsch im Formular war eigentlich Vier gewinnt, Zweitwunsch Schiffe versenken — die gesamte bisherige Arbeit (Protokoll, Referenzcode, eigene Notizen) ist auf Schiffe versenken ausgelegt.
+- Eine feste Lesepartnerschaft vereinbaren (Eintrag: `<lesepartner_name>`); Regeln und Protokoll gegenlesen lassen und Ergebnis festhalten.
+- Eine vollständige Partie mit zwei Personen an einer Tastatur spielen.
+- Echo und Handschlag über zwei Rechner ausprobieren, danach die Rollen tauschen.
+- Den Spielserver mit zwei fremden Client-Rechnern testen; die Ausgaben müssen zwei unterschiedliche Client-Adressen und den Spielstart bei beiden zeigen.
 
-## Wie das Spiel abläuft
+## Einrichtung
 
-Ein Spieler verbindet sich, meldet sich mit einem Namen an und bekommt vom Server eine Kennung zugewiesen — `A` oder `B`, je nachdem wer zuerst da war. Der Client entscheidet das nicht selbst, er kann sich weder aussuchen, wer er ist, noch sich als der andere Spieler ausgeben, weil keine einzige Nachricht überhaupt ein Feld dafür hat: der Server weiss immer aus der Verbindung, wer gerade spricht.
-
-Sobald beide verbunden sind, platziert jeder seine Flotte — fünf Schiffe unterschiedlicher Grösse, geprüft auf Überlappung und Rasterüberstand. Danach wird abwechselnd geschossen, bis die gesamte gegnerische Flotte versenkt ist. Jeder Client sieht dabei ausschliesslich sein eigenes Raster und die Ergebnisse seiner eigenen Schüsse — nie, wo die Schiffe des Gegners tatsächlich stehen.
-
-```json
-{"type": "join", "player": "Alice"}
-→ {"type": "welcome", "slot": "A", "player": "Alice", "phase": "waiting"}
-
-{"type": "shoot", "field": "C5"}
-→ {"type": "result", "field": "C5", "result": "sunk", "sunk": "Destroyer", "turn": "B"}
-```
-
-Kommt eine Nachricht zur falschen Zeit, mit falschem Feld oder gar nicht als gültiges JSON an, antwortet der Server mit `error` und einem Code statt zu verstummen oder abzustürzen — siehe [`docs/evidence/01_client_server_output.md`](docs/evidence/01_client_server_output.md).
-
-## Protokoll und Code
-
-Das Protokoll in [`docs/protocol/protocol.json`](docs/protocol/protocol.json) ist keine Beschreibung neben dem Code, sondern dessen Quelle. Eine neue Nachricht entsteht zuerst dort als Eintrag, erst danach als weiterer Fall in `handle()` in `server.py`.
-
-- **`netz.py`** — die reine Transportschicht. Verpackt ein Dictionary als JSON-Zeile und liest sie auf der Gegenseite wieder ein. Kennt keinen einzigen Nachrichtennamen des Spiels.
-- **`board.py`** — die Spielregeln, komplett ohne Netzwerk: Schiffe platzieren, Überlappung und Rasterüberstand prüfen, Treffer eintragen, erkennen, wann ein Schiff versenkt ist. Lässt sich einzeln testen und importieren, ohne einen Server zu starten.
-- **`server.py`** — nimmt Verbindungen an (ein Faden pro Verbindung) und entscheidet über `message["type"]`, was zu tun ist: `join`, `place`, `shoot`, `getState`, `leave`. Ruft für alles, was mit Schiffen zu tun hat, nur `board.py` auf, statt die Logik zu duplizieren.
-- **`client.py`** — verbindet sich, schickt eine `join`-Nachricht, zeigt die Antwort. Deckt bewusst nur den Beitritt ab, siehe „Was noch fehlt".
-- **`test_angriff.py`** — der böse Zwilling von `client.py`. Schickt absichtlich kaputte, unvollständige und doppelte Nachrichten.
-
-## Projektstruktur
-
-```
-Game_Project_Programming3/
-├── README.md
-├── .gitignore
-├── src/                            ausführbarer Code, flach (kein Package)
-│   ├── netz.py                         Transportschicht: JSON-Zeilen senden/lesen
-│   ├── board.py                        Spielregeln ohne Netzwerk
-│   ├── test_board.py                   Tests für board.py
-│   ├── server.py                       nimmt Verbindungen an, spielt die Partie
-│   ├── client.py                       verbindet sich und tritt bei
-│   └── test_angriff.py                 schickt absichtlich ungültige Nachrichten
-└── docs/
-    ├── assignments/                Aufgabenstellungen, unverändert wie gestellt
-    │   └── 01_first_handshake.md
-    ├── evidence/                   reale Testausgaben als Beleg
-    │   └── 01_client_server_output.md
-    └── protocol/
-        └── protocol.json               der eigene, verbindliche Nachrichtenkatalog
-```
-
-`src/` bleibt bewusst flach statt als Package: Schritt 7 des ersten Meilensteins verlangt, dass jemand anderes `client.py` direkt gegen meinen Server startet, ohne vorher irgendetwas zu installieren. `python3 src/client.py <ip>` reicht — Python findet die anderen Module automatisch im selben Ordner.
-
-Kursunterlagen ausserhalb des eigentlichen Codes (Auftragsformulare, Spielkatalog) liegen unter `Projekt/Dokumente/`, nicht in diesem Repository. Kursübungen ohne Bezug zu diesem Spiel liegen unter `Programming3/uebungen_referenzen/`.
-
-## Ausführen
-
-Braucht nur Python 3, sonst nichts — keine externen Abhängigkeiten.
+Python **3.12 oder neuer**, nur Standardbibliothek. Die vorhandene Projektumgebung läuft mit Python 3.14.8. Die erste Prüfung verwendete zusätzlich Python 3.15.0.
 
 ```bash
-# Terminal 1
-python3 src/server.py
-
-# Terminal 2 — ohne Angabe verbindet sich der Client zu localhost
-python3 src/client.py [server-ip]
-
-# optional: den Server mit absichtlich kaputten Nachrichten löchern
-python3 src/test_angriff.py [server-ip]
-
-# die Spielregeln fuer sich alleine testen, ohne Server
-python3 src/test_board.py
+python3 -m venv .venv          # nur wenn noch keine Umgebung vorhanden ist
+source .venv/bin/activate     # macOS / Linux
+# Windows: .venv\Scripts\activate
+python --version
 ```
 
-## Getestet
+Alle folgenden Befehle werden im Repository-Verzeichnis ausgeführt.
 
-Alles hier wurde real ausgeführt, nicht nur geschrieben:
+## Start und Bedienung
 
-- `board.py`: 9 eigenständige Tests (`test_board.py`) für Feld-Parsing, Schiffsplatzierung, Überlappung, Treffer und Versenken.
-- Beitritt: erster und zweiter Client bekommen korrekt die Kennungen `A` und `B`.
-- `test_angriff.py`: alle sechs Angriffsversuche laufen in einen passenden Fehlercode statt in einen Absturz, der Server läuft danach normal weiter.
-- Eine komplette Partie mit zwei gleichzeitig verbundenen Clients: platzieren, abwechselnd schiessen, bis eine Flotte versenkt ist, `gameOver` kommt korrekt beim Verlierer an, `getState` verrät nie die gegnerischen Schiffspositionen.
+Für M0, in zwei Terminals:
 
-Dabei ist ein echter Fehler aufgefallen und wurde behoben: Der Server schickte dem Gewinner den `gameOver`-Broadcast ursprünglich *vor* der eigentlichen Antwort auf dessen eigenen letzten Schuss — zwei Nachrichten kamen dadurch in unerwarteter Reihenfolge auf demselben Socket an. Details und die vollständige Ein-/Ausgabe stehen in [`docs/evidence/01_client_server_output.md`](docs/evidence/01_client_server_output.md).
+```bash
+python src/echo_server.py --port 5100
+python src/echo_client.py 127.0.0.1 --port 5100
+```
 
-Ein Stolperstein beim Testen auf diesem Rechner: macOS belegt Port 5000 serienmässig mit dem AirPlay-Empfänger, was den Server mit `OSError: Address already in use` scheitern lässt. Abhilfe entweder über Systemeinstellungen → AirDrop & Handoff → AirPlay-Empfänger deaktivieren, oder testweise einen anderen Port verwenden. Der committete Code bleibt auf dem vorgegebenen Port 5000.
+Der Client zeigt `Antwort: HALLO NETZ`. Für einen fremden Rechner die tatsächliche Server-IP einsetzen:
 
-## Was noch fehlt
+```bash
+python src/echo_client.py "<server_ip>" --port "<tcp_port>"
+```
 
-**Ein spielbarer Client.** `client.py` deckt bisher nur den Beitritt ab (Ergebnis des ersten Meilensteins). Der Server kann bereits eine komplette Partie korrekt durchspielen — getestet wurde das mit einem eigenen Testskript, das zwei Sockets gleichzeitig steuert, nicht mit `client.py` selbst. Es fehlt also noch ein Client, mit dem ein Mensch tatsächlich am Terminal Schiffe platzieren und schiessen kann.
+`<server_ip>` und `<tcp_port>` vor dem Start ersetzen; danach die Rollen tauschen. Platzhalter haben in dieser Dokumentation die Form `<beispiel_art>`.
 
-**Reconnect.** Bricht die Verbindung mitten in der Partie ab, merkt der Server das (`connected: false`), wartet aber nicht auf eine Wiederverbindung und wertet die Partie auch nicht automatisch als Aufgabe — beides ist im Protokoll als Vorschlag notiert, aber nicht umgesetzt.
+Für M2, ohne Server:
 
-**Die Flotte** (`fleet` in `protocol.json`, die klassischen fünf Schiffstypen) ist plausibel, aber nicht gegen einen echten Spielekatalog bestätigt — die bereitgestellte Datei enthält bislang nur das leere Auftrag-1-Formular, keine Vorgaben zu Schiffstypen.
+```bash
+python src/local_game.py
+```
 
-**M6–M8** (Oberfläche, Fremdtest über das Schulnetz, Abgabe) sind noch nicht begonnen.
+A und B setzen nacheinander ihre Flotte, je Schiff beispielsweise `A1 h`. Danach werden Feldkoordinaten für die Schüsse eingegeben. q beendet die Partie. Bei der Tastaturübergabe verdeckt das Terminal die bisherige Anzeige; der andere Spieler sollte während der Platzierung nicht mitlesen.
+
+Für die aktuelle Kursaufgabe, in drei Terminals:
+
+```bash
+python -u src/server.py --port 5100
+python -u src/client.py 127.0.0.1 Alice --port 5100
+python -u src/client.py 127.0.0.1 Bob --port 5100
+```
+
+Alice erhält `welcome` und `waiting`. Nach Bobs Beitritt erhalten beide `gameStart`. Ein dritter Spieler erhält `GAME_FULL`. Mit q wird der Platz frei und der Gegner erhält `opponentLeft`.
+
+Für eine Netzwerkpartie `play.py` statt `client.py` starten. Die Standardflotte wird nach `gameStart` gesetzt. Eine Feldkoordinate schiesst, `state` fragt den aktuellen Zustand ab, `quit` oder q beendet. Zustände nach gewöhnlichen Spielzügen müssen derzeit abgefragt werden; automatische Zustandsmeldungen gehören zur weiteren Serverarbeit.
+
+Alle Netzwerkprogramme verwenden standardmässig Port 5000. Die Beispiele nutzen 5100, falls 5000 auf macOS durch AirPlay belegt ist. Server und Clients müssen denselben Port verwenden. Der Server hört standardmässig auf `0.0.0.0`; für einen ausschliesslich lokalen Versuch ist `--host 127.0.0.1` möglich.
+
+## Code und Unterlagen
+
+- `board.py`: Spielkern, Regeln und gefilterte Kopien des Zustands; keine Netzabhängigkeit.
+- `netz.py`: UTF-8-JSON-Zeilen über TCP; unverändert gegenüber dem Ausgangsstand.
+- `server.py`: Verbindungen, Spielerzuordnung und Sendungen; eine gemeinsame Sperre umfasst Prüfen, Ändern und Senden.
+- `client.py`: dauerhafter Lobbyclient mit Empfangsthread.
+- `play.py`: vorhandener Netzwerkclient zum Spielen.
+- `local_game.py`: Partie an einer Tastatur ohne Netz.
+- `echo_server.py` / `echo_client.py`: Grundversuch aus M0, ohne Spielprotokoll.
+- [REGELN.md](REGELN.md): Regeln, Abbruchentscheidung und Skizze.
+- [PROTOKOLL.md](PROTOKOLL.md) / [protocol.json](docs/protocol/protocol.json): lesbarer und strukturierter Nachrichtenkatalog.
+- `docs/assignments/`: unveränderte Kopien der Aufgabenstellungen; ursprüngliche Formulare liegen unter `Projekt/Dokumente/`.
+- [journal.md](journal.md): Arbeitsschritte und offene Punkte.
+
+Beim Netzwerkabbruch wird die gesamte Partie zurückgesetzt. Der nächste Gegner beginnt eine neue Partie. Diese aktuelle Regel ersetzt die Wartefrist mit Aufgabe aus dem ursprünglichen Vorschlag; Details stehen im Regelblatt.
+
+## Tests und Nachweise
+
+```bash
+python src/test_board.py
+python src/test_game.py
+python src/test_transport.py
+python src/test_tools.py
+python src/test_network.py
+```
+
+Den Handshake-Angriffstest auf einem frischen, separat gestarteten Server ausführen:
+
+```bash
+python src/test_angriff.py 127.0.0.1 --port 5100
+```
+
+Die [erste lokale Prüfung](docs/evidence/03_local_output.md) enthält 47 bestandene Tests und Terminalausgaben. Der [ergänzte Prüflauf](docs/evidence/03_followup_output.md) enthält **57 bestandene Tests** und die Ergebnisse für Echo, lokale Partie und Transport sowie die erneute Gesamtprüfung. Historische Nachweise bleiben unverändert.
+
+Die [Schulnetz-Checkliste](docs/evidence/03_school_network_checklist.md) beschreibt die noch durchzuführenden Versuche. Lokale Prüfungen sind kein Nachweis für einen Versuch mit fremden Rechnern.

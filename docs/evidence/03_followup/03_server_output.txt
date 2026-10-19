@@ -1,0 +1,43 @@
+$ /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/.venv/bin/python -u /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/server.py --host 127.0.0.1 --port 61885
+Server wartet auf Port 61885
+verbunden: ('127.0.0.1', 61886)
+  <- [('127.0.0.1', 61886)] {'type': 'join', 'player': 'Alice'}
+  -> [A] {'type': 'welcome', 'slot': 'A', 'player': 'Alice', 'phase': 'waiting'}
+  -> [A] {'type': 'waiting', 'reason': 'warte auf Gegner'}
+verbunden: ('127.0.0.1', 61888)
+  <- [('127.0.0.1', 61888)] {'type': 'join', 'player': 'Bob'}
+  -> [B] {'type': 'welcome', 'slot': 'B', 'player': 'Bob', 'phase': 'placing'}
+  -> [A] {'type': 'gameStart', 'phase': 'placing', 'players': [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Bob'}]}
+  -> [B] {'type': 'gameStart', 'phase': 'placing', 'players': [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Bob'}]}
+verbunden: ('127.0.0.1', 61889)
+  <- [('127.0.0.1', 61889)] {'type': 'join', 'player': 'Carol'}
+  -> [nicht angemeldet] {'type': 'error', 'code': 'GAME_FULL', 'message': 'es sind bereits zwei Spieler verbunden'}
+getrennt: ('127.0.0.1', 61889)
+  -> [A] {'type': 'opponentLeft', 'slot': 'B', 'player': 'Bob'}
+getrennt: ('127.0.0.1', 61888)
+verbunden: ('127.0.0.1', 61890)
+  <- [('127.0.0.1', 61890)] {'type': 'join', 'player': 'Dave'}
+  -> [B] {'type': 'welcome', 'slot': 'B', 'player': 'Dave', 'phase': 'placing'}
+  -> [A] {'type': 'gameStart', 'phase': 'placing', 'players': [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Dave'}]}
+  -> [B] {'type': 'gameStart', 'phase': 'placing', 'players': [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Dave'}]}
+  -> [A] {'type': 'opponentLeft', 'slot': 'B', 'player': 'Dave'}
+getrennt: ('127.0.0.1', 61890)
+getrennt: ('127.0.0.1', 61886)
+verbunden: ('127.0.0.1', 61891)
+  <- [('127.0.0.1', 61891)] {'type': 'nonsense'}
+  -> [nicht angemeldet] {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: nonsense'}
+  <- [('127.0.0.1', 61891)] {'player': 'Alice'}
+  -> [nicht angemeldet] {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: None'}
+  <- [('127.0.0.1', 61891)] {'type': 'join'}
+  -> [nicht angemeldet] {'type': 'error', 'code': 'MISSING_PLAYER', 'message': 'Name fehlt'}
+  <- [('127.0.0.1', 61891)] {'type': 'join', 'player': 'Bob'}
+  -> [A] {'type': 'welcome', 'slot': 'A', 'player': 'Bob', 'phase': 'waiting'}
+  -> [A] {'type': 'waiting', 'reason': 'warte auf Gegner'}
+  <- [('127.0.0.1', 61891)] {'type': 'join', 'player': 'Bob'}
+  -> [A] {'type': 'error', 'code': 'ALREADY_JOINED', 'message': 'diese Verbindung ist bereits einem Spieler zugeordnet'}
+  <- [('127.0.0.1', 61891)] {'type': 'broken'}
+  -> [A] {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+  <- [('127.0.0.1', 61891)] {'type': 'broken'}
+  -> [A] {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+getrennt: ('127.0.0.1', 61891)
+Server beendet

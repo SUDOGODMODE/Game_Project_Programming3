@@ -1,0 +1,457 @@
+Schiffe versenken fuer zwei Personen. q beendet das Spiel.
+Spieler A platziert seine Flotte.
+Carrier (5 Felder), Start Richtung (z.B. A1 h): Battleship (4 Felder), Start Richtung (z.B. A1 h): Cruiser (3 Felder), Start Richtung (z.B. A1 h): Submarine (3 Felder), Start Richtung (z.B. A1 h): Destroyer (2 Felder), Start Richtung (z.B. A1 h): Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  . . . . . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B platziert seine Flotte.
+Carrier (5 Felder), Start Richtung (z.B. A1 h): Battleship (4 Felder), Start Richtung (z.B. A1 h): Cruiser (3 Felder), Start Richtung (z.B. A1 h): Submarine (3 Felder), Start Richtung (z.B. A1 h): Destroyer (2 Felder), Start Richtung (z.B. A1 h): Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  . . . . . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  . . . . . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: A1 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X S S S S . . . . .     1  . . . . . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J1 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X . . . . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: B1 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X S S S . . . . .     1  . . . . . . . . . o
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J2 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X . . . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: C1 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X S S . . . . .     1  . . . . . . . . . o
+ 2  S S S S . . . . . .     2  . . . . . . . . . o
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J3 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X . . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: D1 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X S . . . . .     1  . . . . . . . . . o
+ 2  S S S S . . . . . .     2  . . . . . . . . . o
+ 3  S S S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J4 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X . . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: E1 -> Versenkt (Carrier)
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . . o
+ 2  S S S S . . . . . .     2  . . . . . . . . . o
+ 3  S S S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J5 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  . . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: A2 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . . o
+ 2  X S S S . . . . . .     2  . . . . . . . . . o
+ 3  S S S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J6 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X . . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: B2 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . . o
+ 2  X X S S . . . . . .     2  . . . . . . . . . o
+ 3  S S S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J7 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X . . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: C2 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . . o
+ 2  X X X S . . . . . .     2  . . . . . . . . . o
+ 3  S S S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J8 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X . . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: D2 -> Versenkt (Battleship)
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . . o
+ 2  X X X X . . . . . .     2  . . . . . . . . . o
+ 3  S S S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J9 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  . . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: A3 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . . o
+ 2  X X X X . . . . . .     2  . . . . . . . . . o
+ 3  X S S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . o
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler B, Schuss (z.B. C5): Spieler B: J10 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  X . . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: B3 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . . o
+ 2  X X X X . . . . . .     2  . . . . . . . . . o
+ 3  X X S . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . o
+10  . . . . . . . . . .    10  . . . . . . . . . o
+Spieler B, Schuss (z.B. C5): Spieler B: I1 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  X X . . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: C3 -> Versenkt (Cruiser)
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . o o
+ 2  X X X X . . . . . .     2  . . . . . . . . . o
+ 3  X X X . . . . . . .     3  . . . . . . . . . o
+ 4  S S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . o
+10  . . . . . . . . . .    10  . . . . . . . . . o
+Spieler B, Schuss (z.B. C5): Spieler B: I2 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  X X X . . . . . . .
+ 4  S S S . . . . . . .     4  . . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: A4 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . o o
+ 2  X X X X . . . . . .     2  . . . . . . . . o o
+ 3  X X X . . . . . . .     3  . . . . . . . . . o
+ 4  X S S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . o
+10  . . . . . . . . . .    10  . . . . . . . . . o
+Spieler B, Schuss (z.B. C5): Spieler B: I3 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  X X X . . . . . . .
+ 4  S S S . . . . . . .     4  X . . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: B4 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . o o
+ 2  X X X X . . . . . .     2  . . . . . . . . o o
+ 3  X X X . . . . . . .     3  . . . . . . . . o o
+ 4  X X S . . . . . . .     4  . . . . . . . . . o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . o
+10  . . . . . . . . . .    10  . . . . . . . . . o
+Spieler B, Schuss (z.B. C5): Spieler B: I4 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  X X X . . . . . . .
+ 4  S S S . . . . . . .     4  X X . . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: C4 -> Versenkt (Submarine)
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . o o
+ 2  X X X X . . . . . .     2  . . . . . . . . o o
+ 3  X X X . . . . . . .     3  . . . . . . . . o o
+ 4  X X X . . . . . . .     4  . . . . . . . . o o
+ 5  S S . . . . . . . .     5  . . . . . . . . . o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . o
+10  . . . . . . . . . .    10  . . . . . . . . . o
+Spieler B, Schuss (z.B. C5): Spieler B: I5 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  X X X . . . . . . .
+ 4  S S S . . . . . . .     4  X X X . . . . . . .
+ 5  S S . . . . . . . .     5  . . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: A5 -> Treffer
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  X X X X X . . . . .     1  . . . . . . . . o o
+ 2  X X X X . . . . . .     2  . . . . . . . . o o
+ 3  X X X . . . . . . .     3  . . . . . . . . o o
+ 4  X X X . . . . . . .     4  . . . . . . . . o o
+ 5  X S . . . . . . . .     5  . . . . . . . . o o
+ 6  . . . . . . . . . .     6  . . . . . . . . . o
+ 7  . . . . . . . . . .     7  . . . . . . . . . o
+ 8  . . . . . . . . . .     8  . . . . . . . . . o
+ 9  . . . . . . . . . .     9  . . . . . . . . . o
+10  . . . . . . . . . .    10  . . . . . . . . . o
+Spieler B, Schuss (z.B. C5): Spieler B: I6 -> Wasser
+Eigenes Brett: S Schiff, X getroffen; Zielbrett: o Wasser, X Treffer
+    A B C D E F G H I J        A B C D E F G H I J
+ 1  S S S S S . . . . .     1  X X X X X . . . . .
+ 2  S S S S . . . . . .     2  X X X X . . . . . .
+ 3  S S S . . . . . . .     3  X X X . . . . . . .
+ 4  S S S . . . . . . .     4  X X X . . . . . . .
+ 5  S S . . . . . . . .     5  X . . . . . . . . .
+ 6  . . . . . . . . . .     6  . . . . . . . . . .
+ 7  . . . . . . . . . .     7  . . . . . . . . . .
+ 8  . . . . . . . . . .     8  . . . . . . . . . .
+ 9  . . . . . . . . . .     9  . . . . . . . . . .
+10  . . . . . . . . . .    10  . . . . . . . . . .
+Spieler A, Schuss (z.B. C5): Spieler A: B5 -> Versenkt (Destroyer)
+Spieler A gewinnt!

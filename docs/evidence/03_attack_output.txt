@@ -1,0 +1,16 @@
+-> {'type': 'nonsense'}
+<- {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: nonsense'}
+-> {'player': 'Alice'}
+<- {'type': 'error', 'code': 'UNKNOWN_TYPE', 'message': 'unbekannter Typ: None'}
+-> {'type': 'join'}
+<- {'type': 'error', 'code': 'MISSING_PLAYER', 'message': 'Name fehlt'}
+-> {'type': 'join', 'player': 'Bob'}
+<- {'type': 'welcome', 'slot': 'A', 'player': 'Bob', 'phase': 'waiting'}
+-> {'type': 'join', 'player': 'Bob'}
+<- {'type': 'waiting', 'reason': 'warte auf Gegner'}
+<- {'type': 'error', 'code': 'ALREADY_JOINED', 'message': 'diese Verbindung ist bereits einem Spieler zugeordnet'}
+-> das ist kein json
+<- {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+-> [1,2,3]
+<- {'type': 'error', 'code': 'INVALID_JSON', 'message': 'kein gueltiges JSON'}
+Alle Handshake-Angriffe wie erwartet abgelehnt.

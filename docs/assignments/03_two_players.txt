@@ -1,0 +1,358 @@
+Meilenstein 3:
+
+
+
+HFTM · Projekt · Meilenstein
+Zwei Spieler, ein Tisch
+
+Beide Spieler sind gleichzeitig verbunden. Und wenn der zweite beitritt, erscheint im Terminal des ersten eine Zeile, ohne dass er etwas geschickt hat.
+EinstiegWorum es heute geht
+
+Dein Server aus dem letzten Meilenstein kann genau eines: Er wartet auf eine Nachricht, antwortet darauf und wartet wieder. Frage, Antwort, Frage, Antwort. Solange nur ein Client da ist und dieser Client immer zuerst spricht, reicht das.
+
+Ein Spiel funktioniert so nicht. Wenn dein Gegner einen Stein setzt, musst du es erfahren, ohne vorher danach gefragt zu haben. Daraus folgt die Frage, die diesen Abend trägt:
+Wie erfährt ein Client etwas, das er nicht angefragt hat?
+
+Die Antwort besteht aus zwei Teilen, und beide müssen da sein, sonst siehst du nichts. Der Server muss mehrere Verbindungen gleichzeitig offen halten und von sich aus senden können. Und der Client muss zuhören, während er gar nichts tut.
+
+Am Ende dieses Abends sieht das so aus. Alice verbindet sich und wartet. Dann verbindet sich Bob, und in Alices Terminal erscheint eine Zeile von selbst:
+
+-> {'type': 'join', 'player': 'Alice'}
+<- {'type': 'welcome', 'playerId': 1, 'player': 'Alice'}
+<- {'type': 'waiting', 'reason': 'warte auf Gegner'}
+<- {'type': 'gameStart', 'players': [...]}      <== kam ungefragt
+
+Wie beim letzten Mal gehst du in zwei Runden vor. Zuerst bringst du eine geprüfte Fassung zum Laufen, danach baust du sie auf dein eigenes Protokoll um. So weisst du bei jedem Fehler, ob er im Netzcode steckt oder in deiner Anpassung.
+
+netz.py bleibt unverändert. Du änderst nur server.py und client.py.
+Schritt 1Das Problem sehen
+
+Bevor du etwas änderst, schau dir an, woran dein jetziger Server scheitert. Dafür brauchst du drei Terminalfenster: eines für den Server, zwei für Clients.
+
+Dein bisheriger Client beendet sich sofort nach der Antwort. Damit hältst du keine Verbindung offen. Lege deshalb eine Datei client_halten.py an, die verbunden bleibt, bis du Enter drückst:
+
+import socket, sys, threading
+from netz import sende, leser
+NAME = sys.argv[1]
+s = socket.create_connection(("127.0.0.1", 5000))
+threading.Thread(target=lambda: [print("<-", n, flush=True) for n in leser(s)], daemon=True).start()
+sende(s, {"type": "join", "player": NAME}); print("->", NAME, flush=True)
+for z in sys.stdin: pass
+
+Vor der Ausführung schriftlich
+
+Du startest deinen alten Server. Dann verbindest du Alice und lässt sie verbunden. Dann startest du Bob. Was sieht Bob? Und was steht im Server-Terminal? Leg dich fest, bevor du es ausprobierst.
+
+Terminal 1:  $ python3 server.py
+Terminal 2:  $ python3 client_halten.py Alice     (offen lassen)
+Terminal 3:  $ python3 client_halten.py Bob
+
+Das kommt heraus:
+
+--- Bob ---
+-> Bob
+          (sonst nichts, auch nach Minuten nicht)
+
+--- Server ---
+Server wartet auf Port 5000
+verbunden: ('127.0.0.1', 35522)
+  <- {'type': 'join', 'player': 'Alice'}
+  -> {'type': 'welcome', 'playerId': 1, 'player': 'Alice'}
+
+Bob hat seine Nachricht abgeschickt und bekommt nichts zurück. Und im Server-Terminal steht nicht einmal, dass Bob sich verbunden hat.
+
+Das ist kein Absturz und kein Fehler im Netz. Dein Server steht in der Zeile for nachricht in leser(sock) und wartet auf die nächste Nachricht von Alice. Erst wenn Alice die Verbindung schliesst, kommt er zurück zu accept() und bemerkt Bob. Das Betriebssystem hat Bobs Verbindung angenommen und in eine Warteschlange gelegt, dein Programm holt sie nur nicht ab.
+Ein Server, der auf einen Client wartet, ist für alle anderen nicht da.
+Schritt 2Der neue Server
+
+Drei Dinge ändern sich. Lies die drei Absätze, bevor du den Code abtippst, dann erkennst du beim Tippen, was wozu gehört.
+
+Ein Thread pro Verbindung. Der Hauptfaden tut nur noch annehmen und weiterreichen. Jede Verbindung bekommt einen eigenen Faden, der in leser warten darf, ohne alle anderen zu blockieren. Das ist Übung 6 aus dem Übungsheft, angewandt auf dein Spiel.
+
+Ein Verzeichnis der Verbundenen. Bisher kannte der Server nur den einen Socket, mit dem er gerade sprach. Jetzt braucht er eine Liste aller Spieler, sonst kann er niemandem etwas schicken, der gerade nicht gefragt hat. Die Funktion an_alle geht diese Liste durch.
+
+Eine Sperre um dieses Verzeichnis. Mehrere Fäden greifen jetzt auf dieselben Daten zu, und damit ist der geteilte Zustand aus Block 1 zurück. Warum genau, steht gleich nach dem Code.
+
+"""server.py: ein Thread pro Verbindung, der Server meldet sich von sich aus."""
+import socket
+import threading
+
+from netz import sende, leser
+
+HOST, PORT = "0.0.0.0", 5000
+MAX_SPIELER = 2
+
+sperre = threading.Lock()      # schuetzt clients und zaehler
+clients = {}                   # spieler_id -> {"sock": ..., "name": ...}
+zaehler = {"naechste_id": 1}
+
+
+def an_alle(nachricht):
+    """Schickt eine Nachricht an alle Verbundenen.
+    Der Aufrufer haelt bereits die Sperre."""
+    for eintrag in list(clients.values()):
+        try:
+            sende(eintrag["sock"], nachricht)
+        except OSError:
+            pass
+
+
+def behandeln(nachricht, verbindung, sock):
+    """Entscheidet anhand von type, was zu tun ist, und verschickt selbst."""
+    typ = nachricht.get("type")
+
+    if typ == "join":
+        with sperre:                                    # kritischer Abschnitt
+            if verbindung["spieler_id"] is not None:
+                sende(sock, {"type": "rejected", "reason": "bereits beigetreten"})
+                return
+            if len(clients) >= MAX_SPIELER:
+                sende(sock, {"type": "rejected", "reason": "Spiel ist voll"})
+                return
+            name = nachricht.get("player")
+            if not isinstance(name, str) or not name.strip():
+                sende(sock, {"type": "rejected", "reason": "Name fehlt"})
+                return
+
+            spieler_id = zaehler["naechste_id"]
+            zaehler["naechste_id"] += 1
+            verbindung["spieler_id"] = spieler_id
+            clients[spieler_id] = {"sock": sock, "name": name}
+
+            sende(sock, {"type": "welcome", "playerId": spieler_id, "player": name})
+
+            if len(clients) < MAX_SPIELER:
+                sende(sock, {"type": "waiting", "reason": "warte auf Gegner"})
+            else:
+                an_alle({"type": "gameStart",
+                         "players": [{"playerId": i, "player": c["name"]}
+                                     for i, c in sorted(clients.items())]})
+        return
+
+    if typ == "kaputt":
+        sende(sock, {"type": "rejected", "reason": "kein gueltiges JSON"})
+        return
+
+    sende(sock, {"type": "rejected", "reason": f"unbekannter Typ: {typ}"})
+
+
+def bedienen(sock, adresse):
+    """Laeuft in einem eigenen Thread, einer pro Verbindung."""
+    verbindung = {"spieler_id": None}
+    try:
+        for nachricht in leser(sock):
+            print("  <-", adresse, nachricht, flush=True)
+            behandeln(nachricht, verbindung, sock)
+    finally:
+        with sperre:
+            spieler_id = verbindung["spieler_id"]
+            weg = clients.pop(spieler_id, None)
+            if weg is not None:
+                an_alle({"type": "opponentLeft",
+                         "playerId": spieler_id, "player": weg["name"]})
+        sock.close()
+        print("getrennt:", adresse, flush=True)
+
+
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as horcher:
+        horcher.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        horcher.bind((HOST, PORT))
+        horcher.listen()
+        print("Server wartet auf Port", PORT, flush=True)
+        while True:
+            sock, adresse = horcher.accept()
+            print("verbunden:", adresse, flush=True)
+            threading.Thread(target=bedienen, args=(sock, adresse),
+                             daemon=True).start()
+
+
+if __name__ == "__main__":
+    main()
+
+Was an diesem Code wichtig ist
+
+behandeln gibt nichts mehr zurück. Beim letzten Mal lieferte die Funktion eine Antwort, und main hat sie verschickt. Das geht nicht mehr, denn ein einziges join löst jetzt bis zu drei Sendungen aus, an zwei verschiedene Empfänger. Deshalb verschickt behandeln selbst.
+
+verbindung gehört zu einem Faden, clients und zaehler gehören allen. Das ist der entscheidende Unterschied. Jeder Faden hat sein eigenes verbindung, da kann nichts kollidieren. Die beiden anderen liegen für alle Fäden im selben Speicher, und nur die brauchen die Sperre.
+
+an_alle fängt OSError ab. Wenn ein Client zwischendurch verschwunden ist, soll das Senden an ihn nicht die Zustellung an die anderen verhindern.
+
+list(clients.values()) statt direkt über das Dictionary zu laufen. Die Kopie schadet nicht und erspart dir einen Fehler, sobald später jemand während des Sendens aus der Liste fällt.
+
+Das finally in bedienen läuft, egal wie die Verbindung endet. Fenster geschlossen, Kabel gezogen, Absturz im eigenen Code. Der Eintrag verschwindet aus clients, und der verbliebene Spieler erfährt es. Ohne diesen Block sammeln sich tote Verbindungen, und dein Gegner wartet auf jemanden, der nie wiederkommt.
+
+daemon=True sorgt dafür, dass diese Fäden das Programm nicht am Beenden hindern. Ohne das läuft dein Server nach Strg-C weiter.
+Warum die Sperre da sein muss
+
+Ohne with sperre läuft alles, solange sich niemand im selben Moment verbindet. Dann aber passiert Folgendes. Zwei Clients schicken gleichzeitig ihr join, zwei Fäden laufen los:
+
+Faden A                              Faden B
+len(clients) >= 2 ?  nein (1)
+                                     len(clients) >= 2 ?  nein (1)
+clients[2] = ...
+                                     clients[3] = ...
+
+Beide haben geprüft, bevor einer geschrieben hat. Beide sahen einen freien Platz, beide tragen sich ein, und in deinem Zwei-Spieler-Spiel sitzen drei Leute. Es gibt keine Fehlermeldung, nichts stürzt ab.
+
+Das ist genau der Wettlauf aus Übung 7, nur mit deinem Spielerverzeichnis statt mit einem Spielfeld. Und daraus folgt dieselbe Regel wie dort:
+Prüfen und Handeln gehören in denselben geschützten Abschnitt. Nicht nur das Handeln.
+
+Deshalb beginnt with sperre vor der Prüfung und endet erst nach dem Senden. Würde die Sperre erst um clients[spieler_id] = ... gelegt, wäre nichts gewonnen.
+Schritt 3Der neue Client
+
+Dein bisheriger Client macht zwei Dinge nacheinander: senden, dann genau eine Antwort abholen. Danach ist er fertig. Beides passt nicht mehr. Er weiss nicht, wie viele Nachrichten kommen, und er muss auch dann empfangen können, wenn er selbst nichts tut.
+
+Also bekommt er einen zweiten Faden. Einer empfängt im Hintergrund, der Hauptfaden wartet auf deine Tastatur. Das ist genau die Form aus Kapitel 3.3 des Skripts.
+
+"""client.py: empfaengt in einem eigenen Thread, auch ungefragte Nachrichten."""
+import socket
+import sys
+import threading
+
+from netz import sende, leser
+
+HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
+NAME = sys.argv[2] if len(sys.argv) > 2 else "Alice"
+PORT = 5000
+
+
+def empfangen(sock):
+    """Laeuft im Hintergrund und zeigt alles, was hereinkommt."""
+    for nachricht in leser(sock):
+        print("<-", nachricht, flush=True)
+    print("Verbindung beendet", flush=True)
+
+
+with socket.create_connection((HOST, PORT)) as sock:
+    threading.Thread(target=empfangen, args=(sock,), daemon=True).start()
+
+    beitritt = {"type": "join", "player": NAME}
+    sende(sock, beitritt)
+    print("->", beitritt, flush=True)
+
+    print("Enter q zum Beenden.", flush=True)
+    for zeile in sys.stdin:
+        if zeile.strip() == "q":
+            break
+
+Der Empfangsthread läuft dauerhaft. Er zeigt alles, was hereinkommt, in der Reihenfolge, in der es kommt. Ob es eine Antwort auf deine Frage war oder eine Meldung des Servers, sieht er nicht und muss er nicht sehen.
+
+Die Schleife for zeile in sys.stdin hält den Hauptfaden am Leben und damit die Verbindung offen. Ohne sie wäre das Programm sofort zu Ende. Später tippst du hier deine Züge ein.
+
+Zwei Argumente beim Start, Adresse und Name. So kannst du zwei Clients mit verschiedenen Namen starten, ohne die Datei zu ändern.
+Die Falle, die fast alle erwischt
+
+Wenn du den Empfangsthread einbaust, aber den Hauptfaden enden lässt, siehst du gar nichts mehr. Der Client sendet, der Server antwortet korrekt, und auf dem Bildschirm steht nur die gesendete Zeile.
+
+Der Grund: Das with endet, der Socket wird geschlossen, und der Empfangsthread ist ein Daemon und wird mit dem Programm beendet. Die Antwort war unterwegs, hatte aber keine Zeit mehr. Zehn Durchläufe eines solchen Clients zeigen zehnmal nichts, nicht etwa manchmal etwas.
+
+Das sieht aus wie ein kaputter Server und ist ein zu schneller Client. Wenn bei dir eine Antwort fehlt: Prüf zuerst das Server-Terminal. Steht dort ein ->, dann war der Server in Ordnung.
+Schritt 4Die vier Fälle
+
+Jetzt prüfst du vier Situationen. Alle vier gehören zur Abgabe, und jede deckt etwas anderes auf.
+Vor der Ausführung schriftlich
+
+Schreib für jeden der vier Fälle hin, was in welchem Terminal erscheinen muss. Besonders bei Fall 2: In welchen Fenstern steht etwas Neues?
+Fall 1: Der erste Spieler wartet
+
+$ python3 client.py 127.0.0.1 Alice
+-> {'type': 'join', 'player': 'Alice'}
+Enter q zum Beenden.
+<- {'type': 'welcome', 'playerId': 1, 'player': 'Alice'}
+<- {'type': 'waiting', 'reason': 'warte auf Gegner'}
+
+Lass dieses Fenster offen.
+Fall 2: Der zweite Spieler startet das Spiel
+
+$ python3 client.py 127.0.0.1 Bob
+-> {'type': 'join', 'player': 'Bob'}
+Enter q zum Beenden.
+<- {'type': 'welcome', 'playerId': 2, 'player': 'Bob'}
+<- {'type': 'gameStart', 'players': [{'playerId': 1, 'player': 'Alice'},
+                                     {'playerId': 2, 'player': 'Bob'}]}
+
+Und jetzt schau in Alices Fenster. Dort ist eine Zeile dazugekommen, obwohl Alice nichts getan hat:
+
+<- {'type': 'gameStart', 'players': [{'playerId': 1, 'player': 'Alice'},
+                                     {'playerId': 2, 'player': 'Bob'}]}
+
+Das ist der Punkt des ganzen Abends. Wenn diese Zeile bei Alice steht, funktioniert dein Server als Spielserver.
+Fall 3: Der dritte wird abgewiesen
+
+$ python3 client.py 127.0.0.1 Carol
+-> {'type': 'join', 'player': 'Carol'}
+Enter q zum Beenden.
+<- {'type': 'rejected', 'reason': 'Spiel ist voll'}
+
+Fall 4: Einer geht
+
+Schliess Bobs Fenster oder tippe dort q. In Alices Fenster erscheint:
+
+<- {'type': 'opponentLeft', 'playerId': 2, 'player': 'Bob'}
+
+Probier beides aus, q und das harte Schliessen des Fensters. Beide müssen dasselbe auslösen, denn genau dafür ist das finally da.
+Weiter, wenn
+
+    Alle vier Fälle laufen wie oben.
+    Bei Fall 2 ist die neue Zeile in beiden Fenstern erschienen.
+    Bei Fall 4 läuft der Server danach weiter und nimmt einen neuen Spieler an.
+    Du kannst erklären, warum with sperre vor der Prüfung beginnt und nicht erst beim Eintragen.
+
+Schritt 5Auf dein eigenes Protokoll umbauen
+
+Erst jetzt ersetzt du die Namen durch die aus deinem Protokoll. Ändere eine Sache, teste, dann die nächste.
+Was	Wo
+Typnamen für Beitritt und Willkommen	wie im letzten Meilenstein, in client.py und in behandeln
+Die drei neuen Nachrichten	In behandeln und bedienen. Bei dir heissen sie vielleicht anders als waiting, gameStart und opponentLeft.
+Spielerzahl	MAX_SPIELER. Zwei bei den meisten Spielen.
+Was in gameStart steht	Mindestens, wer mitspielt. Wenn dein Spiel Symbole, Farben oder Reihenfolge vergibt, gehört das hier hinein. Es kommt vom Server, nicht vom Client.
+Protokolldatei	Die drei neuen Nachrichten eintragen, mit Richtung und Beispiel. Sie sind die ersten in deinem Protokoll, die der Server ungefragt schickt. Vermerk das.
+Zur Protokolldatei
+
+Bisher hatte jede Nachricht eine Anfrage und eine Antwort. Diese drei haben keine Anfrage. Wenn dein Protokoll die Nachrichten als request und response paarweise beschreibt, passt diese Form nicht mehr. Schreib ab jetzt pro Nachricht eine Zeile mit Richtung und Anlass, dann kannst du auch Nachrichten beschreiben, die von selbst kommen.
+Weiter, wenn
+
+    Client und Server verwenden deine Nachrichten.
+    Die vier Fälle aus Schritt 4 laufen auch mit deinem Format.
+    Die Protokolldatei enthält die drei neuen Nachrichten und stimmt mit dem Code überein.
+
+Schritt 6Über zwei Rechner
+
+Jetzt zum ersten Mal richtig verteilt: dein Server läuft bei dir, und die beiden Spieler sitzen an zwei anderen Rechnern.
+
+    Finde deine IP-Adresse: ipconfig unter Windows, ip addr unter Linux, ifconfig unter macOS. Du suchst die Adresse im Schulnetz, nicht 127.0.0.1.
+    Starte deinen Server.
+    Zwei Leute aus der Klasse starten deinen Client mit deiner Adresse: python3 client.py 192.168.1.42 Alice
+    Prüf, dass beide das Spielstart-Signal bekommen haben, und dass im Server-Terminal zwei verschiedene fremde Adressen stehen.
+
+Unter Windows fragt die Firewall beim ersten Start nach. Erlaube den Zugriff für private Netzwerke.
+Schritt 7Nachweis
+
+Du gibst ab:
+
+    die Ausgabe deines Server-Terminals aus Schritt 6, auf der zwei verschiedene fremde Adressen zu sehen sind,
+    die Ausgaben beider Client-Terminals, auf denen das Spielstart-Signal steht,
+    die Ausgabe zu Fall 3 und zu Fall 4,
+    netz.py, server.py, client.py,
+    deine aktualisierte Protokolldatei.
+
+HilfeWenn es nicht geht
+Was du siehst	Ursache
+Der Client zeigt nur die gesendete Zeile, nie eine Antwort	Dein Hauptfaden endet zu schnell. Siehe die Falle in Schritt 3. Prüf zuerst, ob im Server-Terminal ein -> steht.
+Alice bekommt kein Spielstart-Signal, Bob schon	Du sendest an sock statt über an_alle. sock ist immer nur die Verbindung, von der die Nachricht kam.
+Der Server hängt vollständig, auch neue Verbindungen	Eine Sperre wurde nicht freigegeben. Prüf, dass du überall with sperre verwendest und nirgends sperre.acquire() ohne release. Und dass an_alle die Sperre nicht selbst nochmals anfordert.
+RuntimeError: dictionary changed size during iteration	Du läufst direkt über clients.values(). Nimm list(...) wie im Code oben.
+Der zweite Client bekommt gar nichts	Du hast noch die alte Accept-Schleife ohne Thread. Vergleich mit main oben.
+Nach Strg-C läuft der Server weiter	daemon=True fehlt beim Thread.
+KeyError im finally	Ein Client hat die Verbindung geschlossen, bevor er beigetreten ist. Deshalb clients.pop(spieler_id, None) mit zweitem Argument statt del.
+Address already in use	Ein alter Server läuft noch. Fenster schliessen oder Strg-C.
+AusblickWas noch fehlt
+
+Dein Server hält jetzt beide Spieler gleichzeitig, kennt sie beim Namen und kann von sich aus zu allen sprechen. Damit sind alle Bauteile da, die ein Spiel braucht, ausser dem Spiel selbst.
+
+Als Nächstes kommt der erste Zug. Der Server nimmt eine Zugnachricht an, prüft sie gegen die Regeln, ändert den Spielstand und schickt den neuen Stand an beide. Dafür brauchst du deinen Spielkern, also die Klasse, die deine Regeln kennt und von Sockets nichts weiss.
+
+Und dann liegt der Spielstand im selben Speicher wie heute das Spielerverzeichnis, mit zwei Fäden darauf. Die Sperre, die du heute um ein Dictionary gelegt hast, kommt dann um dein Spielbrett.
+HFTM · Projekt «Verteiltes Spiel» · Meilenstein: Zwei Spieler, ein Tisch
+Alle Programme und Ausgaben geprüft unter Python 3.12

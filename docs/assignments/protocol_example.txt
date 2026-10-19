@@ -1,0 +1,41 @@
+	
+protocol	"DistributedGame"
+version	"1.0"
+messages	
+join	
+description	"Ein Spieler tritt dem Spiel bei"
+request	
+player	"Alice"
+response	
+status	"ok"
+playerId	1
+move	
+description	"Ein Spieler macht einen Zug"
+request	
+playerId	1
+from	"a2"
+to	"a4"
+response	
+status	"ok"
+move	
+from	"a2"
+to	"a4"
+getState	
+description	"Aktuellen Spielzustand abfragen"
+request	{}
+response	
+status	"ok"
+currentPlayer	2
+board	{}
+leave	
+description	"Ein Spieler verlässt das Spiel"
+request	
+playerId	1
+response	
+status	"ok"
+error	
+description	"Fehler bei einer Anfrage"
+response	
+status	"error"
+code	"INVALID_MOVE"
+message	"Der Zug ist nicht erlaubt"

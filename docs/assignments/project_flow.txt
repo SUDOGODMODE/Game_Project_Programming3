@@ -1,0 +1,788 @@
+
+HFTM · Block 2 · Netzwerkprogrammierung
+Projektablauf
+
+Neun Meilensteine von der leeren Datei bis zum Spiel, das auf vier Rechnern gleichzeitig läuft. Mit geprüftem Beispielcode und den Fallen, die fast alle erwischen.
+Sozialform	Einzelarbeit
+Voraussetzung	Python 1 und 2, Block 1 über Threads
+Werkzeuge	Python 3.12 oder neuer, ein Editor, Git. Standardbibliothek genügt
+Beispiel	Drei gewinnt, vollständig ausprogrammiert und getestet
+Abgabe	lauffähiges Programm, Protokollspezifikation, Kurzdokumentation, Demo
+
+Sie bauen ein Spiel, das auf mehreren Rechnern gleichzeitig läuft. Das ist kein Programmierprojekt mit einem Netzwerkanteil, sondern ein Netzwerkprojekt mit einem Spiel als Anlass. Der Unterschied wird an genau einer Stelle sichtbar: bei der Frage, wer entscheiden darf, was passiert.
+
+Der Ablauf ist so gebaut, dass Sie in jedem Meilenstein etwas fertig haben, das für sich funktioniert. Wer die Reihenfolge tauscht — typischerweise, weil die Oberfläche verlockender aussieht als der Spielkern — baut später zweimal.
+Kapitel 1Die vier Schichten
+
+Ihr Programm besteht am Schluss aus vier Teilen, die einander in genau einer Richtung kennen. Diese Trennung ist nicht Kosmetik; sie ist der Grund, warum Sie den Spielkern testen können, ohne einen Server zu starten, und warum Sie die Oberfläche austauschen können, ohne das Protokoll anzufassen.
+Schicht	Weiss nichts von	Datei
+Spielkern – Regeln, Zustand, Zugprüfung	Netz, Sockets, Oberfläche	spiel.py
+Protokoll – welche Nachrichten es gibt	wie sie übertragen werden	PROTOKOLL.md
+Transport – Sockets, Threads, Zeilen	Spielregeln	netz.py, server.py
+Oberfläche – Anzeige und Knöpfe	Spielregeln	client_gui.py
+
+Lesen Sie die mittlere Spalte zweimal. Dass der Spielkern nichts vom Netz weiss, ist die Bedingung dafür, dass Sie ihn mit gewöhnlichen Testfunktionen prüfen können. Dass die Oberfläche die Spielregeln nicht kennt, ist die Bedingung dafür, dass ein manipulierter Client nichts kaputtmachen kann.
+1.1 Die Regel, die alles andere nach sich zieht
+Der Server ist die Wahrheit. Der Client zeigt an und schickt Wünsche.
+
+Ein Client schickt nie «ich habe auf Feld 4 gesetzt». Er schickt «ich möchte auf Feld 4 setzen». Der Server prüft, entscheidet, ändert den Zustand und teilt allen mit, wie er jetzt aussieht. Der Client zeichnet, was er bekommt — er rechnet den Zustand nie selbst weiter.
+
+Daraus folgen drei Dinge, die im ganzen Projekt gelten:
+
+    Der Client prüft nie eine Regel, ausser um Knöpfe auszugrauen. Der Server prüft immer nochmals.
+    Zufall gehört auf den Server. Würfel, gemischte Karten, ausgeloste Wörter.
+    Verborgene Information verlässt den Server nicht. Nicht ausgegraut, nicht versteckt, sondern gar nicht gesendet.
+
+Der Fehler, der am teuersten ist
+
+Man baut zuerst den Client fertig, weil man dort etwas sieht, und legt die Spiellogik dorthin. Der Server wird zur Weiterleitungsstelle, die Nachrichten durchreicht. Das funktioniert, solange beide Clients ehrlich sind und niemand die Verbindung verliert. Danach ist es nicht mehr reparierbar, sondern nur noch neu zu schreiben. Der Ablauf unten geht deshalb bewusst vom Kern nach aussen.
+Kapitel 2Meilensteine im Überblick
+ 	Meilenstein	Abgabe am Ende
+M0	Werkzeuge und erstes Netz	Echo über zwei Rechner, Repository steht
+M1	Spielvorschlag	Regelblatt, freigegeben
+M2	Spielkern ohne Netz	Klasse mit Tests, am Tisch spielbar
+M3	Das Protokoll	PROTOKOLL.md, von einer fremden Person gelesen	3
+M4	Der Server	zwei Konsolenclients spielen eine Partie
+M5	Client und Robustheit	Server überlebt den bösen Client
+M6	Die Oberfläche	grafischer Client mit Bildern
+M7	Härtung und Fremdtest	Partie über das Schulnetz, Testprotokoll
+M8	Abgabe und Demo	Vorführung, Dokumentation, Reflexion
+Wenn die Zeit knapp wird
+
+Gekürzt wird bei M6 und bei den Spielregeln, nie bei M2, M3 und M5. Eine schlichte Oberfläche mit einem korrekten, angriffsfesten Server ist eine gute Arbeit. Eine schöne Oberfläche auf einem Server, der beim ersten unerwarteten Zeichen abstürzt, ist keine.
+2.1 Sie arbeiten allein — drei Folgerungen
+
+Das Projekt ist Einzelarbeit. Sie schreiben Spielkern, Protokoll, Server und Oberfläche selbst. Daraus folgen drei Dinge, die Sie von Anfang an einplanen sollten.
+ 	Folgerung
+Umfang	Nehmen Sie ein Spiel für zwei Spieler. Drei oder mehr bedeuten drei Terminalfenster bei jedem einzelnen Test.
+Testen	Einen zweiten und dritten Spieler von Hand zu bedienen, wiederholen Sie bei jedem Durchlauf. Ein Skript nicht. Schreiben Sie sich in M4 einen Testspieler, der eine Zugliste abarbeitet.
+Gegenlesen	Zwei Stellen brauchen fremde Augen: das Regelblatt (M1) und die Protokolldatei (M3, M7). Verabreden Sie sich dafür fest mit einer anderen Person aus der Klasse — jede baut ihr eigenes Spiel, aber Sie lesen einander gegen.
+Meilenstein M0Werkzeuge und erstes Netz
+
+Ziel ist, dass zwei Rechner im Schulzimmer miteinander gesprochen haben. Ohne Spiel, ohne Protokoll, ohne Oberfläche. Nur ein Programm, das etwas schickt, und eines, das gross zurückschreibt, was es bekommen hat.
+Aufgaben
+
+    Repository anlegen, erster Commit.
+    Virtuelle Umgebung einrichten, Python-Version prüfen.
+    Echo-Server und Echo-Client abtippen, lokal ausprobieren.
+    Dasselbe über zwei Rechner: Sie starten den Server, eine Mitstudentin oder ein Mitstudent verbindet sich über Ihre IP-Adresse. Danach umgekehrt.
+    Feste Lesepartnerschaft für M1, M3 und M7 verabreden und im README festhalten.
+
+$ python3 -m venv .venv
+$ source .venv/bin/activate        # Windows: .venv\Scripts\activate
+$ python3 --version
+Python 3.14.7
+
+Die Ordnerstruktur für das ganze Projekt legen Sie gleich mit an. Sie ändert sich bis zum Schluss nicht mehr:
+
+spiel/
+├─ spiel.py              # Spielkern, kein Netz
+├─ netz.py               # Senden und Lesen von Nachrichten
+├─ server.py             # Spielserver
+├─ client_konsole.py     # Client fuer das Terminal
+├─ client_gui.py         # Client mit Oberflaeche
+├─ test_spiel.py         # Tests fuer den Kern
+├─ bilder/               # Texturen
+├─ PROTOKOLL.md          # Nachrichtenkatalog
+└─ README.md             # Start, Bedienung, Rollen
+
+Der Echo-Server
+
+import socket
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as horcher:
+    horcher.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    horcher.bind(("0.0.0.0", 5000))
+    horcher.listen()
+    print("warte auf Port 5000 ...")
+    sock, adresse = horcher.accept()
+    with sock:
+        print("verbunden mit", adresse)
+        while True:
+            daten = sock.recv(1024)
+            if not daten:
+                break
+            print("empfangen:", daten)
+            sock.sendall(daten.upper())
+    print("Gegenseite hat geschlossen")
+
+AF_INET ist die Adressfamilie, also IPv4. SOCK_STREAM ist TCP: eine Verbindung, die Bytes in der richtigen Reihenfolge und vollständig überträgt.
+
+SO_REUSEADDR erlaubt, den Port sofort wieder zu belegen. Ohne diese Zeile bekommen Sie beim schnellen Neustart minutenlang Address already in use. Sie werden diese Zeile lieben lernen.
+
+bind(("0.0.0.0", 5000)) horcht auf allen Netzwerkkarten. Mit "127.0.0.1" wäre der Server nur vom eigenen Rechner erreichbar — das ist der häufigste Grund dafür, dass der Mitspieler nicht durchkommt.
+
+accept() wartet, bis sich jemand verbindet, und liefert einen zweiten Socket für genau diese Verbindung. Der erste horcht weiter.
+
+recv(1024) liefert bis zu 1024 Bytes. Ein leeres Ergebnis heisst nicht «nichts da», sondern «die Gegenseite hat geschlossen».
+Der Echo-Client
+
+import socket
+
+with socket.create_connection(("127.0.0.1", 5000)) as sock:
+    sock.sendall("hallo netz\n".encode("utf-8"))
+    antwort = sock.recv(1024)
+    print("Antwort:", antwort.decode("utf-8").strip())
+
+$ python3 echo_client.py
+Antwort: HALLO NETZ
+
+Für den Versuch über zwei Rechner ersetzen Sie 127.0.0.1 durch die IP-Adresse des Server-Rechners. Diese finden Sie mit ipconfig unter Windows und ip addr unter Linux und macOS. Beide Rechner müssen im selben Netz sein, und die Windows-Firewall fragt beim ersten Mal nach — erlauben Sie den Zugriff für private Netzwerke.
+Fertig, wenn
+
+    Das Repository existiert, die Ordnerstruktur steht.
+    Echo funktioniert lokal.
+    Echo funktioniert einmal über zwei Rechner, IP-Adresse notiert.
+    Die Lesepartnerschaft steht im README.
+
+Meilenstein M1Spielvorschlag und Regelblatt
+
+Diesen Meilenstein führt der Spielekatalog. Sie wählen ein Spiel, füllen das Formular in Kapitel 7 des Katalogs aus und geben es ab. Nach der Freigabe schreiben Sie daraus das Regelblatt: dieselben Inhalte, aber vollständig und so präzise, dass jemand ohne Ihre Erklärung danach programmieren könnte.
+
+Ein Satz zur Reihenfolge, weil er erfahrungsgemäss ignoriert wird: Schreiben Sie die Regeln auf, bevor Sie sie programmieren. Nicht weil Dokumentation Selbstzweck wäre, sondern weil beim Aufschreiben die Sonderfälle auffallen. Was passiert bei Gleichstand? Was, wenn ein Spieler nicht ziehen kann? Was, wenn jemand mitten im Spiel geht? Wer diese drei Fragen erst im Code beantwortet, beantwortet sie an drei verschiedenen Stellen verschieden.
+Fertig, wenn
+
+    Der Vorschlag ist freigegeben.
+    Das Regelblatt beschreibt Zustand, alle Zugarten, alle Ungültigkeitsgründe und das Spielende.
+    Die drei Fragen oben sind beantwortet: Gleichstand, Zugunfähigkeit, Abbruch.
+    Ihre Lesepartnerin oder Ihr Lesepartner hat das Blatt gelesen und keine Frage mehr.
+
+Meilenstein M2Der Spielkern, ohne eine Zeile Netz
+
+Jetzt programmieren Sie Ihr Spiel — als gewöhnliche Python-Klasse, die auf einem einzigen Rechner läuft und von Sockets nichts weiss. Am Ende dieses Meilensteins können zwei Personen an einer Tastatur abwechselnd spielen. Das ist kein Zwischenschritt, den man überspringen kann: Alles, was Sie hier nicht prüfen, prüfen Sie später zwischen zwei Rechnern, und dort ist jeder Fehler dreimal so teuer.
+Die Form, die sich bewährt hat
+
+Vier Methoden, immer dieselben. Das Beispiel ist Drei gewinnt; ersetzen Sie den Inhalt durch Ihr Spiel, nicht die Form.
+
+"""Spielkern: kennt kein Netz, keine Sockets, keine GUI."""
+
+LINIEN = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),
+          (1,4,7),(2,5,8),(0,4,8),(2,4,6)]
+
+
+class DreiGewinnt:
+    def __init__(self):
+        self.feld = [" "] * 9
+        self.am_zug = "X"
+        self.gewinner = None
+        self.beendet = False
+
+    def zug_pruefen(self, spieler, index):
+        """Gibt None zurueck, wenn der Zug erlaubt ist, sonst einen Grund."""
+        if self.beendet:
+            return "Das Spiel ist beendet"
+        if spieler != self.am_zug:
+            return "Sie sind nicht am Zug"
+        if type(index) is not int or not 0 <= index <= 8:
+            return "Feld ausserhalb des Bretts"
+        if self.feld[index] != " ":
+            return "Feld ist besetzt"
+        return None
+
+    def zug_ausfuehren(self, spieler, index):
+        grund = self.zug_pruefen(spieler, index)
+        if grund is not None:
+            raise ValueError(grund)
+        self.feld[index] = spieler
+        for a, b, c in LINIEN:
+            if self.feld[a] == self.feld[b] == self.feld[c] != " ":
+                self.gewinner, self.beendet = spieler, True
+                return
+        if " " not in self.feld:
+            self.beendet = True
+            return
+        self.am_zug = "O" if spieler == "X" else "X"
+
+    def zustand(self):
+        return {"feld": list(self.feld), "am_zug": self.am_zug,
+                "beendet": self.beendet, "gewinner": self.gewinner}
+
+zug_pruefen ist von zug_ausfuehren getrennt, weil Sie beides an verschiedenen Stellen brauchen: der Server prüft und führt aus, die Oberfläche will nur wissen, welche Knöpfe sie ausgrauen soll.
+
+Der Grund ist ein Text, kein False. «Feld ist besetzt» kann der Server unverändert an den Client weiterreichen. Ein blosses False hätte man dort nochmals übersetzen müssen.
+
+zustand() liefert eine Kopie – beachten Sie list(self.feld). Sonst reicht der Server eine Referenz auf seine eigenen Daten heraus, und irgendwo ändert jemand daran herum.
+
+Der Spielerwechsel steht am Schluss, nicht am Anfang, und er ist eine Entscheidung, kein Umschalten. Bei Spielen mit Zusatzzug – Punkte und Kästchen – steht hier eine Bedingung.
+Warum type(index) is not int und nicht isinstance
+
+In Python ist bool eine Unterklasse von int. isinstance(True, int) ist wahr, und liste[True] ist dasselbe wie liste[1]. Ein Client, der {"typ": "zug", "feld": true} schickt, setzt damit auf Feld 1 — an einer Prüfung vorbei, die man für wasserdicht hielt. Das ist keine Theorie: Genau dieser Zug wurde beim Testen des Beispielservers angenommen, bis die Prüfung auf type(...) is not int umgestellt war. Ein Zeichen, das im Vorbeigehen übersehen wird, und eine Lücke.
+Tests
+
+Der Kern ist der einzige Teil Ihres Programms, den Sie vollständig testen können, ohne etwas zu starten. Nutzen Sie das. Fünf Tests sind das Minimum; Spiele der Gruppe B brauchen mehr.
+
+import unittest
+from spiel import DreiGewinnt
+
+
+class TestDreiGewinnt(unittest.TestCase):
+    def test_falscher_spieler_wird_abgewiesen(self):
+        s = DreiGewinnt()
+        with self.assertRaises(ValueError):
+            s.zug_ausfuehren("O", 0)
+
+    def test_besetztes_feld_wird_abgewiesen(self):
+        s = DreiGewinnt()
+        s.zug_ausfuehren("X", 4)
+        with self.assertRaises(ValueError):
+            s.zug_ausfuehren("O", 4)
+
+    def test_gewinn_in_der_zeile(self):
+        s = DreiGewinnt()
+        for sp, i in [("X",0),("O",3),("X",1),("O",4),("X",2)]:
+            s.zug_ausfuehren(sp, i)
+        self.assertTrue(s.beendet)
+        self.assertEqual(s.gewinner, "X")
+
+    def test_unentschieden(self):
+        s = DreiGewinnt()
+        for sp, i in [("X",0),("O",1),("X",2),("O",4),("X",3),
+                      ("O",5),("X",7),("O",6),("X",8)]:
+            s.zug_ausfuehren(sp, i)
+        self.assertTrue(s.beendet)
+        self.assertIsNone(s.gewinner)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+$ python3 -m unittest -v test_spiel.py
+test_besetztes_feld_wird_abgewiesen ... ok
+test_falscher_spieler_wird_abgewiesen ... ok
+test_gewinn_in_der_zeile ... ok
+test_startzustand ... ok
+test_unentschieden ... ok
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+OK
+
+Schreiben Sie mindestens einen Test für den Sonderfall, den Sie in Frage 8 des Vorschlags als schwierigsten benannt haben. Beim Wortduell sind das doppelte Buchstaben, bei Reversi das erzwungene Aussetzen, bei Mau-Mau der leere Nachziehstapel.
+Fertig, wenn
+
+    Der Kern enthält kein import socket und kein import tkinter.
+    Mindestens fünf Tests laufen durch, darunter einer für Ihren schwierigsten Sonderfall.
+    Zwei Personen haben an einem Rechner eine vollständige Partie gespielt.
+    Jeder Ungültigkeitsgrund aus dem Regelblatt hat eine Entsprechung im Code.
+
+Meilenstein M3Das Protokoll
+
+Ein Protokoll ist die Vereinbarung darüber, welche Nachrichten es gibt, wie sie aussehen und wer wann welche schickt. Es entsteht auf Papier, nicht im Code. Der Test dafür, ob es taugt, ist simpel: Eine andere Person liest es und kann danach einen Client für Ihr Spiel schreiben, ohne Ihren Code gesehen zu haben.
+3.1 TCP kennt keine Nachrichten
+
+Bevor Sie Nachrichten entwerfen, müssen Sie eine Eigenschaft von TCP kennen, die fast alle unterschätzen. TCP überträgt einen Strom von Bytes. Es gibt keine Grenzen darin. Was Sie in einem sendall abgeschickt haben, kommt nicht zwingend in einem recv an, und zwei Sendungen können in einem einzigen recv zusammen ankommen.
+
+Das folgende Protokoll ist echte Ausgabe, nicht Illustration. Ein Client schickt zuerst zwei vollständige Nachrichten auf einmal, danach eine Nachricht in zwei Hälften:
+
+ein recv() liefert: b'{"typ":"zug","feld":1}\n{"typ":"zug","feld":2}\n'
+ein recv() liefert: b'{"typ":"zug","fe'
+ein recv() liefert: b'ld":3}\n'
+
+Wer json.loads(sock.recv(1024)) schreibt, hat in der ersten Zeile zwei Nachrichten in einem String und in der zweiten eine halbe. Beides führt zu einem Fehler oder, schlimmer, zu still verlorenen Zügen.
+Ein recv ist keine Nachricht. Sie brauchen eine eigene Grenze.
+3.2 Zeilen als Grenze
+
+Die einfachste brauchbare Grenze ist das Zeilenende. Jede Nachricht ist ein JSON-Objekt in einer Zeile, abgeschlossen mit \n. Das Format hat einen Namen, JSON Lines, und ist für genau diesen Zweck verbreitet. Es funktioniert, weil JSON innerhalb eines Objekts keine echten Zeilenumbrüche enthalten darf — in Zeichenketten stehen sie als \n geschrieben, nicht als Byte.
+
+"""Gemeinsame Hilfsfunktionen fuer das Zeilenprotokoll (JSON Lines)."""
+import json
+
+
+def sende(sock, nachricht: dict) -> None:
+    """Verschickt genau eine Nachricht als eine Zeile."""
+    zeile = json.dumps(nachricht, ensure_ascii=False) + "\n"
+    sock.sendall(zeile.encode("utf-8"))
+
+
+def leser(sock):
+    """Liefert eine Nachricht nach der anderen, bis die Gegenseite schliesst."""
+    datei = sock.makefile("r", encoding="utf-8", newline="\n")
+    for zeile in datei:
+        zeile = zeile.strip()
+        if not zeile:
+            continue
+        try:
+            yield json.loads(zeile)
+        except json.JSONDecodeError:
+            yield {"typ": "fehler", "grund": "kein gueltiges JSON"}
+
+sock.makefile("r", ...) legt ein Dateiobjekt über den Socket. Damit übernimmt Python das Zusammensetzen der Bytes zu Zeilen — genau das Problem aus 3.1, gelöst von der Standardbibliothek. Die Schleife for zeile in datei endet, wenn die Gegenseite schliesst.
+
+sendall statt send: send darf einen Teil schicken und melden, wie viel es war. sendall wiederholt, bis alles draussen ist. Nehmen Sie immer sendall.
+
+ensure_ascii=False lässt Umlaute als Umlaute stehen statt als \u00e4. Zusammen mit encode("utf-8") und demselben encoding auf der Leseseite ist das durchgehend sauber.
+
+Ungültiges JSON führt nicht zum Absturz, sondern zu einer Nachricht vom Typ fehler. Der Aufrufer entscheidet, was er damit tut. Diese vier Zeilen sind der Unterschied zwischen einem Server, den man mit einem Tastendruck umwirft, und einem, der es nicht merkt.
+3.3 Der Nachrichtenkatalog
+
+Ihre Datei PROTOKOLL.md enthält eine Tabelle wie diese, mit allen Nachrichten. Jede bekommt eine Richtung, die Pflichtfelder und einen Satz dazu, wann sie auftritt.
+Typ	Richtung	Felder	Wann
+willkommen	S → C	zeichen	direkt nach dem Verbinden
+zustand	S → C	feld, am_zug, beendet, gewinner	nach jeder Zustandsänderung, an alle
+zug	C → S	feld	wenn der Spieler etwas tun will
+abgelehnt	S → C	grund	Zug war ungültig, nur an den Absender
+ende	S → C	gewinner	Spiel vorbei, an alle
+gegner_weg	S → C	zeichen	eine Verbindung ist abgebrochen
+
+Drei Entwurfsregeln, die Sie sich sparen können zu lernen, weil sie hier stehen:
+
+    Jede Nachricht hat ein Feld typ. Der Empfänger entscheidet daran, was er tut, und kann unbekannte Typen höflich ablehnen statt abzustürzen.
+    Der Server schickt den ganzen Zustand, nicht die Änderung. «Feld 4 ist jetzt X» ist kürzer, aber sobald eine Nachricht verloren geht oder ein Client später dazukommt, driften die Anzeigen auseinander. Bei den Zustandsgrössen dieses Projekts ist die Ersparnis bedeutungslos.
+    Bei verborgener Information wird pro Empfänger gebaut. Eine Funktion sicht_fuer(spieler) im Spielkern liefert das, was dieser Spieler sehen darf. Der Server ruft sie für jeden Client einzeln auf.
+
+Fertig, wenn
+
+    PROTOKOLL.md listet alle Nachrichten mit Richtung, Feldern und Anlass.
+    Für jede Nachricht steht ein vollständiges Beispiel als JSON-Zeile darin.
+    Ein Ablaufbeispiel zeigt eine ganze Partie von der Verbindung bis zum Ende.
+    Ihre Lesepartnerin oder Ihr Lesepartner hat es gelesen und sagt, sie oder er könnte danach einen Client bauen.
+    netz.py ist geschrieben und mit zwei Testprogrammen ausprobiert.
+
+Meilenstein M4Der Server
+
+Hier trifft Block 1 auf das Projekt. Ihr Server bedient mehrere Clients gleichzeitig, jeder in einem eigenen Thread, und alle greifen auf denselben Spielzustand zu. Das ist der geteilte Zustand aus Kapitel 3 des Skripts — diesmal nicht als Kontostand im Beispiel, sondern als Ihr Spielbrett.
+Denkpause
+
+Zwei Clients schicken im selben Moment einen Zug. Beide Threads lesen «X ist am Zug», beide finden das Feld frei, beide schreiben. Welcher Endzustand kommt heraus, und welche der drei Möglichkeiten aus Übung 2 des Übungshefts entspricht dem? Beantworten Sie es, bevor Sie weiterlesen.
+Der Aufbau
+
+"""Spielserver: ein Thread pro Client, ein Lock um den Spielzustand."""
+import socket
+import threading
+
+from netz import sende, leser
+from spiel import DreiGewinnt
+
+HOST, PORT = "0.0.0.0", 5000
+
+spiel = DreiGewinnt()
+sperre = threading.Lock()          # schuetzt spiel und clients
+clients = {}                       # zeichen -> socket
+
+
+def an_alle(nachricht):
+    """Aufrufer haelt bereits die Sperre."""
+    for sock in list(clients.values()):
+        try:
+            sende(sock, nachricht)
+        except OSError:
+            pass
+
+
+def zustand_senden():
+    an_alle({"typ": "zustand", **spiel.zustand()})
+
+
+def client_bedienen(sock, zeichen):
+    try:
+        sende(sock, {"typ": "willkommen", "zeichen": zeichen})
+        for nachricht in leser(sock):
+            if nachricht.get("typ") != "zug":
+                sende(sock, {"typ": "abgelehnt", "grund": "unbekannter Typ"})
+                continue
+            with sperre:                       # kritischer Abschnitt
+                if len(clients) < 2:
+                    sende(sock, {"typ": "abgelehnt", "grund": "Gegner fehlt"})
+                    continue
+                try:
+                    spiel.zug_ausfuehren(zeichen, nachricht.get("feld"))
+                except ValueError as fehler:
+                    sende(sock, {"typ": "abgelehnt", "grund": str(fehler)})
+                    continue
+                zustand_senden()
+                if spiel.beendet:
+                    an_alle({"typ": "ende", "gewinner": spiel.gewinner})
+    finally:
+        with sperre:
+            clients.pop(zeichen, None)
+            an_alle({"typ": "gegner_weg", "zeichen": zeichen})
+        sock.close()
+
+
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as horcher:
+        horcher.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        horcher.bind((HOST, PORT))
+        horcher.listen()
+        print(f"Server laeuft auf Port {PORT}")
+        for zeichen in ("X", "O"):
+            sock, adresse = horcher.accept()
+            print("verbunden:", adresse, "als", zeichen)
+            with sperre:
+                clients[zeichen] = sock
+            threading.Thread(target=client_bedienen, args=(sock, zeichen),
+                             daemon=True).start()
+        with sperre:                       # beide sind da, Startzustand verteilen
+            zustand_senden()
+        threading.Event().wait()
+
+
+if __name__ == "__main__":
+    main()
+
+Was an diesem Code wichtig ist
+
+Der kritische Abschnitt umfasst Prüfen, Ausführen und Senden. Nicht nur das Ausführen. Gäbe die Sperre nach zug_ausfuehren frei und erst danach sähe das Senden, könnten zwei Zustände in falscher Reihenfolge bei den Clients ankommen. Das ist die Antwort auf Übung 6 aus Block 1, angewandt.
+
+Der Kern prüft, nicht der Server. zug_ausfuehren wirft eine ValueError mit einem lesbaren Grund, den der Server unverändert weiterreicht. Der Server enthält keine einzige Spielregel — suchen Sie im Listing nach dem Wort «Linie», es kommt nicht vor.
+
+nachricht.get("feld") statt nachricht["feld"]. Fehlt das Feld, kommt None, und die Prüfung im Kern weist es ab. Mit den eckigen Klammern hätte eine unvollständige Nachricht den Thread beendet.
+
+Das finally ist nicht optional. Egal wie der Client verschwindet – Fenster geschlossen, Kabel gezogen, Absturz – der Eintrag wird entfernt und die Gegenseite erfährt es. Ohne diesen Block bleiben tote Sockets in der Tabelle und der andere Spieler wartet ewig.
+
+daemon=True sorgt dafür, dass diese Threads das Programm nicht am Beenden hindern. threading.Event().wait() hält den Hauptthread schlafend am Leben, ohne Prozessorzeit zu verbrauchen.
+Ein Sendevorgang unter der Sperre
+
+Im Listing wird gesendet, während die Sperre gehalten wird. Das ist für ein Spiel dieser Grösse richtig, weil die Reihenfolge der Zustandsnachrichten sonst nicht garantiert ist. Es hat aber einen Preis: Ein Client, der nichts abholt, kann den Sendepuffer füllen, und dann blockiert der Server für alle. In grossen Systemen bekommt jeder Client deshalb eine eigene Warteschlange und einen eigenen Sendethread. Für Ihr Projekt ist das nicht nötig — aber wenn Sie im Bericht erklären können, warum es das in einem grossen System wäre, haben Sie mehr verstanden als der Code zeigt.
+Testen mit Skripten statt mit Fingern
+
+Ab drei Clients wird das Testen von Hand mühsam. Schreiben Sie sich früh einen Testspieler, der eine Liste von Zügen abarbeitet und alles ausgibt, was er empfängt. Zwei Terminals, zwei Aufrufe, reproduzierbar:
+
+$ python3 testspieler.py X 0 1 2 &
+$ python3 testspieler.py O 3 4
+
+Fertig, wenn
+
+    Zwei Konsolenclients spielen eine vollständige Partie bis zum Ende.
+    Ein Zug des falschen Spielers wird abgelehnt, mit Begründung, nur an den Absender.
+    Alle Spielregeln stehen im Kern, keine im Server.
+    Schliesst ein Client sein Fenster, erfährt es der andere und der Server läuft weiter.
+    Der kritische Abschnitt ist im Code als Kommentar markiert und von Ihnen begründbar.
+
+Meilenstein M5Konsolenclient und Robustheit
+
+Der Konsolenclient ist nicht der Vorentwurf der Oberfläche, sondern Ihr Werkzeug für den Rest des Projekts. Wenn später etwas nicht geht, ist die erste Frage immer: Geht es in der Konsole? Damit trennen Sie Netzfehler von Anzeigefehlern in zehn Sekunden.
+
+Der Aufbau ist derselbe wie beim Server, nur umgekehrt: ein Thread liest, was hereinkommt, der Hauptthread wartet auf Tastatureingaben.
+
+import socket
+import threading
+import sys
+
+from netz import sende, leser
+
+HOST, PORT = "127.0.0.1", 5000
+
+
+def empfangen(sock):
+    for n in leser(sock):
+        typ = n.get("typ")
+        if typ == "willkommen":
+            print("Sie spielen", n["zeichen"])
+        elif typ == "zustand":
+            print(n["feld"], "| am Zug:", n["am_zug"])
+        elif typ == "abgelehnt":
+            print("abgelehnt:", n["grund"])
+        elif typ == "ende":
+            print("Ende. Gewinner:", n["gewinner"] or "unentschieden")
+    print("Verbindung beendet")
+
+
+def main():
+    with socket.create_connection((HOST, PORT)) as sock:
+        threading.Thread(target=empfangen, args=(sock,), daemon=True).start()
+        for zeile in sys.stdin:
+            zeile = zeile.strip()
+            if zeile == "q":
+                break
+            if zeile:
+                sende(sock, {"typ": "zug", "feld": int(zeile)})
+
+
+if __name__ == "__main__":
+    main()
+
+Der böse Client
+
+Jetzt kommt die Übung, die diesen Meilenstein trägt. Schreiben Sie einen Client, der sich nicht an Ihr Protokoll hält, und lassen Sie ihn auf Ihren eigenen Server los. Nicht um ihn zu ärgern, sondern weil ein Server, der nur mit dem eigenen Client funktioniert, kein Server ist.
+
+Diese sieben Angriffe sind Pflicht. Der Server muss jeden überstehen und danach weiterlaufen:
+#	Was geschickt wird	Erwartete Reaktion
+1	kein json	abgelehnt, Server läuft weiter
+2	{"typ":"zug","feld":"abc"}	abgelehnt, falscher Typ
+3	{"typ":"zug","feld":99}	abgelehnt, ausserhalb
+4	{"typ":"zug"}	abgelehnt, Feld fehlt
+5	{"typ":"unsinn"}	abgelehnt, unbekannter Typ
+6	ein Zug, wenn der andere dran ist	abgelehnt, nicht am Zug
+7	Verbindung mitten im Zug trennen	Gegner wird benachrichtigt, Server läuft
+
+So sieht ein bestandener Durchlauf aus — echte Ausgabe des Beispielservers:
+
+$ python3 boeser_client.py
+boese <- {'typ': 'abgelehnt', 'grund': 'unbekannter Typ'}          # 1
+boese <- {'typ': 'abgelehnt', 'grund': 'Feld ausserhalb des Bretts'} # 2
+boese <- {'typ': 'abgelehnt', 'grund': 'Feld ausserhalb des Bretts'} # 3
+boese <- {'typ': 'abgelehnt', 'grund': 'Feld ausserhalb des Bretts'} # 4
+boese <- {'typ': 'abgelehnt', 'grund': 'unbekannter Typ'}          # 5
+
+=== Server laeuft noch? === JA
+
+Halten Sie das Ergebnis in einer Tabelle im Repository fest, mit Datum. Diese Tabelle ist Teil der Abgabe.
+Vertrauen ist keine Sicherheitsmassnahme
+
+Der böse Client ist kein akademisches Spiel. In dem Moment, in dem Ihr Server auf einem Port horcht, kann sich jedes Programm damit verbinden — auch telnet, auch ein von Hand getipptes JSON. Jede Prüfung, die Sie in den Client statt in den Server gelegt haben, existiert dann nicht.
+Fertig, wenn
+
+    Der Konsolenclient spielt eine vollständige Partie.
+    Alle sieben Angriffe sind durchgeführt, das Ergebnis ist tabellarisch festgehalten.
+    Der Server hat keinen davon mit einem Absturz beantwortet.
+    Kein Angriff hat den Spielzustand verändert, ausser er war regelkonform.
+
+Meilenstein M6Die Oberfläche
+
+GUI-Programmierung hatten Sie nicht. Sie brauchen davon auch nur einen kleinen Teil, und den bekommen Sie hier. Wir nehmen tkinter, weil es Teil der Standardbibliothek ist: nichts zu installieren, auf allen drei Betriebssystemen gleich, und PNG-Bilder kann es seit Tk 8.6 direkt laden.
+6.1 Die eine Regel, die Sie einhalten müssen
+
+Eine grafische Oberfläche läuft in einer Schleife, die auf Ereignisse wartet: Mausklick, Tastendruck, Fenster verschoben. Diese Schleife heisst mainloop() und gehört einem Thread — dem Hauptthread. Ihr Netzthread darf sie nicht anfassen.
+Nichts aus einem fremden Thread an der Oberfläche ändern. Nie.
+
+Ein Aufruf wie label.config(...) aus dem Netzthread führt zu Fehlern, die sich nicht reproduzieren lassen — genau die Klasse von Fehlern aus Block 1, Kapitel 3. Manchmal läuft es tagelang gut, dann friert das Fenster ein oder das Programm verschwindet ohne Meldung.
+
+Die Lösung ist ein Briefkasten. Der Netzthread legt Nachrichten in eine queue.Queue und fasst sonst nichts an. Die Oberfläche schaut zehnmal pro Sekunde nach, ob etwas darin liegt. Queue ist für genau diesen Zweck gebaut und braucht keine eigene Sperre.
+
+"""Grafischer Client. Der Netzthread schreibt nur in eine Queue,
+gezeichnet wird ausschliesslich im Tk-Thread."""
+import queue
+import socket
+import threading
+import tkinter as tk
+
+from netz import sende, leser
+
+HOST, PORT = "127.0.0.1", 5000
+
+
+class Fenster:
+    def __init__(self, sock):
+        self.sock = sock
+        self.posteingang = queue.Queue()
+        self.zeichen = None
+
+        self.wurzel = tk.Tk()
+        self.wurzel.title("Drei gewinnt")
+        self.knoepfe = []
+        raster = tk.Frame(self.wurzel)
+        raster.pack(padx=10, pady=10)
+        for i in range(9):
+            b = tk.Button(raster, text=" ", width=4, height=2,
+                          font=("Helvetica", 24),
+                          command=lambda i=i: self.zug_senden(i))
+            b.grid(row=i // 3, column=i % 3)
+            self.knoepfe.append(b)
+        self.zeile = tk.Label(self.wurzel, text="verbinde ...")
+        self.zeile.pack(pady=(0, 8))
+
+        threading.Thread(target=self.empfangen, daemon=True).start()
+        self.wurzel.after(100, self.posteingang_leeren)
+
+    # --- Netzthread ---------------------------------------------------
+    def empfangen(self):
+        for nachricht in leser(self.sock):
+            self.posteingang.put(nachricht)
+        self.posteingang.put({"typ": "verbindung_weg"})
+
+    # --- Tk-Thread ----------------------------------------------------
+    def posteingang_leeren(self):
+        while True:
+            try:
+                n = self.posteingang.get_nowait()
+            except queue.Empty:
+                break
+            self.verarbeiten(n)
+        self.wurzel.after(100, self.posteingang_leeren)
+
+    def verarbeiten(self, n):
+        typ = n.get("typ")
+        if typ == "willkommen":
+            self.zeichen = n["zeichen"]
+            self.zeile.config(text=f"Sie spielen {self.zeichen}")
+        elif typ == "zustand":
+            for b, wert in zip(self.knoepfe, n["feld"]):
+                b.config(text=wert)
+            dran = n["am_zug"] == self.zeichen
+            self.zeile.config(text="Sie sind am Zug" if dran
+                              else "Gegner ist am Zug")
+        elif typ == "abgelehnt":
+            self.zeile.config(text="abgelehnt: " + n["grund"])
+        elif typ == "ende":
+            self.zeile.config(text="Gewinner: " + (n["gewinner"] or "unentschieden"))
+        elif typ == "verbindung_weg":
+            self.zeile.config(text="Verbindung verloren")
+
+    def zug_senden(self, index):
+        try:
+            sende(self.sock, {"typ": "zug", "feld": index})
+        except OSError:
+            self.zeile.config(text="Senden fehlgeschlagen")
+
+
+def main():
+    sock = socket.create_connection((HOST, PORT))
+    Fenster(sock).wurzel.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+
+after(100, funktion) lässt Tk die Funktion in 100 Millisekunden aufrufen — einmal. Dass sie sich am Ende selbst wieder anmeldet, macht daraus eine Schleife, die die Oberfläche nicht blockiert.
+
+get_nowait() wirft queue.Empty, statt zu warten. Deshalb die Schleife mit break: Sie leert den Briefkasten vollständig und kehrt sofort zurück.
+
+lambda i=i: ... mit dem Standardwert ist nötig. Ohne i=i merken sich alle neun Knöpfe dieselbe Variable, und alle senden Feld 8. Das ist die klassische Schleifenfalle, und in Oberflächen fällt sie besonders oft auf.
+
+Die Oberfläche kennt keine einzige Spielregel. Sie zeigt an, was der Server schickt, und schickt Wünsche zurück. Mehr nicht.
+6.2 Bilder und Texturen
+
+Tk lädt PNG direkt, ohne Zusatzpaket:
+
+bild = tk.PhotoImage(file="bilder/kreuz.png")
+klein = bild.subsample(2, 2)          # halbiert die Kantenlaenge
+knopf.config(image=klein, text="")
+knopf.bild = klein                    # Referenz festhalten!
+
+Zwei Fallen mit Bildern
+
+Erstens: Wenn Sie das PhotoImage-Objekt nirgends festhalten, räumt Pythons Speicherverwaltung es weg — und der Knopf wird leer, ohne Fehlermeldung. Deshalb die letzte Zeile: Das Bild wird als Attribut am Widget abgelegt und lebt damit so lange wie dieses.
+
+Zweitens: subsample und zoom rechnen nur mit ganzen Faktoren. Aus 64 Pixeln werden 32 oder 21, nicht 40. Erzeugen Sie Ihre Bilder deshalb gleich in der Grösse, die Sie brauchen, oder in einem ganzzahligen Vielfachen davon. Für beliebige Skalierung bräuchten Sie Pillow — ein Zusatzpaket, das Sie für dieses Projekt nicht brauchen sollten.
+
+Für Bildmaterial dürfen und sollen Sie generative Werkzeuge verwenden. Verlangen Sie explizit PNG mit transparentem Hintergrund und eine feste Kantenlänge in Zweierpotenzen, also 64, 128 oder 256 Pixel. Legen Sie alles in bilder/ ab und notieren Sie in README.md, womit es erzeugt wurde. Die Regeln dazu stehen im Kapitel KI im Projekt.
+6.3 Wenn Sie mehr wollen als Knöpfe
+
+Ein Raster aus Knöpfen reicht für Drei gewinnt, Vier gewinnt, Kartenspiele und Quiz. Für freies Zeichnen — Linien bei Punkte und Kästchen, Figuren auf einem Raster — nehmen Sie tk.Canvas: Sie zeichnen mit create_line, create_image, create_rectangle und rechnen im Mausereignis die Pixelkoordinaten in Spielfeldkoordinaten um.
+
+Wer eine echte Spielegrafik will, kann stattdessen pygame-ce verwenden. Das kostet eine Installation und eine andere Struktur — dort gibt es keine after-Methode, sondern eine eigene Hauptschleife, in der Sie den Briefkasten pro Bild einmal leeren. Das Muster bleibt dasselbe: Netzthread schreibt in die Queue, Zeichenschleife liest sie. Nehmen Sie es nur, wenn M6 sonst planmässig fertig wäre.
+Fertig, wenn
+
+    Zwei grafische Clients spielen eine vollständige Partie gegeneinander.
+    Kein tk-Aufruf steht im Netzthread — nachgewiesen, nicht vermutet.
+    Die Oberfläche zeigt, wer am Zug ist, und meldet abgelehnte Züge sichtbar.
+    Bricht die Verbindung ab, erscheint eine Meldung statt eines eingefrorenen Fensters.
+    Mindestens ein selbst erzeugtes Bild ist eingebunden, Herkunft dokumentiert.
+
+Meilenstein M7Härtung und Fremdtest
+
+Bis hierhin lief alles auf einem Rechner oder auf zweien, die nebeneinander stehen. Jetzt gehen Sie ins Schulnetz und lassen andere auf Ihr Programm los.
+Aufgaben
+
+    Echte Verteilung. Server auf einem Rechner, alle Clients auf anderen. Die Server-Adresse wird beim Start abgefragt oder als Argument übergeben — sie steht nicht mehr fest im Code.
+    Wartezimmer. Wer sich verbindet, bevor alle da sind, bekommt eine Meldung und wartet. Ihr Server hört jetzt dauerhaft zu, statt nach zwei Verbindungen aufzuhören.
+    Abbruch behandeln. Was passiert, wenn mitten in der Partie jemand geht? Entscheiden Sie eine Regel — Partie beenden, warten, oder durch einen einfachen Automaten ersetzen — und setzen Sie sie um.
+    Mitschreiben. Jede ein- und ausgehende Nachricht mit Zeitstempel in eine Datei. Dies ist Ihr wichtigstes Werkzeug für alles, was jetzt noch schiefgeht.
+    Fremdtest. Ihre Lesepartnerin oder Ihr Lesepartner bekommt Ihre PROTOKOLL.md und Ihre Server-Adresse — und sonst nichts. Sie oder er versucht, mit einem eigenen einfachen Client eine Partie zu spielen. Danach umgekehrt.
+
+Der Fremdtest ist die eigentliche Prüfung
+
+Alles bis M6 haben Sie mit Ihrem eigenen Client getestet, der zufällig genau das schickt, was Ihr Server erwartet. Ob Ihr Protokoll wirklich beschreibt, was Ihr Server tut, zeigt sich erst, wenn jemand nur das Dokument gelesen hat. Jede Abweichung, die dabei auffindet, gehört in den Bericht — sie ist ein Ergebnis, kein Makel.
+Netzwerk im Schulzimmer
+Problem	Ursache und Abhilfe
+Verbindung wird abgelehnt	Server nicht gestartet, falscher Port, oder der Server hört auf 127.0.0.1 statt 0.0.0.0.
+Zeitüberschreitung	Firewall. Unter Windows beim ersten Start für private Netze freigeben. Oder die Rechner sind in getrennten Netzen — WLAN-Gastnetz gegen Kabelnetz.
+Address already in use	Alter Prozess läuft noch, oder SO_REUSEADDR fehlt.
+Es geht lokal, aber nicht über das Netz	Fast immer die Adresse im Client oder die Bindeadresse im Server. Prüfen Sie zuerst mit dem Echo-Programm aus M0.
+Fertig, wenn
+
+    Eine vollständige Partie läuft über mindestens drei verschiedene Rechner.
+    Die Server-Adresse ist konfigurierbar, nicht fest im Code.
+    Ein Verbindungsabbruch mitten im Spiel ist behandelt und dokumentiert.
+    Ein Mitschnitt einer ganzen Partie liegt als Datei vor.
+    Der Fremdtest ist durchgeführt, in beide Richtungen, mit schriftlichem Ergebnis.
+
+Meilenstein M8Abgabe und Vorführung
+Was abgegeben wird
+Teil	Inhalt
+Programm	Alle Dateien im Repository, lauffähig mit der Standardbibliothek. Zusätzliche Pakete nur, wenn sie in README.md mit Installationsbefehl stehen.
+README.md	Wie startet man Server und Client, welche Zusatzpakete, Herkunft der Bilder.
+PROTOKOLL.md	Der Nachrichtenkatalog, aktuell, mit Ablaufbeispiel.
+Bericht	Architektur, Protokollentwurf mit Begründung, Umgang mit dem geteilten Zustand, Testprotokoll böser Client, Ergebnis des Fremdtests, KI-Erklärung, Reflexion.
+Vorführung	Live-Partie über mindestens zwei Rechner, danach Fragen zum Code.
+Die Vorführung
+
+In der Vorführung machen Sie drei Dinge, die man nicht übergehen kann:
+
+    Eine vollständige Partie mit allen vorgesehenen Spielern.
+    Ein ungültiger Zug — und die Ablehnung, sichtbar auf dem Bildschirm.
+    Ein Client wird hart geschlossen. Die anderen laufen weiter.
+
+Die Fragen gehen quer durch das Programm, auch in Teile, die Sie länger nicht angefasst haben. Da Sie alles selbst geschrieben haben, gibt es hier keine Ausrede — und genau deshalb ist die Regel im nächsten Kapitel so streng formuliert.
+RegelnKI im Projekt
+
+Sie dürfen KI-Werkzeuge verwenden. Es wäre unehrlich, so zu tun, als würden Sie es sonst nicht. Die Regeln sind deshalb nicht als Verbot formuliert, sondern als Grenze zwischen dem, was Sie beim Auslagern lernen, und dem, was Sie dabei verlieren.
+Uneingeschränkt	Mit Erklärungspflicht	Selbst
+Bilder, Texturen, Symbole, Hintergründe. Farbwahl und Anordnung der Oberfläche. Rechtschreibung. Fehlermeldungen deuten. 	Aufbau der Oberfläche, wiederkehrender Gerüstcode, einzelne Hilfsfunktionen, Testfälle. Sie müssen jede Zeile erklären können. 	Spielkern und Regeln. Der Nachrichtenkatalog. Die Entscheidung, wo die Sperre liegt. Alles im Bericht.
+
+Die mittlere Spalte ist die entscheidende, und die Regel dazu ist einfach: Was Sie nicht erklären können, geben Sie nicht ab. In der Vorführung wird auf eine beliebige Stelle gezeigt und gefragt, warum sie so aussieht. «Das kam so heraus» zählt als nicht bestanden, unabhängig davon, ob der Code funktioniert.
+
+Der Grund für die rechte Spalte ist kein moralischer. Der Spielkern und das Protokoll sind die beiden Stellen, an denen dieses Modul unterrichtet wird. Wer sie auslagert, hat ein funktionierendes Spiel und nichts gelernt — und merkt es in dem Moment, in dem der Fremdtest eine Abweichung findet und niemand weiss, welche Seite recht hat.
+KI-Erklärung im Bericht
+
+Ehrlich: welche Werkzeuge, wofür eingesetzt, was Sie übernommen und was Sie geändert haben. Nennen Sie eine Stelle, an der ein Vorschlag falsch war und Sie es gemerkt haben — diese Stelle ist im Gespräch mehr wert als ein fehlerfreies Projekt ohne sie.
+RegelnBewertung
+Bereich	Worauf geachtet wird	Punkte
+Architektur	Vier Schichten sauber getrennt. Keine Spielregel im Server, keine im Client. Kern ohne Netzabhängigkeit.	20
+Protokoll	Vollständig, eindeutig, mit Beispielen. Fremdtest bestanden. Abweichungen dokumentiert.	20
+Nebenläufigkeit	Geteilter Zustand geschützt, kritischer Abschnitt richtig bemessen und begründbar. Keine Oberflächenzugriffe aus fremden Threads.	20
+Robustheit	Alle sieben Angriffe überstanden. Verbindungsabbruch behandelt. Testprotokoll vorhanden.	15
+Spiel und Oberfläche	Regeln vollständig, Spiel bedienbar, Zustand erkennbar, Ablehnungen sichtbar.	15
+Bericht und Vorführung	Entscheidungen begründet, jede Person auskunftsfähig, KI-Erklärung vorhanden.	10
+
+Fünfundfünfzig der hundert Punkte liegen in Architektur, Protokoll und Nebenläufigkeit. Das ist Absicht und entspricht dem, worum es im Modul geht. Ein schlichtes Spiel mit sauberer Struktur schneidet hier besser ab als ein reiches Spiel mit vermischten Schichten.
+Anhang AReferenzen
+
+Alle Verweise wurden geprüft. Die Beispiele in diesem Dokument sind unter Python 3.12 ausgeführt worden; alle laufen unverändert auch unter neueren Versionen.
+Grundlage
+Socket Programming HOWTO — die beste Einführung, kurz und ohne Umwege. Erklärt insbesondere, warum ein recv keine Nachricht ist.
+docs.python.org/3/howto/sockets.html
+socket — Referenz — nachschlagen für create_connection, makefile, setsockopt, sendall.
+docs.python.org/3/library/socket.html
+threading — Thread, Lock, Event. Bekannt aus Block 1.
+docs.python.org/3/library/threading.html
+queue — der Briefkasten zwischen Netzthread und Oberfläche. Bereits threadsicher.
+docs.python.org/3/library/queue.html
+json — dumps, loads, JSONDecodeError.
+docs.python.org/3/library/json.html
+JSON Lines — das Zeilenformat, das wir als Rahmen verwenden. Kurz und vollständig.
+jsonlines.org
+Oberfläche
+tkinter — Referenz — Widgets, after, PhotoImage.
+docs.python.org/3/library/tkinter.html
+TkDocs Tutorial — ausführlicher und besser bebildert als die Referenz, mit Beispielen für Raster und Canvas.
+tkdocs.com/tutorial/
+pygame-ce — nur, wenn Sie vor der Zeit fertig sind. Installation mit pip install pygame-ce, aktuell 2.5.8.
+pyga.me/docs/
+Werkzeuge
+venv — virtuelle Umgebungen.
+docs.python.org/3/library/venv.html
+unittest — Tests ohne Zusatzpaket, genügt für dieses Projekt vollständig.
+docs.python.org/3/library/unittest.html
+Wenn Sie weitergehen wollen
+selectors — viele Verbindungen in einem einzigen Thread bedienen, ohne Threads und ohne Sperren. Der andere Weg zum selben Ziel.
+docs.python.org/3/library/selectors.html
+asyncio Streams — derselbe Gedanke mit async und await. Interessant, aber für dieses Projekt bewusst nicht verwendet: Threads machen den geteilten Zustand sichtbar, um den es hier geht.
+docs.python.org/3/library/asyncio-stream.html
+socketserver — ein Gerüst, das Ihnen die Accept-Schleife und das Threading abnimmt. Erst ansehen, wenn Sie es einmal von Hand gebaut haben.
+docs.python.org/3/library/socketserver.html
+Anhang BBefehle und Vorlagen
+Immer wiederkehrende Befehle
+
+python3 -m venv .venv                 # Umgebung anlegen
+source .venv/bin/activate             # aktivieren (Linux, macOS)
+.venv\Scripts\activate                # aktivieren (Windows)
+python3 -m unittest -v test_spiel.py  # Tests laufen lassen
+python3 server.py                     # Server starten
+python3 client_konsole.py             # Client starten
+ip addr      /  ipconfig              # eigene IP-Adresse finden
+
+Testprotokoll böser Client
+
+Diese Tabelle gehört ausgefüllt ins Repository, mit Datum und Namen.
+#	Angriff	Erwartet	Beobachtet	i.O.
+1	kein JSON	abgelehnt, Server läuft	 	 
+2	falscher Typ im Feld	abgelehnt	 	 
+3	Wert ausserhalb	abgelehnt	 	 
+4	Pflichtfeld fehlt	abgelehnt	 	 
+5	unbekannter Typ	abgelehnt	 	 
+6	Zug ausser der Reihe	abgelehnt	 	 
+7	Abbruch mitten im Zug	Gegner informiert	 	 
+Journal
+
+Nach jeder Arbeitseinheit, im Repository, unter journal.md. Was gemacht, was offen, was hängt. Rettet später die Vorführung.

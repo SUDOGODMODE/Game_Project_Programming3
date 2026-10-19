@@ -1,0 +1,65 @@
+$ python3 src/test_board.py
+  ok  test_parse_cell
+  ok  test_ship_cells_horizontal_and_vertical
+  ok  test_validate_placement_accepts_valid_fleet
+  ok  test_validate_placement_rejects_overlap
+  ok  test_validate_placement_rejects_wrong_ship_count
+  ok  test_validate_placement_rejects_out_of_bounds
+  ok  test_validate_placement_rejects_garbage_input
+  ok  test_apply_shot_hit_miss_sunk
+  ok  test_all_sunk_false_until_every_ship_is_down
+alle Tests bestanden (9)
+
+$ python3 src/test_game.py
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.001s
+
+OK
+
+$ python3 src/test_network.py
+test_actual_attack_script_matches_direct_replies_despite_waiting_event (__main__.NetworkTests.test_actual_attack_script_matches_direct_replies_despite_waiting_event) ... ok
+test_complete_game_preserves_validation_turns_results_and_game_over (__main__.NetworkTests.test_complete_game_preserves_validation_turns_results_and_game_over) ... ok
+test_departure_after_finished_game_clears_winner_for_replacement (__main__.NetworkTests.test_departure_after_finished_game_clears_winner_for_replacement) ... ok
+test_disconnect_before_join_does_not_notify_or_claim_a_slot (__main__.NetworkTests.test_disconnect_before_join_does_not_notify_or_claim_a_slot) ... ok
+test_disconnect_racing_a_shot_notifies_once_and_leaves_fresh_waiting_state (__main__.NetworkTests.test_disconnect_racing_a_shot_notifies_once_and_leaves_fresh_waiting_state) ... ok
+test_duplicate_join_does_not_rename_or_restart_game (__main__.NetworkTests.test_duplicate_join_does_not_rename_or_restart_game) ... ok
+test_duplicate_shot_keeps_the_turn_and_prior_result (__main__.NetworkTests.test_duplicate_shot_keeps_the_turn_and_prior_result) ... ok
+test_eof_from_slot_a_keeps_b_and_reuses_first_free_slot_a (__main__.NetworkTests.test_eof_from_slot_a_keeps_b_and_reuses_first_free_slot_a) ... ok
+test_explicit_leave_notifies_once_resets_boards_and_reuses_slot_b (__main__.NetworkTests.test_explicit_leave_notifies_once_resets_boards_and_reuses_slot_b) ... ok
+test_first_join_receives_waiting_without_starting_game (__main__.NetworkTests.test_first_join_receives_waiting_without_starting_game) ... ok
+test_invalid_json_does_not_disconnect_a_joined_player (__main__.NetworkTests.test_invalid_json_does_not_disconnect_a_joined_player) ... ok
+test_killing_real_client_notifies_survivor_and_server_accepts_replacement (__main__.NetworkTests.test_killing_real_client_notifies_survivor_and_server_accepts_replacement) ... ok
+test_last_player_departure_allows_new_first_player_to_wait (__main__.NetworkTests.test_last_player_departure_allows_new_first_player_to_wait) ... ok
+test_malformed_and_unjoined_requests_keep_connection_usable (__main__.NetworkTests.test_malformed_and_unjoined_requests_keep_connection_usable) ... ok
+test_missing_shot_field_is_rejected_and_valid_shot_still_works (__main__.NetworkTests.test_missing_shot_field_is_rejected_and_valid_shot_still_works) ... ok
+test_out_of_bounds_shots_do_not_advance_turn_or_broadcast_state (__main__.NetworkTests.test_out_of_bounds_shots_do_not_advance_turn_or_broadcast_state) ... ok
+test_out_of_turn_shot_does_not_damage_ships_or_notify_opponent (__main__.NetworkTests.test_out_of_turn_shot_does_not_damage_ships_or_notify_opponent) ... ok
+test_play_and_attack_scripts_can_be_imported_without_connecting_or_reading_stdin (__main__.NetworkTests.test_play_and_attack_scripts_can_be_imported_without_connecting_or_reading_stdin) ... ok
+test_real_client_listens_while_idle_and_q_notifies_survivor_once (__main__.NetworkTests.test_real_client_listens_while_idle_and_q_notifies_survivor_once) ... ok
+test_real_play_waits_places_on_start_and_replaces_fleet_after_disconnect (__main__.NetworkTests.test_real_play_waits_places_on_start_and_replaces_fleet_after_disconnect) ... ok
+test_second_join_sends_unsolicited_start_to_both_players (__main__.NetworkTests.test_second_join_sends_unsolicited_start_to_both_players) ... ok
+test_simultaneous_joins_admit_exactly_two_distinct_slots (__main__.NetworkTests.test_simultaneous_joins_admit_exactly_two_distinct_slots) ... ok
+test_state_exposes_own_fleet_and_shots_without_opponents_fleet (__main__.NetworkTests.test_state_exposes_own_fleet_and_shots_without_opponents_fleet) ... ok
+test_third_player_is_rejected_without_changing_the_two_player_game (__main__.NetworkTests.test_third_player_is_rejected_without_changing_the_two_player_game) ... ok
+test_unrecognized_type_does_not_change_an_active_game (__main__.NetworkTests.test_unrecognized_type_does_not_change_an_active_game) ... ok
+test_wrong_type_shot_field_is_rejected_without_changing_game (__main__.NetworkTests.test_wrong_type_shot_field_is_rejected_without_changing_game) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 3.591s
+
+OK
+
+$ python3 src/test_transport.py
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.056s
+
+OK
+
+$ python3 src/test_tools.py
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.196s
+
+OK
