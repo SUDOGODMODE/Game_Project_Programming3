@@ -1,0 +1,187 @@
+test_assertion_failure_returns_failure_and_keeps_reason (tests.meilenstein_04.test_runner.RunnerTests.test_assertion_failure_returns_failure_and_keeps_reason) ... FAIL
+test_class_skip_does_not_invent_executed_test_records (tests.meilenstein_04.test_runner.RunnerTests.test_class_skip_does_not_invent_executed_test_records) ... FAIL
+test_existing_report_is_refused_before_running_suite (tests.meilenstein_04.test_runner.RunnerTests.test_existing_report_is_refused_before_running_suite) ... FAIL
+test_normal_mode_reports_skip_but_strict_mode_rejects_it (tests.meilenstein_04.test_runner.RunnerTests.test_normal_mode_reports_skip_but_strict_mode_rejects_it) ... FAIL
+test_strict_mode_accepts_executed_marked_test (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_accepts_executed_marked_test) ... FAIL
+test_strict_mode_rejects_suite_with_no_gui_tests (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_suite_with_no_gui_tests) ... FAIL
+test_subtest_and_class_error_are_failures_without_fake_test_totals (tests.meilenstein_04.test_runner.RunnerTests.test_subtest_and_class_error_are_failures_without_fake_test_totals) ... FAIL
+test_success_report_identifies_real_test_and_environment (tests.meilenstein_04.test_runner.RunnerTests.test_success_report_identifies_real_test_and_environment) ... FAIL
+test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread (tests.meilenstein_06.test_image.ImageTests.test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread) ... FAIL
+test_actual_handler_logs_each_received_and_sent_message_through_abort (tests.meilenstein_07.test_event_log.EventLogTests.test_actual_handler_logs_each_received_and_sent_message_through_abort) ... FAIL
+test_existing_file_cannot_be_truncated_or_appended (tests.meilenstein_07.test_event_log.EventLogTests.test_existing_file_cannot_be_truncated_or_appended) ... FAIL
+test_metadata_is_immediately_persistent_and_excludes_client_secrets (tests.meilenstein_07.test_event_log.EventLogTests.test_metadata_is_immediately_persistent_and_excludes_client_secrets) ... FAIL
+test_parallel_messages_form_complete_independent_lines (tests.meilenstein_07.test_event_log.EventLogTests.test_parallel_messages_form_complete_independent_lines) ... FAIL
+test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest (tests.meilenstein_08.test_packaging.PackagingTests.test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest) ... FAIL
+test_existing_archive_is_preserved_byte_for_byte (tests.meilenstein_08.test_packaging.PackagingTests.test_existing_archive_is_preserved_byte_for_byte) ... FAIL
+
+======================================================================
+FAIL: test_assertion_failure_returns_failure_and_keeps_reason (tests.meilenstein_04.test_runner.RunnerTests.test_assertion_failure_returns_failure_and_keeps_reason)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 44, in test_assertion_failure_returns_failure_and_keeps_reason
+    code, report = self.run_controlled(Failing)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 14, in run_controlled
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_class_skip_does_not_invent_executed_test_records (tests.meilenstein_04.test_runner.RunnerTests.test_class_skip_does_not_invent_executed_test_records)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 91, in test_class_skip_does_not_invent_executed_test_records
+    code, report = self.run_controlled(MissingDisplay, strict=True)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 14, in run_controlled
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_existing_report_is_refused_before_running_suite (tests.meilenstein_04.test_runner.RunnerTests.test_existing_report_is_refused_before_running_suite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 123, in test_existing_report_is_refused_before_running_suite
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_normal_mode_reports_skip_but_strict_mode_rejects_it (tests.meilenstein_04.test_runner.RunnerTests.test_normal_mode_reports_skip_but_strict_mode_rejects_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 56, in test_normal_mode_reports_skip_but_strict_mode_rejects_it
+    code, report = self.run_controlled(SkippedGui)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 14, in run_controlled
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_strict_mode_accepts_executed_marked_test (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_accepts_executed_marked_test)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 69, in test_strict_mode_accepts_executed_marked_test
+    code, report = self.run_controlled(AvailableGui, strict=True)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 14, in run_controlled
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_strict_mode_rejects_suite_with_no_gui_tests (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_suite_with_no_gui_tests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 79, in test_strict_mode_rejects_suite_with_no_gui_tests
+    code, report = self.run_controlled(ConsoleOnly, strict=True)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 14, in run_controlled
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_subtest_and_class_error_are_failures_without_fake_test_totals (tests.meilenstein_04.test_runner.RunnerTests.test_subtest_and_class_error_are_failures_without_fake_test_totals)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 104, in test_subtest_and_class_error_are_failures_without_fake_test_totals
+    code, report = self.run_controlled(BadSubtest)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 14, in run_controlled
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_success_report_identifies_real_test_and_environment (tests.meilenstein_04.test_runner.RunnerTests.test_success_report_identifies_real_test_and_environment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 26, in test_success_report_identifies_real_test_and_environment
+    code, report = self.run_controlled(Passing)
+                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 14, in run_controlled
+    self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Shared strict/report runner is missing
+
+======================================================================
+FAIL: test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread (tests.meilenstein_06.test_image.ImageTests.test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_06/test_image.py", line 40, in test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread
+    self.assertIsInstance(getattr(window, 'ship_image', None), tk.PhotoImage, 'Actual own PNG image is missing')
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None is not an instance of <class 'tkinter.PhotoImage'> : Actual own PNG image is missing
+
+======================================================================
+FAIL: test_actual_handler_logs_each_received_and_sent_message_through_abort (tests.meilenstein_07.test_event_log.EventLogTests.test_actual_handler_logs_each_received_and_sent_message_through_abort)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_07/test_event_log.py", line 76, in test_actual_handler_logs_each_received_and_sent_message_through_abort
+    self.assertIn('log_file', __import__('inspect').signature(server.new_game).parameters, 'new_game must own a persistent log')
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'log_file' not found in mappingproxy(OrderedDict()) : new_game must own a persistent log
+
+======================================================================
+FAIL: test_existing_file_cannot_be_truncated_or_appended (tests.meilenstein_07.test_event_log.EventLogTests.test_existing_file_cannot_be_truncated_or_appended)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_07/test_event_log.py", line 72, in test_existing_file_cannot_be_truncated_or_appended
+    with self.assertRaises(FileExistsError): self.event_log(path)
+                                             ~~~~~~~~~~~~~~^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_07/test_event_log.py", line 20, in event_log
+    self.assertIsNotNone(spec, 'Persistent EventLog is missing')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Persistent EventLog is missing
+
+======================================================================
+FAIL: test_metadata_is_immediately_persistent_and_excludes_client_secrets (tests.meilenstein_07.test_event_log.EventLogTests.test_metadata_is_immediately_persistent_and_excludes_client_secrets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_07/test_event_log.py", line 37, in test_metadata_is_immediately_persistent_and_excludes_client_secrets
+    log = self.event_log(path)
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_07/test_event_log.py", line 20, in event_log
+    self.assertIsNotNone(spec, 'Persistent EventLog is missing')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Persistent EventLog is missing
+
+======================================================================
+FAIL: test_parallel_messages_form_complete_independent_lines (tests.meilenstein_07.test_event_log.EventLogTests.test_parallel_messages_form_complete_independent_lines)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_07/test_event_log.py", line 53, in test_parallel_messages_form_complete_independent_lines
+    log = self.event_log(path)
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_07/test_event_log.py", line 20, in event_log
+    self.assertIsNotNone(spec, 'Persistent EventLog is missing')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Persistent EventLog is missing
+
+======================================================================
+FAIL: test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest (tests.meilenstein_08.test_packaging.PackagingTests.test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_08/test_packaging.py", line 38, in test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest
+    build = self.builder()
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_08/test_packaging.py", line 13, in builder
+    self.assertIsNotNone(importlib.util.find_spec('tools.build_submission'), 'Submission builder is missing')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Submission builder is missing
+
+======================================================================
+FAIL: test_existing_archive_is_preserved_byte_for_byte (tests.meilenstein_08.test_packaging.PackagingTests.test_existing_archive_is_preserved_byte_for_byte)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_08/test_packaging.py", line 62, in test_existing_archive_is_preserved_byte_for_byte
+    build = self.builder()
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_08/test_packaging.py", line 13, in builder
+    self.assertIsNotNone(importlib.util.find_spec('tools.build_submission'), 'Submission builder is missing')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Submission builder is missing
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.371s
+
+FAILED (failures=15)

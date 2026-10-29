@@ -1,0 +1,1132 @@
+test_server_answers_complete_messages_from_sequential_clients (tests.meilenstein_00.test_echo.TestEchoCLI.test_server_answers_complete_messages_from_sequential_clients) ... ok
+test_all_sunk_false_until_every_ship_is_down (tests.meilenstein_02.test_board.BoardTests.test_all_sunk_false_until_every_ship_is_down) ... ok
+test_apply_shot_hit_miss_sunk (tests.meilenstein_02.test_board.BoardTests.test_apply_shot_hit_miss_sunk) ... ok
+test_parse_cell (tests.meilenstein_02.test_board.BoardTests.test_parse_cell) ... ok
+test_ship_cells_horizontal_and_vertical (tests.meilenstein_02.test_board.BoardTests.test_ship_cells_horizontal_and_vertical) ... ok
+test_validate_placement_accepts_valid_fleet (tests.meilenstein_02.test_board.BoardTests.test_validate_placement_accepts_valid_fleet) ... ok
+test_validate_placement_rejects_garbage_input (tests.meilenstein_02.test_board.BoardTests.test_validate_placement_rejects_garbage_input) ... ok
+test_validate_placement_rejects_out_of_bounds (tests.meilenstein_02.test_board.BoardTests.test_validate_placement_rejects_out_of_bounds) ... ok
+test_validate_placement_rejects_overlap (tests.meilenstein_02.test_board.BoardTests.test_validate_placement_rejects_overlap) ... ok
+test_validate_placement_rejects_wrong_ship_count (tests.meilenstein_02.test_board.BoardTests.test_validate_placement_rejects_wrong_ship_count) ... ok
+test_aliases_hit_the_same_cell_and_cannot_be_repeated (tests.meilenstein_02.test_game.TestBattleshipGame.test_aliases_hit_the_same_cell_and_cannot_be_repeated) ... ok
+test_bad_fleet_is_rejected_without_partial_placement (tests.meilenstein_02.test_game.TestBattleshipGame.test_bad_fleet_is_rejected_without_partial_placement) ... ok
+test_full_match_finishes_only_when_the_whole_fleet_is_sunk (tests.meilenstein_02.test_game.TestBattleshipGame.test_full_match_finishes_only_when_the_whole_fleet_is_sunk) ... ok
+test_incoming_hits_and_misses_are_copied_without_enemy_fleet (tests.meilenstein_02.test_game.TestBattleshipGame.test_incoming_hits_and_misses_are_copied_without_enemy_fleet) ... ok
+test_invalid_fields_are_rejected_without_changing_the_turn (tests.meilenstein_02.test_game.TestBattleshipGame.test_invalid_fields_are_rejected_without_changing_the_turn) ... ok
+test_reset_and_start_clear_the_previous_match (tests.meilenstein_02.test_game.TestBattleshipGame.test_reset_and_start_clear_the_previous_match) ... ok
+test_shooting_waits_for_both_fleets (tests.meilenstein_02.test_game.TestBattleshipGame.test_shooting_waits_for_both_fleets) ... ok
+test_state_contains_only_own_fleet_and_copies_nested_data (tests.meilenstein_02.test_game.TestBattleshipGame.test_state_contains_only_own_fleet_and_copies_nested_data) ... ok
+test_unknown_player_is_rejected (tests.meilenstein_02.test_game.TestBattleshipGame.test_unknown_player_is_rejected) ... ok
+test_wrong_turn_does_not_change_either_board (tests.meilenstein_02.test_game.TestBattleshipGame.test_wrong_turn_does_not_change_either_board) ... ok
+test_shot_helper_normalizes_coordinates (tests.meilenstein_02.test_game.TestBoardInput.test_shot_helper_normalizes_coordinates) ... ok
+test_unhashable_ship_type_is_a_placement_error (tests.meilenstein_02.test_game.TestBoardInput.test_unhashable_ship_type_is_a_placement_error) ... ok
+test_unicode_digits_are_not_coordinates (tests.meilenstein_02.test_game.TestBoardInput.test_unicode_digits_are_not_coordinates) ... ok
+test_complete_match_retries_bad_input_without_consuming_a_turn (tests.meilenstein_02.test_local_game.TestLocalGameCLI.test_complete_match_retries_bad_input_without_consuming_a_turn) ... ok
+test_invalid_fleet_is_retried_before_other_player_places (tests.meilenstein_02.test_local_game.TestLocalGameCLI.test_invalid_fleet_is_retried_before_other_player_places) ... ok
+test_quit_and_eof_abort_without_announcing_a_winner (tests.meilenstein_02.test_local_game.TestLocalGameCLI.test_quit_and_eof_abort_without_announcing_a_winner) ... ok
+test_terminal_announces_winner_without_another_handover (tests.meilenstein_02.test_local_game.TestLocalGameCLI.test_terminal_announces_winner_without_another_handover) ... ok
+test_actual_attack_script_matches_direct_replies_despite_waiting_event (tests.meilenstein_03.test_network.NetworkTests.test_actual_attack_script_matches_direct_replies_despite_waiting_event) ... verbunden: ('127.0.0.1', 51846)
+  <- [('127.0.0.1', 51846)] type=unknown
+  -> [nicht angemeldet] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 51846)] type=unknown
+  -> [nicht angemeldet] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 51846)] type=join
+  -> [nicht angemeldet] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 51846)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51846)] type=join
+  -> [A] type=error code=ALREADY_JOINED
+  <- [('127.0.0.1', 51846)] type=broken
+  -> [A] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 51846)] type=broken
+  -> [A] type=error code=INVALID_JSON
+getrennt: ('127.0.0.1', 51846)
+ok
+test_complete_game_preserves_validation_turns_results_and_game_over (tests.meilenstein_03.test_network.NetworkTests.test_complete_game_preserves_validation_turns_results_and_game_over) ... verbunden: ('127.0.0.1', 51849)
+verbunden: ('127.0.0.1', 51850)
+  <- [('127.0.0.1', 51849)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51850)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=place
+  -> [A] type=error code=INVALID_PLACEMENT
+  <- [('127.0.0.1', 51849)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=error code=NOT_YOUR_TURN
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51850)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=result
+  -> [B] type=gameOver
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51850)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51849)] type=shoot
+  -> [A] type=error code=WRONG_PHASE
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51850)
+getrennt: ('127.0.0.1', 51849)
+ok
+test_departure_after_finished_game_clears_winner_for_replacement (tests.meilenstein_03.test_network.NetworkTests.test_departure_after_finished_game_clears_winner_for_replacement) ... verbunden: ('127.0.0.1', 51852)
+verbunden: ('127.0.0.1', 51853)
+  <- [('127.0.0.1', 51852)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51853)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51853)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=shoot
+  -> [A] type=result
+  -> [B] type=gameOver
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51852)] type=leave
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51852)
+  <- [('127.0.0.1', 51853)] type=getState
+  -> [B] type=state
+verbunden: ('127.0.0.1', 51854)
+  <- [('127.0.0.1', 51854)] type=join
+  -> [A] type=welcome
+  -> [B] type=gameStart
+  -> [A] type=gameStart
+  -> [B] type=state
+  -> [A] type=state
+  <- [('127.0.0.1', 51853)] type=getState
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51853)
+getrennt: ('127.0.0.1', 51854)
+ok
+test_disconnect_before_join_does_not_notify_or_claim_a_slot (tests.meilenstein_03.test_network.NetworkTests.test_disconnect_before_join_does_not_notify_or_claim_a_slot) ... verbunden: ('127.0.0.1', 51856)
+  <- [('127.0.0.1', 51856)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51857)
+  <- [('127.0.0.1', 51857)] type=getState
+  -> [nicht angemeldet] type=error code=NOT_JOINED
+getrennt: ('127.0.0.1', 51857)
+  <- [('127.0.0.1', 51856)] type=getState
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51858)
+  <- [('127.0.0.1', 51858)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51858)
+getrennt: ('127.0.0.1', 51856)
+ok
+test_disconnect_racing_a_shot_notifies_once_and_leaves_fresh_waiting_state (tests.meilenstein_03.test_network.NetworkTests.test_disconnect_racing_a_shot_notifies_once_and_leaves_fresh_waiting_state) ... verbunden: ('127.0.0.1', 51860)
+verbunden: ('127.0.0.1', 51861)
+  <- [('127.0.0.1', 51860)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51861)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51860)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51861)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  <- [('127.0.0.1', 51860)] type=shoot
+  -> [A] type=state
+  -> [A] type=error code=WRONG_PHASE
+getrennt: ('127.0.0.1', 51861)
+  <- [('127.0.0.1', 51860)] type=getState
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51860)
+ok
+test_duplicate_join_does_not_rename_or_restart_game (tests.meilenstein_03.test_network.NetworkTests.test_duplicate_join_does_not_rename_or_restart_game) ... verbunden: ('127.0.0.1', 51863)
+verbunden: ('127.0.0.1', 51864)
+  <- [('127.0.0.1', 51863)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51864)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51863)] type=join
+  -> [A] type=error code=ALREADY_JOINED
+  <- [('127.0.0.1', 51863)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51864)] type=getState
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51863)
+getrennt: ('127.0.0.1', 51864)
+ok
+test_duplicate_shot_keeps_the_turn_and_prior_result (tests.meilenstein_03.test_network.NetworkTests.test_duplicate_shot_keeps_the_turn_and_prior_result) ... verbunden: ('127.0.0.1', 51866)
+verbunden: ('127.0.0.1', 51867)
+  <- [('127.0.0.1', 51866)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51867)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51866)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51867)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51866)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51867)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51866)] type=shoot
+  -> [A] type=error code=DUPLICATE_SHOT
+  <- [('127.0.0.1', 51866)] type=getState
+  -> [A] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51867)
+getrennt: ('127.0.0.1', 51866)
+ok
+test_eof_from_slot_a_keeps_b_and_reuses_first_free_slot_a (tests.meilenstein_03.test_network.NetworkTests.test_eof_from_slot_a_keeps_b_and_reuses_first_free_slot_a) ... verbunden: ('127.0.0.1', 51869)
+verbunden: ('127.0.0.1', 51870)
+  <- [('127.0.0.1', 51869)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51870)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51869)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51870)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51869)
+  <- [('127.0.0.1', 51870)] type=getState
+  -> [B] type=state
+verbunden: ('127.0.0.1', 51871)
+  <- [('127.0.0.1', 51871)] type=join
+  -> [A] type=welcome
+  -> [B] type=gameStart
+  -> [A] type=gameStart
+  -> [B] type=state
+  -> [A] type=state
+  <- [('127.0.0.1', 51870)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51871)] type=getState
+  -> [A] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51871)
+getrennt: ('127.0.0.1', 51870)
+ok
+test_explicit_leave_notifies_once_resets_boards_and_reuses_slot_b (tests.meilenstein_03.test_network.NetworkTests.test_explicit_leave_notifies_once_resets_boards_and_reuses_slot_b) ... verbunden: ('127.0.0.1', 51873)
+verbunden: ('127.0.0.1', 51874)
+  <- [('127.0.0.1', 51873)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51874)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51873)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51874)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51873)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51874)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51874)] type=leave
+  -> [A] type=opponentLeft
+  -> [A] type=state
+  <- [('127.0.0.1', 51873)] type=getState
+getrennt: ('127.0.0.1', 51874)
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51875)
+  <- [('127.0.0.1', 51875)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51875)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51873)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51875)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51875)
+getrennt: ('127.0.0.1', 51873)
+ok
+test_first_join_receives_waiting_without_starting_game (tests.meilenstein_03.test_network.NetworkTests.test_first_join_receives_waiting_without_starting_game) ... verbunden: ('127.0.0.1', 51877)
+  <- [('127.0.0.1', 51877)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51877)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51877)] type=place
+  -> [A] type=error code=WRONG_PHASE
+getrennt: ('127.0.0.1', 51877)
+ok
+test_invalid_json_does_not_disconnect_a_joined_player (tests.meilenstein_03.test_network.NetworkTests.test_invalid_json_does_not_disconnect_a_joined_player) ... verbunden: ('127.0.0.1', 51879)
+verbunden: ('127.0.0.1', 51880)
+  <- [('127.0.0.1', 51879)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51880)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51879)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51880)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51879)] type=broken
+  -> [A] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 51879)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51880)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51879)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51880)
+getrennt: ('127.0.0.1', 51879)
+ok
+test_killing_real_client_notifies_survivor_and_server_accepts_replacement (tests.meilenstein_03.test_network.NetworkTests.test_killing_real_client_notifies_survivor_and_server_accepts_replacement) ... verbunden: ('127.0.0.1', 51882)
+  <- [('127.0.0.1', 51882)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51883)
+  <- [('127.0.0.1', 51883)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51883)
+verbunden: ('127.0.0.1', 51884)
+  <- [('127.0.0.1', 51884)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51884)
+getrennt: ('127.0.0.1', 51882)
+ok
+test_last_player_departure_allows_new_first_player_to_wait (tests.meilenstein_03.test_network.NetworkTests.test_last_player_departure_allows_new_first_player_to_wait) ... verbunden: ('127.0.0.1', 51886)
+  <- [('127.0.0.1', 51886)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51886)] type=leave
+getrennt: ('127.0.0.1', 51886)
+verbunden: ('127.0.0.1', 51887)
+  <- [('127.0.0.1', 51887)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51887)] type=getState
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51887)
+ok
+test_malformed_and_unjoined_requests_keep_connection_usable (tests.meilenstein_03.test_network.NetworkTests.test_malformed_and_unjoined_requests_keep_connection_usable) ... verbunden: ('127.0.0.1', 51889)
+  <- [('127.0.0.1', 51889)] type=broken
+  -> [nicht angemeldet] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 51889)] type=broken
+  -> [nicht angemeldet] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 51889)] type=broken
+  -> [nicht angemeldet] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 51889)] type=unknown
+  -> [nicht angemeldet] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 51889)] type=unknown
+  -> [nicht angemeldet] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 51889)] type=join
+  -> [nicht angemeldet] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 51889)] type=join
+  -> [nicht angemeldet] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 51889)] type=join
+  -> [nicht angemeldet] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 51889)] type=getState
+  -> [nicht angemeldet] type=error code=NOT_JOINED
+  <- [('127.0.0.1', 51889)] type=leave
+  -> [nicht angemeldet] type=error code=NOT_JOINED
+  <- [('127.0.0.1', 51889)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51889)
+ok
+test_missing_shot_field_is_rejected_and_valid_shot_still_works (tests.meilenstein_03.test_network.NetworkTests.test_missing_shot_field_is_rejected_and_valid_shot_still_works) ... verbunden: ('127.0.0.1', 51891)
+verbunden: ('127.0.0.1', 51892)
+  <- [('127.0.0.1', 51891)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51892)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51891)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51892)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51891)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51891)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51892)
+getrennt: ('127.0.0.1', 51891)
+ok
+test_out_of_bounds_shots_do_not_advance_turn_or_broadcast_state (tests.meilenstein_03.test_network.NetworkTests.test_out_of_bounds_shots_do_not_advance_turn_or_broadcast_state) ... verbunden: ('127.0.0.1', 51894)
+verbunden: ('127.0.0.1', 51895)
+  <- [('127.0.0.1', 51894)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51895)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51894)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51895)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51894)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51894)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51895)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51894)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51894)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51895)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51894)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51894)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51895)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51894)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51894)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51895)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51894)
+getrennt: ('127.0.0.1', 51895)
+ok
+test_out_of_turn_shot_does_not_damage_ships_or_notify_opponent (tests.meilenstein_03.test_network.NetworkTests.test_out_of_turn_shot_does_not_damage_ships_or_notify_opponent) ... verbunden: ('127.0.0.1', 51897)
+verbunden: ('127.0.0.1', 51898)
+  <- [('127.0.0.1', 51897)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51898)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51897)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51898)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51898)] type=shoot
+  -> [B] type=error code=NOT_YOUR_TURN
+  <- [('127.0.0.1', 51897)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51898)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51898)
+getrennt: ('127.0.0.1', 51897)
+ok
+test_play_and_attack_scripts_can_be_imported_without_connecting_or_reading_stdin (tests.meilenstein_03.test_network.NetworkTests.test_play_and_attack_scripts_can_be_imported_without_connecting_or_reading_stdin) ... ok
+test_real_client_listens_while_idle_and_q_notifies_survivor_once (tests.meilenstein_03.test_network.NetworkTests.test_real_client_listens_while_idle_and_q_notifies_survivor_once) ... verbunden: ('127.0.0.1', 51901)
+  <- [('127.0.0.1', 51901)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51902)
+  <- [('127.0.0.1', 51902)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51902)
+getrennt: ('127.0.0.1', 51901)
+ok
+test_real_play_waits_places_on_start_and_replaces_fleet_after_disconnect (tests.meilenstein_03.test_network.NetworkTests.test_real_play_waits_places_on_start_and_replaces_fleet_after_disconnect) ... verbunden: ('127.0.0.1', 51904)
+  <- [('127.0.0.1', 51904)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51904)] type=getState
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51905)
+  <- [('127.0.0.1', 51905)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  <- [('127.0.0.1', 51904)] type=place
+  -> [B] type=state
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51905)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51905)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51905)
+  <- [('127.0.0.1', 51904)] type=getState
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51906)
+  <- [('127.0.0.1', 51906)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51904)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51906)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51906)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51904)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51904)] type=leave
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51904)
+getrennt: ('127.0.0.1', 51906)
+ok
+test_second_join_sends_unsolicited_start_to_both_players (tests.meilenstein_03.test_network.NetworkTests.test_second_join_sends_unsolicited_start_to_both_players) ... verbunden: ('127.0.0.1', 51908)
+verbunden: ('127.0.0.1', 51909)
+  <- [('127.0.0.1', 51908)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51909)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51909)
+getrennt: ('127.0.0.1', 51908)
+ok
+test_simultaneous_joins_admit_exactly_two_distinct_slots (tests.meilenstein_03.test_network.NetworkTests.test_simultaneous_joins_admit_exactly_two_distinct_slots) ... verbunden: ('127.0.0.1', 51911)
+verbunden: ('127.0.0.1', 51912)
+verbunden: ('127.0.0.1', 51913)
+verbunden: ('127.0.0.1', 51914)
+verbunden: ('127.0.0.1', 51915)
+verbunden: ('127.0.0.1', 51916)
+  <- [('127.0.0.1', 51913)] type=join
+  <- [('127.0.0.1', 51912)] type=join
+  <- [('127.0.0.1', 51915)] type=join
+  <- [('127.0.0.1', 51911)] type=join
+  <- [('127.0.0.1', 51914)] type=join
+  -> [A] type=welcome
+  <- [('127.0.0.1', 51916)] type=join
+  -> [A] type=waiting
+  -> [A] type=state
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [nicht angemeldet] type=error code=GAME_FULL
+  -> [nicht angemeldet] type=error code=GAME_FULL
+  -> [nicht angemeldet] type=error code=GAME_FULL
+  -> [nicht angemeldet] type=error code=GAME_FULL
+  <- [('127.0.0.1', 51912)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51913)] type=getState
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51916)
+getrennt: ('127.0.0.1', 51915)
+getrennt: ('127.0.0.1', 51914)
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51913)
+getrennt: ('127.0.0.1', 51912)
+getrennt: ('127.0.0.1', 51911)
+ok
+test_state_exposes_own_fleet_and_shots_without_opponents_fleet (tests.meilenstein_03.test_network.NetworkTests.test_state_exposes_own_fleet_and_shots_without_opponents_fleet) ... verbunden: ('127.0.0.1', 51918)
+verbunden: ('127.0.0.1', 51919)
+  <- [('127.0.0.1', 51918)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51919)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51918)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51919)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51918)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51918)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51919)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+getrennt: ('127.0.0.1', 51919)
+getrennt: ('127.0.0.1', 51918)
+ok
+test_third_player_is_rejected_without_changing_the_two_player_game (tests.meilenstein_03.test_network.NetworkTests.test_third_player_is_rejected_without_changing_the_two_player_game) ... verbunden: ('127.0.0.1', 51921)
+verbunden: ('127.0.0.1', 51922)
+  <- [('127.0.0.1', 51921)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51922)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+verbunden: ('127.0.0.1', 51923)
+  <- [('127.0.0.1', 51923)] type=join
+  -> [nicht angemeldet] type=error code=GAME_FULL
+  <- [('127.0.0.1', 51923)] type=getState
+  -> [nicht angemeldet] type=error code=NOT_JOINED
+  <- [('127.0.0.1', 51921)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51922)] type=getState
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51923)
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51922)
+getrennt: ('127.0.0.1', 51921)
+ok
+test_unrecognized_type_does_not_change_an_active_game (tests.meilenstein_03.test_network.NetworkTests.test_unrecognized_type_does_not_change_an_active_game) ... verbunden: ('127.0.0.1', 51925)
+verbunden: ('127.0.0.1', 51926)
+  <- [('127.0.0.1', 51925)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51926)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51925)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51926)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51925)] type=unknown
+  -> [A] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 51925)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51926)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51925)
+getrennt: ('127.0.0.1', 51926)
+ok
+test_wrong_type_shot_field_is_rejected_without_changing_game (tests.meilenstein_03.test_network.NetworkTests.test_wrong_type_shot_field_is_rejected_without_changing_game) ... verbunden: ('127.0.0.1', 51928)
+verbunden: ('127.0.0.1', 51929)
+  <- [('127.0.0.1', 51928)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 51929)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51928)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51929)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51928)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51928)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51929)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51928)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51928)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51929)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51928)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51928)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51929)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51928)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51928)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51929)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 51928)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 51928)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 51929)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 51929)
+getrennt: ('127.0.0.1', 51928)
+ok
+test_empty_lines_are_ignored_and_eof_ends_the_reader (tests.meilenstein_03.test_transport.TestTransport.test_empty_lines_are_ignored_and_eof_ends_the_reader) ... ok
+test_fragmented_utf8_message_waits_for_its_complete_line (tests.meilenstein_03.test_transport.TestTransport.test_fragmented_utf8_message_waits_for_its_complete_line) ... ok
+test_hard_read_error_ends_reader_and_closes_stream (tests.meilenstein_03.test_transport.TestTransport.test_hard_read_error_ends_reader_and_closes_stream) ... ok
+test_invalid_json_and_non_objects_do_not_lose_the_next_message (tests.meilenstein_03.test_transport.TestTransport.test_invalid_json_and_non_objects_do_not_lose_the_next_message) ... ok
+test_send_preserves_unicode_and_escapes_newlines (tests.meilenstein_03.test_transport.TestTransport.test_send_preserves_unicode_and_escapes_newlines) ... ok
+test_two_messages_in_one_send_are_read_separately (tests.meilenstein_03.test_transport.TestTransport.test_two_messages_in_one_send_are_read_separately) ... ok
+test_clean_completed_game_is_saved_as_pass (tests.meilenstein_04.test_demo_tool.DemoEvidenceTests.test_clean_completed_game_is_saved_as_pass) ... ok
+test_existing_evidence_directory_is_refused_without_modifying_any_file (tests.meilenstein_04.test_demo_tool.DemoEvidenceTests.test_existing_evidence_directory_is_refused_without_modifying_any_file) ... ok
+test_private_payload_in_log_is_saved_as_failure_even_after_completed_game (tests.meilenstein_04.test_demo_tool.DemoEvidenceTests.test_private_payload_in_log_is_saved_as_failure_even_after_completed_game) ... ok
+test_all_target_buttons_send_their_own_coordinate_without_drawing (tests.meilenstein_04.test_gui.GuiTests.test_all_target_buttons_send_their_own_coordinate_without_drawing) ... ok
+test_error_is_readable_and_does_not_change_boards (tests.meilenstein_04.test_gui.GuiTests.test_error_is_readable_and_does_not_change_boards) ... ok
+test_full_state_renders_both_boards_including_incoming_misses_and_clears (tests.meilenstein_04.test_gui.GuiTests.test_full_state_renders_both_boards_including_incoming_misses_and_clears) ... ok
+test_get_state_button_sends_request (tests.meilenstein_04.test_gui.GuiTests.test_get_state_button_sends_request) ... ok
+test_idle_socket_does_not_block_tk_after_callbacks (tests.meilenstein_04.test_gui.GuiTests.test_idle_socket_does_not_block_tk_after_callbacks) ... ok
+test_lobby_events_preserve_confirmed_boards_until_server_state (tests.meilenstein_04.test_gui.GuiTests.test_lobby_events_preserve_confirmed_boards_until_server_state) ... ok
+test_opponent_leaving_clears_boards_and_replacement_enables_placement (tests.meilenstein_04.test_gui.GuiTests.test_opponent_leaving_clears_boards_and_replacement_enables_placement) ... ok
+test_placement_controls_send_individual_fleet_without_speculative_drawing (tests.meilenstein_04.test_gui.GuiTests.test_placement_controls_send_individual_fleet_without_speculative_drawing) ... ok
+test_randomize_produces_valid_varying_candidates_only (tests.meilenstein_04.test_gui.GuiTests.test_randomize_produces_valid_varying_candidates_only) ... ok
+test_receive_queue_drains_on_main_thread_and_renders_last_message (tests.meilenstein_04.test_gui.GuiTests.test_receive_queue_drains_on_main_thread_and_renders_last_message) ... ok
+test_results_and_acknowledgements_do_not_draw_before_state (tests.meilenstein_04.test_gui.GuiTests.test_results_and_acknowledgements_do_not_draw_before_state) ... ok
+test_server_close_disables_requests_and_is_visible (tests.meilenstein_04.test_gui.GuiTests.test_server_close_disables_requests_and_is_visible) ... ok
+test_stalled_send_runs_in_worker_and_does_not_block_tk (tests.meilenstein_04.test_gui.GuiTests.test_stalled_send_runs_in_worker_and_does_not_block_tk) ... ok
+test_waiting_turn_and_winner_status (tests.meilenstein_04.test_gui.GuiTests.test_waiting_turn_and_winner_status) ... ok
+test_window_cross_closes_socket_and_workers_promptly (tests.meilenstein_04.test_gui.GuiTests.test_window_cross_closes_socket_and_workers_promptly) ... ok
+test_complete_documented_game_preserves_recipients_order_and_reset (tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset) ... ok
+test_json_and_markdown_catalogs_have_complete_consistent_examples (tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples) ... ok
+test_departure_pushes_empty_state_and_replacement_gets_fresh_round (tests.meilenstein_04.test_server_states.StateTests.test_departure_pushes_empty_state_and_replacement_gets_fresh_round) ... ok
+test_each_successful_join_sends_lobby_then_full_state_to_every_player (tests.meilenstein_04.test_server_states.StateTests.test_each_successful_join_sends_lobby_then_full_state_to_every_player) ... ok
+test_place_and_shot_push_separate_complete_views_after_direct_reply (tests.meilenstein_04.test_server_states.StateTests.test_place_and_shot_push_separate_complete_views_after_direct_reply) ... ok
+test_rejections_are_private_and_preserve_both_complete_states (tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states) ... ok
+test_server_logs_metadata_without_fleets_or_untrusted_type_and_error_text (tests.meilenstein_04.test_server_states.StateTests.test_server_logs_metadata_without_fleets_or_untrusted_type_and_error_text) ... ok
+
+----------------------------------------------------------------------
+Ran 84 tests in 5.107s
+
+OK

@@ -1,0 +1,6 @@
+test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread (tests.meilenstein_06.test_image.ImageTests.test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.611s
+
+OK

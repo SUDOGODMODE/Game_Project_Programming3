@@ -1,0 +1,60 @@
+Standardflotte: Zeilen 1-5, ab Spalte A. Befehle: C5, state, quit oder q.
+Zug und Zustand kommen automatisch; state fragt sie zusaetzlich ab.
+Willkommen, Bob! Du bist Spieler B.
+Neue Partie: [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Bob'}]. Standardflotte wird platziert.
+Zustand -> Phase: placing, am Zug: None, eigene Schiffe: 0, eigene Schuesse: 0
+Zustand -> Phase: placing, am Zug: None, eigene Schiffe: 0, eigene Schuesse: 0
+Flotte platziert. Phase: shooting
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 0
+Fehler: NOT_YOUR_TURN - Spieler B ist nicht am Zug
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 0
+Schuss auf J1: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 1
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 1
+Schuss auf J2: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 2
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 2
+Schuss auf J3: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 3
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 3
+Schuss auf J4: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 4
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 4
+Schuss auf J5: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 5
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 5
+Schuss auf J6: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 6
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 6
+Schuss auf J7: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 7
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 7
+Schuss auf J8: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 8
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 8
+Schuss auf J9: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 9
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 9
+Schuss auf J10: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 10
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 10
+Schuss auf I1: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 11
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 11
+Schuss auf I2: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 12
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 12
+Schuss auf I3: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 13
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 13
+Schuss auf I4: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 14
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 14
+Schuss auf I5: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 15
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 15
+Schuss auf I6: miss Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 16
+Spiel beendet. Gewinner: A. q beendet den Client.
+Zustand -> Phase: finished, am Zug: None, eigene Schiffe: 5, eigene Schuesse: 16
+Verbindung beendet

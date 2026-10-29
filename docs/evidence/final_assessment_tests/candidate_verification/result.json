@@ -1,0 +1,47 @@
+{
+  "started_at": "2026-10-27T18:00:25.376613+01:00",
+  "archive": "/private/tmp/Schiffe_versenken_candidate_20261027.zip",
+  "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+  "result": "PASS",
+  "archive_sha256": "3ed836f3fadf3f4b686ad7c905498fa3f1a606183a314b16ca16fc325ed9a08f",
+  "manifest_members_verified": 162,
+  "original_document_links_verified": 7,
+  "tests": {
+    "tests_run": 101,
+    "passed": 101,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gui": {
+    "required": true,
+    "discovered": 16,
+    "executed": 16,
+    "skipped": 0,
+    "issues": []
+  },
+  "environment": {
+    "python": "3.14.10 (main, Oct 25 2026, 17:12:00) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "tk": "9.1"
+  },
+  "runtime": {
+    "started_at": "2026-10-27T18:00:33.030071+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "attacks": 7,
+    "console_shots": 33,
+    "persistent_log_counts": {
+      "attacks": {
+        "<-": 38,
+        "->": 61
+      },
+      "console": {
+        "<-": 40,
+        "->": 117
+      }
+    },
+    "finished_at": "2026-10-27T18:00:33.546820+01:00"
+  },
+  "finished_at": "2026-10-27T18:00:33.589751+01:00"
+}

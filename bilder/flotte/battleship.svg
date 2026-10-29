@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40" width="160" height="40">
+  <title>Schlachtschiff, vier Felder</title>
+  <desc>Draufsicht mit gepanzertem Rumpf, Brücke und zwei Doppeltürmen. Bug rechts.</desc>
+  <polygon points="3,13 12,7 117,5 137,10 157,20 137,30 117,35 12,33 3,27" fill="#a7c9da" stroke="#3b6278" stroke-width="1.5"/>
+  <polygon points="11,14 19,10 116,9 134,13 148,20 134,27 116,31 19,30 11,26" fill="#d0e3e9" stroke="#789eaf" stroke-width="0.8"/>
+  <line x1="20" y1="12" x2="116" y2="11" stroke="#edf7fa" stroke-width="1"/>
+  <line x1="20" y1="28" x2="116" y2="29" stroke="#edf7fa" stroke-width="1"/>
+  <polygon points="57,13 83,11 96,16 96,24 83,29 57,27 51,23 51,17" fill="#8fb6ca" stroke="#4a7289" stroke-width="1"/>
+  <rect x="67" y="13" width="17" height="14" fill="#bbd9e5" stroke="#4a7289" stroke-width="1"/>
+  <rect x="84" y="16" width="7" height="8" fill="#dcecf0" stroke="#4a7289" stroke-width="0.8"/>
+  <rect x="62" y="17" width="5" height="6" fill="#4c7287" stroke="#34586e" stroke-width="0.8"/>
+  <line x1="77" y1="10" x2="77" y2="30" stroke="#456d83" stroke-width="1.4"/>
+  <line x1="73" y1="20" x2="81" y2="20" stroke="#edf7fa" stroke-width="1.2"/>
+  <ellipse cx="34" cy="20" rx="9" ry="7" fill="#7fa6bd" stroke="#3c647a" stroke-width="1"/>
+  <rect x="27" y="15" width="12" height="10" fill="#c0dce7" stroke="#3c647a" stroke-width="1"/>
+  <line x1="17" y1="17.5" x2="28" y2="17.5" stroke="#466d82" stroke-width="1.8"/>
+  <line x1="17" y1="22.5" x2="28" y2="22.5" stroke="#466d82" stroke-width="1.8"/>
+  <ellipse cx="108" cy="20" rx="9" ry="7" fill="#7fa6bd" stroke="#3c647a" stroke-width="1"/>
+  <rect x="104" y="15" width="12" height="10" fill="#c0dce7" stroke="#3c647a" stroke-width="1"/>
+  <line x1="115" y1="17.5" x2="129" y2="17.5" stroke="#466d82" stroke-width="1.8"/>
+  <line x1="115" y1="22.5" x2="129" y2="22.5" stroke="#466d82" stroke-width="1.8"/>
+  <circle cx="137" cy="20" r="3" fill="#a0c4d6" stroke="#527a90" stroke-width="0.8"/>
+</svg>

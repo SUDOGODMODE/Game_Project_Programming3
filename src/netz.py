@@ -40,7 +40,9 @@ def read_messages(sock) -> Iterator[dict]:
 
     Bricht die Gegenseite die Verbindung ab, endet die Schleife von selbst
     (makefile liefert dann keine weiteren Zeilen mehr, der Generator ist
-    einfach erschoepft). Eine Zeile, die kein gueltiges JSON ist, fuehrt
+    einfach erschoepft). Ein harter Socketfehler beendet den Leser ebenso;
+    der Textstream wird bei jedem Ende geschlossen.
+    Eine Zeile, die kein gueltiges JSON ist, fuehrt
     nicht zum Absturz: Es wird eine Ersatznachricht vom Typ "broken"
     geliefert, und der Aufrufer entscheidet selbst, was damit passiert
     (siehe server.py: handle()).
@@ -53,17 +55,21 @@ def read_messages(sock) -> Iterator[dict]:
     Uebung 4 vorwegnimmt: "Jedes Programm darf sich mit Ihrem Port
     verbinden und schicken, was es will."
     """
-    stream = sock.makefile("r", encoding=ENCODING, newline="\n")
-    for line in stream:
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            parsed = json.loads(line)
-        except json.JSONDecodeError:
-            yield {"type": "broken"}
-            continue
-        if not isinstance(parsed, dict):
-            yield {"type": "broken"}
-            continue
-        yield parsed
+    try:
+        with sock.makefile("r", encoding=ENCODING, newline="\n") as stream:
+            for line in stream:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    parsed = json.loads(line)
+                except json.JSONDecodeError:
+                    yield {"type": "broken"}
+                    continue
+                if not isinstance(parsed, dict):
+                    yield {"type": "broken"}
+                    continue
+                yield parsed
+    except OSError:
+        # Ein harter Socketabbruch hat fuer Aufrufer dieselbe Bedeutung wie EOF.
+        return

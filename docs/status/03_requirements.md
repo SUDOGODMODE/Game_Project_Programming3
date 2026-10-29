@@ -1,5 +1,12 @@
 # Anforderungsabgleich bis Meilenstein 3
 
+Historischer Abgleich vom 13.10.2026. Technische Aussagen zu damals fehlenden
+Zustandsmeldungen und GUI beschreiben diesen Zeitpunkt. Der aktuelle Stand
+und die zusätzlichen Kursanforderungen stehen im [M4-Abgleich](04_requirements.md).
+
+Die damaligen Testdateien wurden am 27.10.2026 von `src/` nach
+`tests/meilenstein_XX/` verschoben; der aktuelle Testaufruf steht im README.
+
 Stand: 13.10.2026. Grundlage sind die beiden Nummerierungen der Kursunterlagen. «Lokal geprüft» bezeichnet einen tatsächlich ausgeführten Versuch; «offen» bezeichnet noch fehlende Arbeit oder einen fremden Nachweis.
 
 ## Unterlagen

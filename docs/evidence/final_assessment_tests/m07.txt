@@ -1,0 +1,19 @@
+test_actual_handler_logs_each_received_and_sent_message_through_abort (tests.meilenstein_07.test_event_log.EventLogTests.test_actual_handler_logs_each_received_and_sent_message_through_abort) ... verbunden: ('127.0.0.1', 12345)
+  <- [('127.0.0.1', 12345)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 12345)] type=broken
+  -> [A] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 12345)] type=getState
+  -> [A] type=state
+getrennt: ('127.0.0.1', 12345)
+ok
+test_existing_file_cannot_be_truncated_or_appended (tests.meilenstein_07.test_event_log.EventLogTests.test_existing_file_cannot_be_truncated_or_appended) ... ok
+test_metadata_is_immediately_persistent_and_excludes_client_secrets (tests.meilenstein_07.test_event_log.EventLogTests.test_metadata_is_immediately_persistent_and_excludes_client_secrets) ... ok
+test_parallel_messages_form_complete_independent_lines (tests.meilenstein_07.test_event_log.EventLogTests.test_parallel_messages_form_complete_independent_lines) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.005s
+
+OK

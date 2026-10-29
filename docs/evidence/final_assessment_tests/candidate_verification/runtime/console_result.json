@@ -1,0 +1,181 @@
+{
+  "timestamp": "2026-10-27T18:00:33.545902+01:00",
+  "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+  "result": "PASS",
+  "scope": "Serverprozess und zwei echte play.py-Prozesse lokal ueber TCP",
+  "shots": [
+    {
+      "player": "A",
+      "field": "A1",
+      "line": "Schuss auf A1: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J1",
+      "line": "Schuss auf J1: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "B1",
+      "line": "Schuss auf B1: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J2",
+      "line": "Schuss auf J2: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "C1",
+      "line": "Schuss auf C1: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J3",
+      "line": "Schuss auf J3: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "D1",
+      "line": "Schuss auf D1: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J4",
+      "line": "Schuss auf J4: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "E1",
+      "line": "Schuss auf E1: sunk - Carrier versenkt! Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J5",
+      "line": "Schuss auf J5: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "A2",
+      "line": "Schuss auf A2: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J6",
+      "line": "Schuss auf J6: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "B2",
+      "line": "Schuss auf B2: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J7",
+      "line": "Schuss auf J7: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "C2",
+      "line": "Schuss auf C2: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J8",
+      "line": "Schuss auf J8: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "D2",
+      "line": "Schuss auf D2: sunk - Battleship versenkt! Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J9",
+      "line": "Schuss auf J9: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "A3",
+      "line": "Schuss auf A3: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "J10",
+      "line": "Schuss auf J10: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "B3",
+      "line": "Schuss auf B3: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "I1",
+      "line": "Schuss auf I1: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "C3",
+      "line": "Schuss auf C3: sunk - Cruiser versenkt! Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "I2",
+      "line": "Schuss auf I2: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "A4",
+      "line": "Schuss auf A4: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "I3",
+      "line": "Schuss auf I3: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "B4",
+      "line": "Schuss auf B4: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "I4",
+      "line": "Schuss auf I4: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "C4",
+      "line": "Schuss auf C4: sunk - Submarine versenkt! Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "I5",
+      "line": "Schuss auf I5: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "A5",
+      "line": "Schuss auf A5: hit Der Gegner ist am Zug."
+    },
+    {
+      "player": "B",
+      "field": "I6",
+      "line": "Schuss auf I6: miss Der Gegner ist am Zug."
+    },
+    {
+      "player": "A",
+      "field": "B5",
+      "line": "Schuss auf B5: sunk - Destroyer versenkt! Gewonnen! q beendet den Client."
+    }
+  ],
+  "checks": [
+    "Warten/Beitritt",
+    "automatische Standardflotte",
+    "NOT_YOUR_TURN",
+    "33 gueltige Schuesse",
+    "Sieg A/Niederlage B",
+    "sauberes Clientende"
+  ]
+}

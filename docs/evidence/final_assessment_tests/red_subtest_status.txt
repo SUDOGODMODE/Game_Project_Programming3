@@ -1,0 +1,15 @@
+test_strict_mode_rejects_gui_subtest_skip (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_gui_subtest_skip) ... FAIL
+
+======================================================================
+FAIL: test_strict_mode_rejects_gui_subtest_skip (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_gui_subtest_skip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 87, in test_strict_mode_rejects_gui_subtest_skip
+    self.assertNotEqual(report['tests'][0]['status'], 'running', 'Completed test with skipped subtest needs an honest final outcome')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'running' == 'running' : Completed test with skipped subtest needs an honest final outcome
+
+----------------------------------------------------------------------
+Ran 1 test in 0.017s
+
+FAILED (failures=1)

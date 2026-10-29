@@ -1,0 +1,108 @@
+Nachrichtenlog: docs/evidence/final_assessment_tests/local_20261027_a/attacks_messages.jsonl
+Server wartet auf Port 52934
+verbunden: ('127.0.0.1', 52935)
+verbunden: ('127.0.0.1', 52936)
+  <- [('127.0.0.1', 52935)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 52936)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=broken
+  -> [A] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=unknown
+  -> [A] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 52936)] type=shoot
+  -> [B] type=error code=NOT_YOUR_TURN
+  <- [('127.0.0.1', 52935)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=getState
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 52935)
+verbunden: ('127.0.0.1', 52938)
+  <- [('127.0.0.1', 52938)] type=join
+  -> [A] type=welcome
+  -> [B] type=gameStart
+  -> [A] type=gameStart
+  -> [B] type=state
+  -> [A] type=state
+  <- [('127.0.0.1', 52938)] type=place
+  -> [A] type=placeAck
+  -> [B] type=state
+  -> [A] type=state
+  <- [('127.0.0.1', 52936)] type=place
+  -> [B] type=placeAck
+  -> [B] type=state
+  -> [A] type=state
+  <- [('127.0.0.1', 52938)] type=shoot
+  -> [A] type=result
+  -> [B] type=state
+  -> [A] type=state
+  -> [A] type=opponentLeft
+Server beendet
+getrennt: ('127.0.0.1', 52936)getrennt: ('127.0.0.1', 52938)
+

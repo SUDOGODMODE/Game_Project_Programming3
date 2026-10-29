@@ -82,7 +82,7 @@ def main() -> None:
             try:
                 send_message({"type": "join", "player": args.name})
                 show("Standardflotte: Zeilen 1-5, ab Spalte A. Befehle: C5, state, quit oder q.")
-                show("Mit state den aktuellen Zug abfragen; waehrend der Partie gibt es noch keinen Zustandspush.")
+                show("Zug und Zustand kommen automatisch; state fragt sie zusaetzlich ab.")
                 for line in sys.stdin:
                     command = line.strip()
                     if not command:

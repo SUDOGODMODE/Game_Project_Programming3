@@ -1,6 +1,6 @@
 # Schiffe versenken — Regelblatt
 
-Stand: 13.10.2026. Spielwahl freigegeben, bestätigt im Gespräch. Die folgenden Regeln beschreiben den aktuellen Spielkern. Gegenlesen steht noch aus.
+Stand: 27.10.2026. Spielwahl freigegeben, bestätigt im Gespräch. Die folgenden Regeln beschreiben den aktuellen Spielkern. Gegenlesen steht noch aus.
 
 Zwei Spieler versuchen, die Flotte des Gegners zu versenken. Jeder setzt fünf Schiffe auf sein eigenes Raster, ohne dem Gegner die Positionen zu zeigen. Danach schiessen die Spieler abwechselnd auf ein gegnerisches Feld. Der Spielkern meldet Wasser, Treffer oder versenkt. Wer zuerst die gesamte gegnerische Flotte getroffen hat, gewinnt.
 
@@ -51,7 +51,7 @@ Unbekannte Spieler lehnt der Kern mit `INVALID_PLAYER` ab. Im Netzwerk vergibt d
 
 ## Verborgene Information
 
-Ein Spieler sieht seine eigenen Schiffe und deren Treffer sowie die Ergebnisse seiner eigenen Schüsse. Die gegnerischen Schiffspositionen werden nicht ausgegeben. `BattleshipGame.state(slot)` liefert diese Sicht als Kopie; eine Änderung der zurückgegebenen Daten verändert die Partie nicht.
+Ein Spieler sieht seine eigenen Schiffe und deren Treffer sowie die Ergebnisse seiner eigenen Schüsse und alle gegnerischen Schüsse auf sein Raster (auch Fehlschüsse). Die gegnerischen Schiffspositionen werden nicht ausgegeben. `BattleshipGame.state(slot)` liefert diese Sicht als Kopie; eine Änderung der zurückgegebenen Daten verändert die Partie nicht.
 
 ## Ende, Zugunfähigkeit und Abbruch
 
@@ -63,13 +63,15 @@ Geht im Netzwerk ein Spieler, wird sein Platz sofort frei. Beide Flotten, Treffe
 
 ## Bedienung und Prüfungen
 
-Eine Partie ohne Server startet mit `python3 src/local_game.py`. Jeder Spieler setzt seine Flotte und schiesst danach abwechselnd. Für eine Netzwerkpartie wird der Server mit zwei Instanzen von `play.py` gestartet; Startbefehle stehen im [README](README.md).
+Eine Partie ohne Server startet mit `python3 src/local_game.py`. Jeder Spieler setzt seine Flotte und schiesst danach abwechselnd. Für eine Netzwerkpartie wird der Server mit zwei Instanzen von `client_gui.py` gestartet; `play.py` bleibt als Konsolendiagnose erhalten; Startbefehle stehen im [README](README.md).
 
-`test_board.py` prüft Brett und Platzierung. `test_game.py` prüft Phasen, Zugfolge, Sieg, ungültige Aktionen, Reset und den im Vorschlag benannten schwierigen Fall: getrennte Spielersichten, die keine gegnerischen Schiffe enthalten und keine internen Daten verändern können. `test_network.py` prüft diese Zuordnung zusätzlich über echte TCP-Verbindungen.
+`tests/meilenstein_02/test_board.py` prüft Brett und Platzierung. `tests/meilenstein_02/test_game.py` prüft Phasen, Zugfolge, Sieg, ungültige Aktionen, Reset und den im Vorschlag benannten schwierigen Fall: getrennte Spielersichten, die keine gegnerischen Schiffe enthalten und keine internen Daten verändern können. `tests/meilenstein_03/test_network.py` prüft diese Zuordnung zusätzlich über echte TCP-Verbindungen.
 
 ## Oberflächenskizze für die Spielwahl
 
-Entwurf für die spätere Oberfläche, noch keine GUI:
+Ursprüngliche Skizze; seit Kursmeilenstein 4 ist die GUI umgesetzt.
+Host und Name werden beim Start als Argumente übergeben; die Platzierung
+erfolgt über einzelne Start-/Richtungsfelder, der Schuss durch Klick im Zielraster:
 
 ```text
 Schiffe versenken
@@ -88,4 +90,4 @@ Schuss: <feld> [Schiessen]        Letzte Antwort / Fehler
 [Verlassen]
 ```
 
-Die beiden Raster zeigen nur die erlaubte Sicht. Eine ungültige Aktion und ein Verbindungsabbruch erscheinen in der Statuszeile. Die Skizze ergänzt das ursprüngliche Formular; Umsetzung und Bilder gehören zu M6.
+Die beiden Raster zeigen nur die erlaubte Sicht. Eine ungültige Aktion und ein Verbindungsabbruch erscheinen in der Statuszeile. Die Skizze ergänzt das ursprüngliche Formular; Der aktuelle GUI-Stand gehört zur einzelnen Kursaufgabe 4 (im alten Projektablauf M6). Start und Bedienung stehen in `docs/guides/`.

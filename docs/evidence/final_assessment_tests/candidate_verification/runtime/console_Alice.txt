@@ -1,0 +1,63 @@
+Standardflotte: Zeilen 1-5, ab Spalte A. Befehle: C5, state, quit oder q.
+Zug und Zustand kommen automatisch; state fragt sie zusaetzlich ab.
+Willkommen, Alice! Du bist Spieler A.
+Warte auf Gegner.
+Zustand -> Phase: waiting, am Zug: None, eigene Schiffe: 0, eigene Schuesse: 0
+Neue Partie: [{'slot': 'A', 'player': 'Alice'}, {'slot': 'B', 'player': 'Bob'}]. Standardflotte wird platziert.
+Zustand -> Phase: placing, am Zug: None, eigene Schiffe: 0, eigene Schuesse: 0
+Flotte platziert. Phase: placing
+Zustand -> Phase: placing, am Zug: None, eigene Schiffe: 5, eigene Schuesse: 0
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 0
+Schuss auf A1: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 1
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 1
+Schuss auf B1: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 2
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 2
+Schuss auf C1: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 3
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 3
+Schuss auf D1: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 4
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 4
+Schuss auf E1: sunk - Carrier versenkt! Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 5
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 5
+Schuss auf A2: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 6
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 6
+Schuss auf B2: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 7
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 7
+Schuss auf C2: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 8
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 8
+Schuss auf D2: sunk - Battleship versenkt! Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 9
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 9
+Schuss auf A3: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 10
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 10
+Schuss auf B3: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 11
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 11
+Schuss auf C3: sunk - Cruiser versenkt! Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 12
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 12
+Schuss auf A4: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 13
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 13
+Schuss auf B4: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 14
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 14
+Schuss auf C4: sunk - Submarine versenkt! Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 15
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 15
+Schuss auf A5: hit Der Gegner ist am Zug.
+Zustand -> Phase: shooting, am Zug: B, eigene Schiffe: 5, eigene Schuesse: 16
+Zustand -> Phase: shooting, am Zug: A, eigene Schiffe: 5, eigene Schuesse: 16
+Schuss auf B5: sunk - Destroyer versenkt! Gewonnen! q beendet den Client.
+Zustand -> Phase: finished, am Zug: None, eigene Schiffe: 5, eigene Schuesse: 17
+Bob hat das Spiel verlassen. Runde zurueckgesetzt; warte auf Gegner.
+Zustand -> Phase: waiting, am Zug: None, eigene Schiffe: 0, eigene Schuesse: 0
+Verbindung beendet

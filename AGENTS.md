@@ -1,6 +1,6 @@
 # Weiterarbeit an diesem Projekt
 
-Vor der nächsten Arbeitseinheit `WEITERARBEITEN.md`, `README.md` und `docs/status/03_requirements.md` lesen und den aktuellen Git-Status prüfen.
+Vor der nächsten Arbeitseinheit `WEITERARBEITEN.md`, `README.md` und `docs/status/04_requirements.md` lesen und den aktuellen Git-Status prüfen.
 
 - Nur lokal arbeiten. Keine Commits, Pushes oder anderen Änderungen auf GitHub ohne neuen Auftrag; die abschliessenden Git-Schritte übernimmt der Projektverantwortliche.
 - Bereits gestagte und sonstige vorhandene Änderungen erhalten; nichts ungefragt zurücksetzen oder überschreiben.

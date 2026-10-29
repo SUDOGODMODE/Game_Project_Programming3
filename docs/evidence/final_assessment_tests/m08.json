@@ -1,0 +1,40 @@
+{
+  "environment": {
+    "python": "3.14.10 (main, Oct 25 2026, 17:12:00) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "tk": "9.1"
+  },
+  "selection": "08",
+  "started_at": "2026-10-27T16:51:56.245272+00:00",
+  "duration_seconds": 0.011407750000216765,
+  "tests": [
+    {
+      "id": "tests.meilenstein_08.test_packaging.PackagingTests.test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest",
+      "status": "passed",
+      "duration_seconds": 0.007542499999544816,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_08.test_packaging.PackagingTests.test_existing_archive_is_preserved_byte_for_byte",
+      "status": "passed",
+      "duration_seconds": 0.003733375000592787,
+      "reason": ""
+    }
+  ],
+  "events": [],
+  "summary": {
+    "tests_run": 2,
+    "passed": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gui": {
+    "required": false,
+    "discovered": 0,
+    "executed": 0,
+    "skipped": 0,
+    "issues": []
+  },
+  "success": true
+}

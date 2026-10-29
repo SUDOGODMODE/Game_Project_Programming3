@@ -1,0 +1,30 @@
+Server wartet auf Port 51370
+verbunden: ('127.0.0.1', 51373)
+  <- [('127.0.0.1', 51373)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+verbunden: ('127.0.0.1', 51375)
+  <- [('127.0.0.1', 51375)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51373)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51375)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 51373)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 51373)
+getrennt: ('127.0.0.1', 51375)
+Server beendet

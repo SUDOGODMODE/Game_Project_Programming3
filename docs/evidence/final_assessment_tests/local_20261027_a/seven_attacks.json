@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1",
+    "case": "ungueltiges JSON",
+    "timestamp": "2026-10-27T17:50:40.743187+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "observed": "INVALID_JSON; nur Absender; beide Sichten und Zugrecht unveraendert; weitere Zustandsanfragen erfolgreich"
+  },
+  {
+    "id": "2",
+    "case": "falsch typisiertes Feld",
+    "timestamp": "2026-10-27T17:50:40.798776+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "observed": "CELL_OUT_OF_BOUNDS; nur Absender; beide Sichten und Zugrecht unveraendert; weitere Zustandsanfragen erfolgreich"
+  },
+  {
+    "id": "3",
+    "case": "Feld ausserhalb",
+    "timestamp": "2026-10-27T17:50:40.854912+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "observed": "CELL_OUT_OF_BOUNDS; nur Absender; beide Sichten und Zugrecht unveraendert; weitere Zustandsanfragen erfolgreich"
+  },
+  {
+    "id": "4",
+    "case": "Pflichtfeld fehlt",
+    "timestamp": "2026-10-27T17:50:40.911743+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "observed": "CELL_OUT_OF_BOUNDS; nur Absender; beide Sichten und Zugrecht unveraendert; weitere Zustandsanfragen erfolgreich"
+  },
+  {
+    "id": "5",
+    "case": "unbekannter Typ",
+    "timestamp": "2026-10-27T17:50:40.966401+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "observed": "UNKNOWN_TYPE; nur Absender; beide Sichten und Zugrecht unveraendert; weitere Zustandsanfragen erfolgreich"
+  },
+  {
+    "id": "6",
+    "case": "ausser der Reihe",
+    "timestamp": "2026-10-27T17:50:41.019952+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "observed": "NOT_YOUR_TURN; nur Absender; beide Sichten und Zugrecht unveraendert; weitere Zustandsanfragen erfolgreich"
+  },
+  {
+    "id": "7",
+    "case": "Verbindung mitten im Zug trennen",
+    "timestamp": "2026-10-27T17:50:41.023963+01:00",
+    "performer": "automatisierter Codex-Testlauf (Rolle 3)",
+    "result": "PASS",
+    "observed": "Unvollstaendiges shoot-JSON, TCP RST; Gegner informiert, leerer Reset, Ersatzbeitritt und naechster gueltiger Schuss erfolgreich"
+  }
+]

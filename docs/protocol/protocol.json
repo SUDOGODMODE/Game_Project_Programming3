@@ -1,7 +1,7 @@
 {
   "protocol": "BattleshipGame",
-  "version": "0.4",
-  "status": "Protokoll für Kursmeilenstein 3 (Zwei Spieler, ein Tisch). Gegenlesen ausstehend. Nachweise und Projektstand: README.md.",
+  "version": "0.5",
+  "status": "Protokoll für Kursmeilenstein 4 (Das Brett auf dem Bildschirm). Gegenlesen und fremde Rechnernachweise ausstehend; aktueller Stand: README.md.",
   "transport": {
     "protocol": "TCP/IPv4",
     "encoding": "UTF-8",
@@ -9,12 +9,14 @@
     "defaultHost": "0.0.0.0 (Server), 127.0.0.1 (Clients)",
     "defaultPort": 5000,
     "internalMarker": "netz.read_messages liefert broken intern für ungültiges JSON oder Nicht-Objekte. broken ist keine reguläre Spielnachricht; die Antwort über TCP ist error/INVALID_JSON.",
-    "clientReading": "Ein Client muss ständig lesen und nach type unterscheiden; nach einer Anfrage können mehrere Antworten und ungefragte Lobby-/Endmeldungen folgen. state ist derzeit nur eine Antwort auf getState."
+    "clientReading": "Ein Client liest dauerhaft und unterscheidet nach type. Ungefragte individuell gefilterte state-Nachrichten folgen auf Beitritt, erfolgreiche Platzierung, erfolgreichen Schuss und Reset. getState bleibt eine zusätzliche private Abfrage. Die nächste Nachricht ist nicht zwingend die direkte Antwort auf die letzte Anfrage.",
+    "disconnectReading": "Ein erkannter harter Socket-Abbruch beendet read_messages wie EOF.",
+    "serverLogging": "Neue exklusive JSONL-Datei pro Serverstart unter logs/ oder --log-file. Jede empfangene/erfolgreich gesendete Nachricht: UTC-ISO-Zeit mit Zeitzone, Richtung, Verbindung/Slot, bekannter Typ (sonst unknown); nur bei ausgehenden Fehlern bekannter Servercode. Sofortiger Flush, serialisierte Schreiber, kein Anhängen/Überschreiben. Keine Namen, freien Clienttexte, Flotten oder vollständigen Zustands-Payloads. Geheimhaltung an tatsächlich je Client empfangenen Nachrichten prüfen. Drahtformat bleibt 0.5."
   },
   "rules": {
     "grid": "10x10; ausgegebene Felder kanonisch A1-J10. Eingaben akzeptieren ASCII-Kleinbuchstaben und führende Nullen (a01 -> A1); Unicode-Ziffern werden abgelehnt. Doppelbeschuss wird mit kanonischen Feldern geprüft.",
     "players": "Genau zwei; der Server vergibt den ersten freien Slot A, dann B. Nach Abgang ist derselbe Slot wieder frei.",
-    "hiddenInformation": "Jeder Client bekommt nur seine eigene Flotte mit Treffern und die Ergebnisse seiner eigenen Schüsse. Die vollständige gegnerische Flotte wird nicht übertragen.",
+    "hiddenInformation": "Jeder Client bekommt ausschliesslich seine eigene Flotte mit Treffern, eigene Schussergebnisse und alle gegnerischen Schüsse auf sein Raster (auch Fehlschüsse). Unbeschossene gegnerische Positionen werden weder während noch nach der Partie übertragen.",
     "identity": "Die Verbindung bestimmt den Slot. Zusätzliche Felder player oder slot ändern den Handelnden nicht.",
     "phases": [
       "waiting",
@@ -23,7 +25,8 @@
       "finished"
     ],
     "turns": "Nach beiden Platzierungen beginnt A; jeder gültige Schuss wechselt den Spieler. Bei Spielende turn null, kein Unentschieden.",
-    "disconnect": "Sofortiger Rundenreset und Freigabe des abgegangenen Slots. Verbliebener Spieler bleibt verbunden in waiting. Ersatzbeitritt beginnt frisch in placing. Kein reconnect/forfeit implementiert."
+    "disconnect": "Sofortiger Rundenreset und Freigabe des abgegangenen Slots. Verbliebener Spieler erhält opponentLeft, dann seinen leeren waiting-Zustand. Ersatzbeitritt beginnt frisch in placing. Kein reconnect/forfeit implementiert.",
+    "moveMessage": "shoot entspricht dem konzeptionellen move der Kursaufgabe. Kein weiterer Nachrichtentyp move."
   },
   "fleet": {
     "note": "Klassische Flotte; je ein Schiff pro Typ. Die Zusammenstellung ist im Regelblatt REGELN.md für dieses Projekt festgelegt.",
@@ -62,9 +65,10 @@
     "turn": null,
     "ownShips": [],
     "shotsAtOpponent": {},
+    "shotsAtSelf": {},
     "winner": null
   },
-  "stateExampleNote": "Mit getState angefragte eigene Ansicht nach Abgang des Gegners.",
+  "stateExampleNote": "Ungefragte eigene Ansicht direkt nach opponentLeft; derselbe Zustand kann zusätzlich mit getState abgefragt werden.",
   "messages": {
     "join": {
       "from": "Client -> Server",
@@ -98,7 +102,7 @@
         "phase": "waiting"
       },
       "unsolicited": false,
-      "note": "Ein alleiniger Spieler bekommt phase waiting. Der zweite bekommt phase placing. welcome steht auf seiner Verbindung vor waiting bzw. gameStart."
+      "note": "Ein alleiniger Spieler bekommt phase waiting, der zweite placing. welcome kommt vor waiting oder gameStart und dem nachfolgenden state."
     },
     "waiting": {
       "from": "Server -> Client",
@@ -139,7 +143,7 @@
         ]
       },
       "unsolicited": true,
-      "note": "Auch der zuvor wartende Client empfängt dies, ohne etwas zu senden. Nach einem Ersatzbeitritt beginnt eine frische Runde."
+      "note": "Auch der wartende Client empfängt dies ungefragt. Danach erhält jeder seinen eigenen state in placing. Ersatzbeitritt beginnt eine frische Runde."
     },
     "place": {
       "from": "Client -> Server",
@@ -195,7 +199,7 @@
         "phase": "placing"
       },
       "unsolicited": false,
-      "note": "Nach der zweiten gültigen Platzierung ist phase shooting und A beginnt. Nur der Absender bekommt placeAck; der andere Client fragt die Phase bei Bedarf mit getState ab."
+      "note": "Nur an den Akteur, danach state an beide. Nach zweiter Platzierung phase shooting und A beginnt. Abgelehnte Platzierung: nur error, kein state-Push."
     },
     "shoot": {
       "from": "Client -> Server",
@@ -210,7 +214,7 @@
         "field": "C5"
       },
       "unsolicited": false,
-      "note": "Der Server prüft Phase, Zug, Feld und Doppelbeschuss. Antwort: result oder error."
+      "note": "Server prüft Phase, Zug, Feld und Doppelbeschuss. Erfolgreich: result, danach gefilterte states für beide. Abgelehnt: nur error an den Absender, kein state-Push und keine Zustandsänderung."
     },
     "result": {
       "from": "Server -> Client",
@@ -231,7 +235,7 @@
         "turn": "B"
       },
       "unsolicited": false,
-      "note": "Beim letzten Treffer: result sunk und turn null. Der Gewinner erhält kein zusätzliches gameOver."
+      "note": "Beim letzten Treffer result sunk, turn null; danach gameOver nur an den Gegner. Danach states an beide. Kein zusätzliches gameOver an den Gewinner."
     },
     "getState": {
       "from": "Client -> Server",
@@ -244,18 +248,19 @@
         "type": "getState"
       },
       "unsolicited": false,
-      "note": "Antwort: state."
+      "note": "Genau ein state an den Anfragenden; keine Nachricht an den anderen Spieler und keine Zustandsänderung."
     },
     "state": {
       "from": "Server -> Client",
       "direction": "server_to_client",
-      "trigger": "Direkte Antwort auf getState; nur an den anfragenden beigetretenen Client.",
+      "trigger": "Ungefragt nach Beitritt, erfolgreicher Platzierung, erfolgreichem Schuss oder Reset an jeden verbundenen Spieler, individuell gefiltert; auf getState nur an den Anfragenden.",
       "requiredFields": {
         "type": "string, genau state",
         "phase": "waiting, placing, shooting oder finished",
         "turn": "A/B oder null",
         "ownShips": "Liste eigener Schiffe: {type, cells: Feldliste, hits: Feldliste}",
         "shotsAtOpponent": "Objekt Feld -> miss/hit/sunk für eigene Schüsse",
+        "shotsAtSelf": "Objekt Feld -> miss/hit/sunk für alle gegnerischen Schüsse auf das eigene Raster, auch Fehlschüsse",
         "winner": "A/B oder null"
       },
       "example": {
@@ -312,10 +317,11 @@
           }
         ],
         "shotsAtOpponent": {},
+        "shotsAtSelf": {},
         "winner": null
       },
-      "unsolicited": false,
-      "note": "Die Antwort enthält nur die eigene Ansicht. Nach opponentLeft: waiting, leere ownShips/shotsAtOpponent und turn/winner null."
+      "unsolicited": true,
+      "note": "Immer vollständige eigene Sicht, keine Gegnerflotte. Siehe stateSemantics. Nach opponentLeft folgt automatisch waiting mit leeren ownShips, shotsAtOpponent und shotsAtSelf, turn und winner null."
     },
     "leave": {
       "from": "Client -> Server",
@@ -345,7 +351,7 @@
         "player": "Bob"
       },
       "unsolicited": true,
-      "note": "Der Server gibt den Slot frei und setzt die Runde zurück; siehe rules.disconnect."
+      "note": "Slot frei, Runde zurückgesetzt; danach folgt automatisch der zurückgesetzte state an den Verbliebenen. Kein zusätzlicher waiting-Nachrichtentyp."
     },
     "gameOver": {
       "from": "Server -> Client",
@@ -362,7 +368,7 @@
         "reason": "sunk"
       },
       "unsolicited": true,
-      "note": "Der Gewinner erkennt das Spielende an result mit turn null. Beide können den Endzustand mit getState abfragen."
+      "note": "Gewinner erkennt das Ende an result.turn null. Danach erhält jeder automatisch seinen vollständigen gefilterten Endzustand mit winner. getState bleibt möglich."
     },
     "error": {
       "from": "Server -> Client",
@@ -396,15 +402,27 @@
     }
   },
   "ordering": [
-    "Erster join: welcome, waiting an diesen Client.",
-    "Zweiter join: welcome an den zweiten Client, danach gameStart an beide.",
-    "Erfolgreiches place: placeAck nur an den Akteur; Zustand derzeit mit getState abfragen.",
-    "Erfolgreiches shoot: result nur an den Akteur; beim Sieg gameOver nur an den Gegner. Kein automatischer state-Push.",
-    "Abgang: genau ein opponentLeft an den verbleibenden Client; interner Reset, kein zusätzlicher state- oder waiting-Push."
+    "Erster join: welcome, waiting, state an diesen Client.",
+    "Zweiter join: welcome an den zweiten Client, gameStart an beide, danach je ein individueller state an beide.",
+    "Erfolgreiches place: placeAck nur an den Akteur, danach je ein individueller state an beide.",
+    "Erfolgreiches shoot: result nur an den Akteur, beim Sieg gameOver nur an den Gegner, danach je ein individueller state an beide.",
+    "Ablehnung: nur error an den Absender; kein state-Push und keine Zustandsänderung.",
+    "getState: genau ein individueller state nur an den Anfragenden.",
+    "Abgang: genau ein opponentLeft an den Verbliebenen, danach sein zurückgesetzter state; kein zusätzlicher waiting-Nachrichtentyp.",
+    "Prüfen, Ändern und Senden unter derselben Spielsperre. Individuelle Zustände sind unabhängige Kopien der erlaubten Sicht. Ereignisreihenfolge je TCP-Verbindung; keine Zusage einer Reihenfolge zwischen Clientverbindungen oder einer zeitgleichen Anzeige."
   ],
   "openQuestions": [
-    "Klassische Flotte gegen das freigegebene Regelblatt bestätigen.",
     "Protokoll gegenlesen lassen.",
-    "Weitere offene Nachweise und Projektphasen: README.md."
-  ]
+    "Echte Schulnetzpartie mit zwei verschiedenen fremden Clientadressen nachweisen.",
+    "Weitere offene Nachweise: README.md."
+  ],
+  "stateSemantics": {
+    "completeView": "Vollständige erlaubte Sicht als unabhängige Kopie, kein Delta. Raster 10x10 A1-J10; kein öffentliches board mit Gegnerflotte.",
+    "ownShips": "Eigene gesetzte Flotte mit cells und hits. Leere Liste vor eigener gültiger Platzierung oder nach Reset. Nach eigener gültiger Platzierung sind Felder ausserhalb der eigenen Flotte Wasser.",
+    "shotsAtOpponent": "Feld -> miss/hit/sunk für alle eigenen bisherigen Schüsse. Fehlender Schlüssel bedeutet unbeschossen und unbekannt, nicht Wasser.",
+    "shotsAtSelf": "Feld -> miss/hit/sunk für alle gegnerischen bisherigen Schüsse auf das eigene Raster, auch Fehlschüsse. Fehlender Schlüssel bedeutet noch nicht vom Gegner beschossen.",
+    "results": "miss: Wasser; hit: Schiff getroffen; sunk: genau dieser Schuss versenkte ein Schiff. Frühere hit-Einträge werden nicht nachträglich zu sunk geändert.",
+    "emptyReset": "phase waiting; ownShips [], shotsAtOpponent {}, shotsAtSelf {}, turn null, winner null.",
+    "rendering": "Client zeichnet beide Raster vollständig aus jedem state; Klicks ändern keinen lokalen Spielstand."
+  }
 }

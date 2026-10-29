@@ -1,17 +1,37 @@
 """Spielserver: verwaltet Verbindungen; die Spielregeln stehen in board.py."""
 import argparse
+from datetime import datetime, timezone
+from pathlib import Path
 import socket
 import threading
+from uuid import uuid4
 
 import board
 from netz import send, read_messages
+from event_log import EventLog, MESSAGE_TYPES
 
 HOST, PORT = "0.0.0.0", 5000
 SLOTS = ("A", "B")
 
 
-def new_game() -> dict:
+def log_message(direction: str, peer, message: dict, game=None, slot=None) -> None:
+    """Nur bekannte Metadaten loggen, niemals Flotten oder freie Clienttexte."""
+    kind = message.get("type")
+    kind = kind if isinstance(kind, str) and kind in MESSAGE_TYPES else "unknown"
+    code = message.get("code") if kind == "error" else None
+    # Fehlercodes stammen ausschliesslich aus unseren eigenen Antwortobjekten.
+    error = f" code={code}" if direction == "->" and code else ""
+    print(f"  {direction} [{peer}] type={kind}{error}", flush=True)
+    if game is not None:
+        game["event_log"].record(direction, peer, message, slot=slot)
+
+
+def new_game(log_file=None) -> dict:
+    if log_file is None:
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
+        log_file = Path(__file__).resolve().parents[1] / "logs" / f"{stamp}_{uuid4().hex[:8]}.jsonl"
     return {
+        "event_log": EventLog(log_file),
         "lock": threading.Lock(),
         "core": board.BattleshipGame(),
         "taken": [],
@@ -33,7 +53,7 @@ def send_to(game: dict, slot: str, message: dict) -> None:
         return
     try:
         send(sock, message)
-        print(f"  -> [{slot}]", message, flush=True)
+        log_message("->", slot, message, game, slot)
     except OSError:
         pass  # Der Empfangsthread entfernt die Verbindung in finally.
 
@@ -42,6 +62,12 @@ def broadcast(game: dict, message: dict) -> None:
     """Schickt an alle angemeldeten Spieler. Die Spielsperre ist bereits gehalten."""
     for slot in list(game["taken"]):
         send_to(game, slot, message)
+
+
+def send_states(game: dict) -> None:
+    """Schickt jedem Spieler seine vollstaendige Sicht; Spielsperre ist gehalten."""
+    for slot in list(game["taken"]):
+        send_to(game, slot, {"type": "state", **game["core"].state(slot)})
 
 
 def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
@@ -99,7 +125,7 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
         slot = connection["slot"]
         if slot is None:
             send(sock, response)
-            print("  -> [nicht angemeldet]", response, flush=True)
+            log_message("->", connection.get("peer", "nicht angemeldet"), response, game)
         else:
             send_to(game, slot, response)
 
@@ -120,6 +146,9 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
             opponent = next(s for s in SLOTS if s != slot)
             send_to(game, opponent, {"type": "gameOver", "winner": slot, "reason": "sunk"})
 
+        if response["type"] in ("welcome", "placeAck", "result"):
+            send_states(game)
+
 
 def remove_player(connection: dict, game: dict) -> None:
     """Gibt den Platz genau einmal frei und verwirft die abgebrochene Partie."""
@@ -134,19 +163,20 @@ def remove_player(connection: dict, game: dict) -> None:
         connection["slot"] = None
         game["core"].reset()
         broadcast(game, {"type": "opponentLeft", "slot": slot, "player": name})
+        send_states(game)
 
 
 def handle_connection(sock: socket.socket, address, game: dict) -> None:
     print("verbunden:", address, flush=True)
-    connection = {"slot": None, "leaving": False}
+    connection = {"slot": None, "leaving": False, "peer": address}
     try:
         for message in read_messages(sock):
-            print(f"  <- [{address}]", message, flush=True)
+            log_message("<-", address, message, game, connection["slot"])
             handle(message, connection, game, sock)
             if connection["leaving"]:
                 break
     except (OSError, UnicodeError) as exc:
-        print(f"Verbindung {address} beendet: {exc}", flush=True)
+        print(f"Verbindung {address} beendet: {type(exc).__name__}", flush=True)
     finally:
         remove_player(connection, game)
         try:
@@ -161,8 +191,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Schiffe-versenken-Server")
     parser.add_argument("--host", default=HOST, help="Bindeadresse (Standard: alle Netzwerkkarten)")
     parser.add_argument("--port", type=int, default=PORT, help="TCP-Port (Standard: 5000)")
+    parser.add_argument("--log-file", type=Path, help="Neue JSONL-Datei; vorhandene Dateien werden abgelehnt")
     args = parser.parse_args()
-    game = new_game()
+    try:
+        game = new_game(log_file=args.log_file)
+    except OSError as exc:
+        parser.exit(1, f"Nachrichtenlog konnte nicht angelegt werden: {exc}\n")
+    connections = []
+    print("Nachrichtenlog:", game["event_log"].path, flush=True)
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
             listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -171,11 +207,23 @@ def main() -> None:
             print("Server wartet auf Port", listener.getsockname()[1], flush=True)
             while True:
                 sock, address = listener.accept()
-                threading.Thread(target=handle_connection, args=(sock, address, game), daemon=True).start()
+                worker = threading.Thread(target=handle_connection, args=(sock, address, game), daemon=True)
+                connections.append((sock, worker))
+                worker.start()
     except KeyboardInterrupt:
         print("Server beendet", flush=True)
     except OSError as exc:
         parser.exit(1, f"Server konnte nicht gestartet werden: {exc}\n")
+    finally:
+        for sock, worker in connections:
+            try:
+                sock.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+            sock.close()
+        for sock, worker in connections:
+            worker.join(timeout=3)
+        game["event_log"].close()
 
 
 if __name__ == "__main__":

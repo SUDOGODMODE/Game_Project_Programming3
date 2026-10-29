@@ -50,7 +50,7 @@ Die Netzwerkprüfungen umfassen auch die Freigabe von Slot A, sechs gleichzeitig
 
 ## Sieben Pflichtangriffe aus dem Projektablauf
 
-Die Tabelle bezieht sich auf die ausgeführten Fälle in [test_network.py](../../src/test_network.py). Je Fall werden auch weitere Anfragen beziehungsweise der Zustand geprüft, damit eine Ablehnung allein keinen unbeachteten Verbindungsabbruch verdeckt.
+Die Tabelle bezieht sich auf die ausgeführten Fälle in [test_network.py](../../tests/meilenstein_03/test_network.py). Je Fall werden auch weitere Anfragen beziehungsweise der Zustand geprüft, damit eine Ablehnung allein keinen unbeachteten Verbindungsabbruch verdeckt.
 
 | Nr. | Angriff | Erwartet | Beobachtet | Ergebnis |
 |---|---|---|---|---|
@@ -67,3 +67,8 @@ Bei Fall 7 hängt die Antwort auf den gleichzeitig gesendeten Schuss von der Rei
 ## Übergabe
 
 Der lokale Funktionsnachweis ist abgeschlossen. Für die Abgabe dieses Kursmeilensteins fehlen noch die Server- und Clientausgaben von zwei fremden Rechnern im Schulnetz. Fachliche Durchsicht, reale Lesepartnerschaft und die weiteren Projektphasen bleiben im [README](../../README.md) aufgeführt. Alle Änderungen liegen lokal und uncommittet vor.
+
+
+Hinweis zum Strukturumzug vom 27.10.2026: Der Link auf den Testcode folgt
+jetzt dem Ordner `tests/meilenstein_03/`. Die damaligen Ergebnisse und
+zugehörigen Rohlogs wurden nicht verändert.

@@ -1,0 +1,21 @@
+{
+  "started": "2026-10-27T16:58:12.847729+01:00",
+  "scope": "Automatisierte lokale TCP-Partie mit zwei echten Tk-Fenstern",
+  "checks": [
+    "Beitritt, Warten und ungefragter Spielstart",
+    "Individuelle Flotten und serverbestaetigte Platzierung",
+    "Klick B6 aktualisiert beide Fenster ohne getState",
+    "Beide Ablehnungen privat; beide Zustaende unveraendert",
+    "Vollstaendige 33-Schuss-Partie, Sieg und Niederlage in beiden Fenstern",
+    "Fensterkreuz, Abbruchanzeige, leerer Reset und Ersatzbeitritt",
+    "Alle echten Zustandsnachrichten enthalten ausschliesslich die jeweilige eigene Flotte"
+  ],
+  "window_size": [
+    800,
+    682
+  ],
+  "out_of_turn": "Fehler NOT_YOUR_TURN: Spieler A ist nicht am Zug",
+  "duplicate_shot": "Fehler DUPLICATE_SHOT: auf B6 wurde bereits geschossen",
+  "result": "PASS",
+  "finished": "2026-10-27T17:01:03.050763+01:00"
+}

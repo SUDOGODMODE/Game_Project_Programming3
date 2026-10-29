@@ -1,0 +1,423 @@
+Brett auf dem Bildschirm
+
+
+
+HFTM · Projekt · Meilenstein
+Das Brett auf dem Bildschirm
+Du klickst auf ein Feld. Im Fenster deines Gegners erscheint dein Stein. Zum ersten Mal ein Spiel statt einer Terminalausgabe.
+EinstiegWorum es heute geht
+Beim letzten Mal hast du erreicht, dass zwei Spieler gleichzeitig verbunden sind und dass der Server von sich aus zu beiden sprechen kann. Was der Server bisher nicht hat, ist etwas, worüber er sprechen könnte. Es gibt noch kein Brett.
+Heute bekommt er eines, und dein Client bekommt ein Fenster. Danach läuft dieser Kreis:
+Klick im Fenster
+  -> {"type": "move", "feld": 4}            an den Server
+       Server prueft, aendert sein Brett
+  <- {"type": "state", "board": [...], ...}  an BEIDE
+       beide Fenster zeichnen neu
+Das Wichtige daran steht in der dritten und vierten Zeile. Der Klick ändert nicht dein Fenster. Er schickt einen Wunsch. Dein Fenster ändert sich erst, wenn der neue Stand zurückkommt, und im selben Moment ändert sich auch das Fenster deines Gegners.
+Der Knopf schickt einen Wunsch. Gezeichnet wird, was der Server zurückschickt.
+Das klingt umständlich, solange du allein testest. Es ist der Grund, warum beide Spieler dasselbe sehen.
+Wie immer: zuerst die geprüfte Fassung zum Laufen bringen, danach auf dein eigenes Spiel umbauen.
+Was heute bewusst fehlt
+Dein Server prüft heute nur drei Dinge: bist du am Zug, liegt das Feld auf dem Brett, ist es frei. Er prüft keine Spielregeln. Niemand gewinnt, und bei Vier gewinnt fällt noch kein Stein nach unten.
+Das ist Absicht. Die Regeln gehören in den Spielkern, und der ist der nächste Meilenstein. Heute geht es darum, dass der Kreis aus Klick, Prüfung und Anzeige steht. Ein Spiel ohne Regeln, das sichtbar funktioniert, ist mehr wert als Regeln, die niemand sieht.
+Schritt 1Das Brett in den Server
+Der Server bekommt drei Dinge dazu: ein Brett, die Angabe, wer am Zug ist, und eine Behandlung für die neue Nachricht move.
+"""server.py: haelt das Brett und schickt nach jedem Zug den neuen Stand an alle."""
+import socket
+import threading
+
+from netz import sende, leser
+
+HOST, PORT = "0.0.0.0", 5000
+MAX_SPIELER = 2
+FELDER = 9                      # 3 mal 3
+ZEICHEN = {1: "X", 2: "O"}
+
+sperre = threading.Lock()
+clients = {}                    # spieler_id -> {"sock": ..., "name": ...}
+zaehler = {"naechste_id": 1}
+brett = [" "] * FELDER
+am_zug = {"spieler_id": 1}
+
+
+def an_alle(nachricht):
+    """Aufrufer haelt bereits die Sperre."""
+    for eintrag in list(clients.values()):
+        try:
+            sende(eintrag["sock"], nachricht)
+        except OSError:
+            pass
+
+
+def stand_senden():
+    """Aufrufer haelt bereits die Sperre."""
+    an_alle({"type": "state", "board": list(brett), "currentPlayer": am_zug["spieler_id"]})
+
+
+def beitreten(nachricht, verbindung, sock):
+    if verbindung["spieler_id"] is not None:
+        sende(sock, {"type": "rejected", "reason": "bereits beigetreten"})
+        return
+    if len(clients) >= MAX_SPIELER:
+        sende(sock, {"type": "rejected", "reason": "Spiel ist voll"})
+        return
+    name = nachricht.get("player")
+    if not isinstance(name, str) or not name.strip():
+        sende(sock, {"type": "rejected", "reason": "Name fehlt"})
+        return
+
+    spieler_id = zaehler["naechste_id"]
+    zaehler["naechste_id"] += 1
+    verbindung["spieler_id"] = spieler_id
+    clients[spieler_id] = {"sock": sock, "name": name}
+
+    sende(sock, {"type": "welcome", "playerId": spieler_id, "player": name,
+                 "symbol": ZEICHEN[spieler_id]})
+    if len(clients) < MAX_SPIELER:
+        sende(sock, {"type": "waiting", "reason": "warte auf Gegner"})
+    else:
+        an_alle({"type": "gameStart",
+                 "players": [{"playerId": i, "player": c["name"], "symbol": ZEICHEN[i]}
+                             for i, c in sorted(clients.items())]})
+        stand_senden()
+
+
+def ziehen(nachricht, verbindung, sock):
+    spieler_id = verbindung["spieler_id"]
+
+    if spieler_id is None:
+        sende(sock, {"type": "rejected", "reason": "noch nicht beigetreten"})
+        return
+    if len(clients) < MAX_SPIELER:
+        sende(sock, {"type": "rejected", "reason": "Gegner fehlt"})
+        return
+    if spieler_id != am_zug["spieler_id"]:
+        sende(sock, {"type": "rejected", "reason": "du bist nicht am Zug"})
+        return
+
+    feld = nachricht.get("feld")
+    if type(feld) is not int or not 0 <= feld < FELDER:
+        sende(sock, {"type": "rejected", "reason": "Feld ausserhalb des Bretts"})
+        return
+    if brett[feld] != " ":
+        sende(sock, {"type": "rejected", "reason": "Feld ist besetzt"})
+        return
+
+    brett[feld] = ZEICHEN[spieler_id]
+    am_zug["spieler_id"] = 2 if spieler_id == 1 else 1
+    stand_senden()
+
+
+def behandeln(nachricht, verbindung, sock):
+    typ = nachricht.get("type")
+
+    if typ == "join":
+        with sperre:                       # kritischer Abschnitt
+            beitreten(nachricht, verbindung, sock)
+        return
+
+    if typ == "move":
+        with sperre:                       # kritischer Abschnitt
+            ziehen(nachricht, verbindung, sock)
+        return
+
+    if typ == "kaputt":
+        sende(sock, {"type": "rejected", "reason": "kein gueltiges JSON"})
+        return
+
+    sende(sock, {"type": "rejected", "reason": f"unbekannter Typ: {typ}"})
+
+
+def bedienen(sock, adresse):
+    verbindung = {"spieler_id": None}
+    try:
+        for nachricht in leser(sock):
+            print("  <-", adresse, nachricht, flush=True)
+            behandeln(nachricht, verbindung, sock)
+    finally:
+        with sperre:
+            spieler_id = verbindung["spieler_id"]
+            weg = clients.pop(spieler_id, None)
+            if weg is not None:
+                an_alle({"type": "opponentLeft",
+                         "playerId": spieler_id, "player": weg["name"]})
+        sock.close()
+        print("getrennt:", adresse, flush=True)
+
+
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as horcher:
+        horcher.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        horcher.bind((HOST, PORT))
+        horcher.listen()
+        print("Server wartet auf Port", PORT, flush=True)
+        while True:
+            sock, adresse = horcher.accept()
+            print("verbunden:", adresse, flush=True)
+            threading.Thread(target=bedienen, args=(sock, adresse),
+                             daemon=True).start()
+
+
+if __name__ == "__main__":
+    main()
+Was an diesem Code wichtig ist
+behandeln ist kürzer geworden, nicht länger. Die Arbeit steckt jetzt in beitreten und ziehen. Jede neue Nachricht in deinem Protokoll bekommt eine eigene Funktion und eine Zeile in behandeln. So bleibt die Stelle übersichtlich, auch wenn dein Spiel zehn Nachrichtentypen hat.
+Die Sperre steht in behandeln, nicht in ziehen. Damit liegt sie an einer einzigen Stelle, und du kannst nicht vergessen, sie bei einer neuen Nachricht zu setzen. ziehen und beitreten dürfen davon ausgehen, dass sie geschützt laufen, und stand_senden ebenfalls. Schreib das als Kommentar dazu, sonst ist es in zwei Wochen vergessen.
+Prüfen und Handeln liegen zusammen im geschützten Abschnitt. ziehen prüft das Feld und schreibt es. Läge die Sperre nur um die Zuweisung, könnten beide Spieler dasselbe freie Feld sehen und beide hineinschreiben. Das ist der Wettlauf aus Übung 7, diesmal mit deinem Brett.
+type(feld) is not int und nicht isinstance. In Python ist bool eine Unterklasse von int, und brett[True] ist dasselbe wie brett[1]. Ein Client, der {"type": "move", "feld": true} schickt, würde mit isinstance an der Prüfung vorbei auf Feld 1 setzen.
+Die Ablehnung geht nur an den Absender, der Stand an alle. Der Gegner muss nicht erfahren, dass du danebengegriffen hast. Er muss erfahren, wie das Brett jetzt aussieht.
+list(brett) in stand_senden. Du schickst eine Kopie. Ohne das gibst du eine Referenz auf deine eigenen Daten heraus.
+Schritt 2Eine kleine Reparatur in netz.py
+Sobald du Fenster statt Terminals hast, schliesst du Clients nicht mehr mit q, sondern mit dem Kreuz oben rechts. Das ist für das Betriebssystem ein harter Abbruch, und dann liefert recv nicht etwa nichts, sondern wirft einen Fehler. Im Server-Terminal steht dann mitten im Spiel:
+Exception in thread Thread-1 (bedienen):
+  ...
+ConnectionResetError: [Errno 104] Connection reset by peer
+Der Server läuft weiter, und das finally hat seine Arbeit getan. Trotzdem gehört das repariert, denn so eine Ausgabe verdeckt jeden echten Fehler. Die Stelle ist netz.py:
+"""netz.py: Nachrichten als JSON-Zeilen senden und lesen."""
+import json
+
+
+def sende(sock, nachricht: dict) -> None:
+    zeile = json.dumps(nachricht, ensure_ascii=False) + "\n"
+    sock.sendall(zeile.encode("utf-8"))
+
+
+def leser(sock):
+    """Liefert Nachrichten, bis die Gegenseite die Verbindung beendet.
+    Ein hartes Abbrechen zaehlt auch als Ende, deshalb das except OSError."""
+    datei = sock.makefile("r", encoding="utf-8", newline="\n")
+    try:
+        for zeile in datei:
+            zeile = zeile.strip()
+            if not zeile:
+                continue
+            try:
+                yield json.loads(zeile)
+            except json.JSONDecodeError:
+                yield {"type": "kaputt"}
+    except OSError:
+        return
+Ein harter Abbruch ist auch ein Ende der Verbindung, nur ein unhöfliches. leser hat versprochen, Nachrichten zu liefern, bis die Gegenseite geht, und hält dieses Versprechen jetzt in beiden Fällen. Dadurch bleiben Server und Client unverändert sauber.
+Schritt 3Der Client mit Fenster
+Lege eine neue Datei client_gui.py an. Deinen alten client.py löschst du nicht. Wenn später etwas nicht geht, ist die erste Frage immer: geht es im Terminal? Damit trennst du Netzfehler von Anzeigefehlern in zehn Sekunden.
+"""client_gui.py: Fenster statt Terminal.
+Der Netzthread schreibt nur in eine Queue, gezeichnet wird nur im Tk-Thread."""
+import queue
+import socket
+import sys
+import threading
+import tkinter as tk
+
+from netz import sende, leser
+
+HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
+NAME = sys.argv[2] if len(sys.argv) > 2 else "Alice"
+PORT = 5000
+SPALTEN = 3
+FELDER = 9
+
+
+class Fenster:
+    def __init__(self, sock):
+        self.sock = sock
+        self.posteingang = queue.Queue()
+        self.spieler_id = None
+
+        self.wurzel = tk.Tk()
+        self.wurzel.title(f"Spiel ({NAME})")
+
+        raster = tk.Frame(self.wurzel)
+        raster.pack(padx=12, pady=12)
+        self.knoepfe = []
+        for i in range(FELDER):
+            k = tk.Button(raster, text=" ", width=4, height=2,
+                          font=("Helvetica", 24),
+                          command=lambda i=i: self.zug_senden(i))
+            k.grid(row=i // SPALTEN, column=i % SPALTEN)
+            self.knoepfe.append(k)
+
+        self.zeile = tk.Label(self.wurzel, text="verbinde ...")
+        self.zeile.pack(pady=(0, 10))
+
+        threading.Thread(target=self.empfangen, daemon=True).start()
+        self.wurzel.after(100, self.posteingang_leeren)
+
+    # ---- Netzthread: schreibt nur in die Queue --------------------
+    def empfangen(self):
+        for nachricht in leser(self.sock):
+            self.posteingang.put(nachricht)
+        self.posteingang.put({"type": "verbindungWeg"})
+
+    # ---- Tk-Thread: alles andere ----------------------------------
+    def posteingang_leeren(self):
+        while True:
+            try:
+                nachricht = self.posteingang.get_nowait()
+            except queue.Empty:
+                break
+            self.verarbeiten(nachricht)
+        self.wurzel.after(100, self.posteingang_leeren)
+
+    def verarbeiten(self, n):
+        typ = n.get("type")
+        if typ == "welcome":
+            self.spieler_id = n["playerId"]
+            self.zeile.config(text=f"Du bist {n['symbol']}")
+        elif typ == "waiting":
+            self.zeile.config(text="warte auf Gegner")
+        elif typ == "gameStart":
+            namen = ", ".join(f"{p['player']} ({p['symbol']})" for p in n["players"])
+            self.zeile.config(text="Spiel laeuft: " + namen)
+        elif typ == "state":
+            self.zeichnen(n)
+        elif typ == "rejected":
+            self.zeile.config(text="abgelehnt: " + n["reason"])
+        elif typ == "opponentLeft":
+            self.zeile.config(text=f"{n['player']} hat das Spiel verlassen")
+        elif typ == "verbindungWeg":
+            self.zeile.config(text="Verbindung verloren")
+
+    def zeichnen(self, n):
+        """Die einzige Stelle, die das Brett anzeigt. Zeichnet immer alles neu."""
+        for knopf, wert in zip(self.knoepfe, n["board"]):
+            knopf.config(text=wert)
+        dran = n["currentPlayer"] == self.spieler_id
+        self.zeile.config(text="Du bist am Zug" if dran else "Gegner ist am Zug")
+
+    def zug_senden(self, feld):
+        try:
+            sende(self.sock, {"type": "move", "feld": feld})
+        except OSError:
+            self.zeile.config(text="Senden fehlgeschlagen")
+
+
+def main():
+    sock = socket.create_connection((HOST, PORT))
+    fenster = Fenster(sock)
+    sende(sock, {"type": "join", "player": NAME})
+    fenster.wurzel.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+Was an diesem Code wichtig ist
+Drei Bereiche, deutlich getrennt. empfangen läuft im Netzthread und schreibt nur in die Queue. Alles darunter läuft im Tk-Thread. Die Kommentare im Code markieren die Grenze. Halte sie beim Erweitern ein.
+zeichnen ist die einzige Stelle, die das Brett anzeigt. Sie setzt alle Felder, auch die unveränderten. Wenn du später irgendwo sonst ein config(text=...) auf einen Spielfeldknopf schreibst, hast du zwei Wahrheiten im Client.
+zug_senden schickt und tut sonst nichts. Kein config, keine lokale Änderung. Das ist die Regel aus dem Einstieg, und sie ist genau eine Zeile lang.
+lambda i=i bei den Knöpfen. Ohne den Standardwert schicken alle neun Felder die Acht.
+self.spieler_id merkt sich der Client aus der Willkommensnachricht. Er braucht sie nur, um zu entscheiden, ob er selbst am Zug ist. Er schickt sie nie mit.
+Das join steht in main, nach dem Erzeugen des Fensters. Würdest du vorher senden, käme die Antwort unter Umständen an, bevor der Empfangsthread läuft.
+Schritt 4Die fünf Fälle
+Starte den Server und zwei Fenster:
+Terminal 1:  $ python3 server.py
+Terminal 2:  $ python3 client_gui.py 127.0.0.1 Alice
+Terminal 3:  $ python3 client_gui.py 127.0.0.1 Bob
+Vor der Ausführung schriftlich
+Alice klickt auf die Mitte. Schreib hin, was danach in Alices Fenster steht und was in Bobs Fenster steht. Beide Antworten, nicht nur die erste.
+So sieht ein Durchlauf aus. Die Zeilen stammen aus einem echten Lauf mit zwei Fenstern:
+A: Du bist am Zug | B: Gegner ist am Zug
+
+Bob klickt, obwohl Alice am Zug ist:
+B: abgelehnt: du bist nicht am Zug
+
+Alice klickt auf Feld 4:
+A Brett: [' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' ']
+B Brett: [' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' ']   <- ohne Klick in B
+B: Du bist am Zug
+
+Bob klickt auf Feld 4, das jetzt besetzt ist:
+B: abgelehnt: Feld ist besetzt
+
+Bob klickt auf Feld 0:
+A Brett: ['O', ' ', ' ', ' ', 'X', ' ', ' ', ' ', ' '] | A: Du bist am Zug
+Die vierte Zeile ist der Punkt des Abends. In Bobs Fenster steht ein X, und Bob hat nichts angeklickt.
+Weiter, wenn
+Ein Klick bei Alice ändert beide Fenster.
+Ein Klick ausser der Reihe wird abgelehnt, und zwar nur im Fenster dessen, der geklickt hat.
+Ein Klick auf ein besetztes Feld wird abgelehnt.
+Die Statuszeile zeigt in genau einem der beiden Fenster «Du bist am Zug».
+Wenn du ein Fenster mit dem Kreuz schliesst, läuft der Server ohne Fehlermeldung weiter und das andere Fenster meldet es.
+Schritt 5Auf dein eigenes Spiel umbauen
+Jetzt wird aus dem Raster dein Spielfeld. Ändere eine Sache, teste, dann die nächste.
+Im Server
+Was
+Wie
+FELDER
+Memory 16, Vier gewinnt 42, Schiffe versenken und Minensucher 100, Mühle 24, Tic-Tac-Toe 9.
+Was in einem Feld steht
+Bei dir vielleicht nicht "X" und "O", sondern eine Zahl, ein Motiv oder null. Der Server entscheidet, was drinsteht.
+Was ein Zug ist
+Bei Vier gewinnt ist es eine Spalte, nicht ein Feld. Bei Schiffe versenken sind es zwei Zahlen. Bei einem Kartenspiel eine Kartenkennung.
+Die drei Prüfungen
+«Feld ist frei» heisst bei Memory «Karte ist noch verdeckt» und bei Schiffe versenken «hier wurde noch nicht geschossen». Der Satz ändert sich, die Stelle nicht.
+Im Client
+Spielart
+Was du änderst
+Tic-Tac-Toe, Memory, Minensucher, Schiffe versenken
+Nur SPALTEN und FELDER. Bei zehn mal zehn nimm kleinere Knöpfe, etwa width=2, height=1 und eine kleinere Schrift.
+Vier gewinnt
+Das Raster zeigt 42 Felder an, geklickt wird aber auf einer eigenen Reihe von sieben Spaltenknöpfen darüber. Die Rasterknöpfe bekommen kein command, sie zeigen nur an. Nimm dafür Labels statt Knöpfe.
+Hangman
+Oben ein grosses Label für das Wort, darunter ein Raster aus 26 Buchstabenknöpfen. Dein Zug ist ein Buchstabe, nicht eine Feldnummer.
+Kartenspiel
+Eine Reihe von Knöpfen, einer je Handkarte. Die Zahl der Knöpfe ändert sich während des Spiels. Einfachster Weg: in zeichnen alle alten Knöpfe mit destroy() entfernen und aus dem neuen Zustand neu aufbauen.
+Rundenbasierter Kampf
+Kein Raster. Zwei bis vier Aktionsknöpfe, dazu Labels für Lebenspunkte und Kampfverlauf. zeichnen setzt die Labels aus dem Zustand.
+Mühle
+Ein Raster von sieben mal sieben. Lege eine Liste der 24 gültigen Positionen als Paare aus Zeile und Spalte an und erzeuge nur dort Knöpfe. Die restlichen 25 Zellen bleiben leer.
+Im Protokoll
+Zwei Nachrichten kommen dazu: der Zug vom Client und der Spielstand vom Server. Trag beide mit Richtung, Pflichtfeldern und einem vollständigen Beispiel ein. Beim Spielstand gehört dazu, was genau in board steht und was ein leeres Feld bedeutet. Wer das nicht aufschreibt, kann später den eigenen Mitschnitt nicht mehr lesen.
+Verborgene Information
+Wenn dein Spiel etwas kennt, das ein Spieler nicht sehen darf, dann darf das nicht in board stehen. Bei Memory sind es die verdeckten Motive, bei Schiffe versenken und Minensucher die Positionen des Gegners.
+Es genügt nicht, das im Client auszugrauen oder nicht anzuzeigen. Es darf nicht gesendet werden. Bau dir dafür eine Funktion, die aus dem einen echten Zustand die Sicht für einen bestimmten Spieler baut, und ruf sie in stand_senden für jeden Client einzeln auf. Statt einer Nachricht an alle werden es dann zwei verschiedene.
+Prüf das danach, indem du deinen Mitschnitt liest. Wenn dort etwas steht, das der Empfänger nicht wissen darf, reicht ein zweites Terminalfenster, um dein Spiel zu gewinnen.
+Weiter, wenn
+Dein Spielfeld wird im Fenster in der richtigen Grösse angezeigt.
+Ein Klick löst den Zug aus, den du erwartest, und ändert beide Fenster.
+Die fünf Fälle aus Schritt 4 laufen mit deinem Spiel.
+Falls dein Spiel verborgene Information hat: Im Mitschnitt steht nichts, was der Empfänger nicht sehen darf.
+Die Protokolldatei enthält beide neuen Nachrichten und stimmt mit dem Code überein.
+Schritt 6Über zwei Rechner
+Server bei dir, zwei Fenster auf zwei anderen Rechnern.
+IP-Adresse herausfinden: ipconfig unter Windows, ip addr unter Linux, ifconfig unter macOS.
+Server starten.
+Zwei Leute aus der Klasse starten python3 client_gui.py 192.168.1.42 Alice mit deiner Adresse.
+Eine Partie spielen. Beide Fenster müssen nach jedem Zug dasselbe zeigen.
+Mach dabei einen Mitschnitt deines Server-Terminals. Du brauchst ihn für den Nachweis, und du brauchst ihn, um die verborgene Information zu prüfen.
+Schritt 7Nachweis
+Ein Bild der beiden Fenster nach demselben Zug, auf dem beide dasselbe Brett zeigen.
+Die Ausgabe deines Server-Terminals aus Schritt 6, mit zwei verschiedenen fremden Adressen.
+Je ein Bild oder eine Ausgabe für eine Ablehnung ausser der Reihe und eine Ablehnung auf ein besetztes Feld.
+netz.py, server.py, client_gui.py.
+Die aktualisierte Protokolldatei.
+HilfeWenn es nicht geht
+Was du siehst
+Ursache
+Alle Knöpfe schicken dieselbe Feldnummer
+lambda i=i fehlt. Skript Kapitel 3.2.
+Das Fenster bleibt leer oder hängt sofort
+Du wartest im Tk-Thread, etwa mit recv oder sleep. Skript Kapitel 1.3.
+Das Fenster friert nach einer Weile ein, ohne Muster
+Du zeichnest aus dem Netzthread. Alles ausser posteingang.put gehört aus empfangen heraus. Skript Kapitel 5.3.
+RuntimeError: main thread is not in main loop
+Dasselbe, nur diesmal mit Meldung.
+Dein eigener Stein erscheint, der des Gegners nicht
+Du änderst die Anzeige im Klick statt in zeichnen. Nimm das config aus zug_senden heraus.
+Beide Fenster zeigen Verschiedenes
+Dieselbe Ursache. Irgendwo rechnet der Client selbst.
+TclError: cannot use geometry manager grid ...
+pack und grid im selben Behälter. Das Raster gehört in einen eigenen Frame.
+Das Fenster ist riesig oder winzig
+width und height sind bei Knöpfen mit Text Zeichen und Zeilen, keine Pixel.
+Nach dem Schliessen eines Fensters läuft der Prozess weiter
+Dem Empfangsthread fehlt daemon=True.
+ConnectionResetError im Server
+Schritt 2 noch nicht gemacht.
+Ein Bild bleibt unsichtbar
+Referenz nicht festgehalten. Skript Kapitel 6.2.
+AusblickWas noch fehlt
+Du hast jetzt ein Spiel, das man anschauen und bedienen kann, und das sich auf zwei Rechnern gleich verhält. Was fehlt, sind die Regeln.
+Als Nächstes kommt der Spielkern: eine Klasse, die dein Spiel kennt und von Sockets und Fenstern nichts weiss. Sie prüft, ob ein Zug erlaubt ist, führt ihn aus und sagt, ob jemand gewonnen hat. Weil sie nichts vom Netz weiss, kannst du sie mit gewöhnlichen Tests prüfen, ohne etwas zu starten.
+Im Server verschwinden dafür die drei Prüfungen aus ziehen, und an ihre Stelle tritt ein Aufruf des Spielkerns. Der Server wird dabei kürzer, nicht länger. Danach fällt bei Vier gewinnt der Stein nach unten, und jemand kann gewinnen.
+HFTM · Projekt «Verteiltes Spiel» · Meilenstein: Das Brett auf dem BildschirmAlle Programme und Ausgaben geprüft unter Python 3.12 mit Tk 8.6 
+

@@ -1,0 +1,236 @@
+HFTM · Block 3 · Skript
+Oberflächen mit tkinter
+Wie aus einem Spielstand ein Fenster wird, aus einem Klick eine Nachricht, und warum ein zweiter Faden das Ganze lautlos zerstören kann.
+Voraussetzung
+Block 1 über Threads, Block 2 über Netzwerkprogrammierung
+Kein Vorwissen nötig
+Oberflächenprogrammierung, Ereignisschleifen, tkinter
+Werkzeug
+tkinter, Teil der Standardbibliothek, nichts zu installieren
+Danach
+Meilenstein: Das Brett auf dem Bildschirm
+Bis jetzt war Ihr Client ein Terminal. Das hat gereicht, solange es um Verbindungen und Nachrichten ging. Für ein Spiel reicht es nicht, und zwar nicht, weil ein Fenster hübscher wäre. Ein Spielstand ist ein Bild, und ein Terminal kann ein Bild nicht ändern. Es kann nur eine weitere Zeile darunterschreiben.
+Dieses Skript führt nur so weit, wie Sie für Ihr Projekt kommen müssen. tkinter kann viel mehr als das, was hier steht. Das meiste davon brauchen Sie nicht.
+Wie wird aus einem Spielstand ein Fenster, und aus einem Klick eine Nachricht?
+Die zweite Hälfte dieser Frage ist die leichtere. Die erste führt am Schluss zu einem Problem, das Sie aus Block 1 wiedererkennen werden.
+Kapitel 1Das Fenster und die Schleife
+1.1 Das kleinste Fenster
+import tkinter as tk
+
+wurzel = tk.Tk()
+wurzel.title("Mein Spiel")
+tk.Label(wurzel, text="Hallo").pack()
+wurzel.mainloop()
+tk.Tk() erzeugt das Hauptfenster. Davon gibt es genau eines pro Programm.
+tk.Label(wurzel, text="Hallo") erzeugt ein Anzeigefeld in diesem Fenster. Das erste Argument ist immer der Behälter, in den das Ding hineingehört.
+.pack() ordnet es an. Ohne diesen Aufruf existiert das Label, ist aber nicht zu sehen. Das Erzeugen und das Anordnen sind zwei getrennte Schritte, und das vergessen alle einmal.
+mainloop() startet die Ereignisschleife. Diese Zeile kehrt erst zurück, wenn das Fenster geschlossen wird.
+1.2 Was mainloop wirklich tut
+Hinter mainloop() steckt eine Schleife, die ungefähr Folgendes tut: nachsehen, ob der Benutzer geklickt, getippt oder das Fenster verschoben hat. Wenn ja, die zuständige Funktion aufrufen. Wenn nein, kurz warten. Von vorne.
+Daraus folgt etwas, das die ganze weitere Struktur Ihres Clients bestimmt: Ihr Code läuft innerhalb dieser Schleife. Jede Funktion, die Sie an einen Knopf hängen, wird von mainloop aufgerufen und muss zurückkehren, bevor es weitergeht. So lange sie läuft, bearbeitet niemand Klicks und niemand zeichnet neu.
+1.3 Wer wartet, friert ein
+Das ist keine Theorie, das lässt sich messen. Das folgende Programm lässt eine Uhr zehnmal pro Sekunde ticken und wartet nach einer halben Sekunde zwei Sekunden lang mitten im Tk-Faden:
+"""Was passiert, wenn im Tk-Thread gewartet wird?"""
+import time, tkinter as tk
+
+w = tk.Tk()
+ticks = []
+
+def tick():
+    ticks.append(time.time())
+    w.after(100, tick)
+
+w.after(100, tick)
+
+def lange_arbeit():
+    time.sleep(2.0)          # steht fuer recv(), also Warten auf das Netz
+
+w.after(500, lange_arbeit)
+w.after(3500, w.quit)
+start = time.time()
+w.mainloop()
+
+luecken = [round(ticks[i+1]-ticks[i], 2) for i in range(len(ticks)-1)]
+print("Anzahl Ticks in 3,5 s:", len(ticks), " (ohne Blockade waeren es rund 34)")
+print("groesste Luecke zwischen zwei Ticks:", max(luecken), "s")
+$ python3 blockiert.py
+Anzahl Ticks in 3,5 s: 14  (ohne Blockade waeren es rund 34)
+groesste Luecke zwischen zwei Ticks: 2.1 s
+Zwanzig Ticks sind ausgefallen. In dieser Zeit hätte das Fenster auf keinen Klick reagiert, sich nicht verschieben lassen und unter Windows die Meldung «reagiert nicht» bekommen.
+Das time.sleep(2.0) steht hier stellvertretend für etwas, das Sie tatsächlich vorhaben: recv(), also das Warten auf eine Nachricht aus dem Netz. Wer das in eine Knopffunktion schreibt, hat ein eingefrorenes Fenster.
+Alles, was wartet, gehört aus dem Tk-Faden heraus. Das ist der Grund für Kapitel 5.
+Kapitel 2Bausteine und Anordnung
+2.1 Drei Bausteine genügen
+Baustein
+Wozu
+tk.Label
+zeigt Text oder ein Bild an, reagiert nicht auf Klicks
+tk.Button
+zeigt Text oder ein Bild an und ruft beim Klick eine Funktion auf
+tk.Frame
+ein leerer Behälter, um eine Gruppe zusammen anzuordnen
+Mit diesen dreien bauen Sie jede Oberfläche, die in diesem Modul vorkommt. Eingabefelder, Menüs und Auswahllisten brauchen Sie nicht.
+2.2 pack: untereinander
+pack() legt die Dinge in der Reihenfolge ab, in der Sie es aufrufen, standardmässig von oben nach unten. Gut für den groben Aufbau: oben das Spielfeld, darunter eine Statuszeile.
+2.3 grid: das Raster
+grid(row=..., column=...) legt die Dinge in Zeilen und Spalten. Das ist die Anordnung, die fast jedes Spiel in diesem Modul braucht.
+import tkinter as tk
+
+wurzel = tk.Tk()
+raster = tk.Frame(wurzel)
+raster.pack(padx=12, pady=12)
+
+knoepfe = []
+for i in range(9):
+    k = tk.Button(raster, text=" ", width=4, height=2,
+                  font=("Helvetica", 24))
+    k.grid(row=i // 3, column=i % 3)
+    knoepfe.append(k)
+
+zeile = tk.Label(wurzel, text="Du bist am Zug")
+zeile.pack(pady=(0, 10))
+wurzel.mainloop()
+i // 3 ist die Zeile, i % 3 die Spalte. Mit diesen beiden Rechnungen wird aus einer flachen Liste von neun Feldern ein Raster von drei mal drei. Bei sieben Spalten hiesse es i // 7 und i % 7.
+Die Knöpfe landen in einem eigenen Frame. Das Fenster selbst bekommt nur zwei Dinge mit pack: dieses Raster und die Statuszeile darunter.
+width=4, height=2 sind bei Knöpfen mit Text keine Pixel, sondern Zeichen und Zeilen. Deshalb ist ein Knopf mit width=4 nicht vier Pixel breit.
+Die Liste knoepfe brauchen Sie später, um die Beschriftungen zu ändern. Ohne sie kämen Sie an die einzelnen Knöpfe nicht mehr heran.
+2.4 pack und grid nicht im selben Behälter
+Innerhalb eines Behälters dürfen Sie nur eine der beiden Anordnungen verwenden. Wer beide mischt, bekommt keinen stillen Fehler, sondern diesen hier:
+TclError: cannot use geometry manager grid inside . which
+already has slaves managed by pack
+Verschiedene Behälter dürfen sich unterscheiden, und genau das nutzt das Beispiel oben: Das Fenster verwendet pack, der Frame darin verwendet grid.
+2.5 Welche Anordnung zu welchem Spiel
+Spielart
+Oberfläche
+Tic-Tac-Toe, Memory, Vier gewinnt, Schiffe versenken, Minensucher
+ein Raster aus Knöpfen mit grid, dazu eine Statuszeile
+Vier gewinnt im Besonderen
+eine Reihe von sieben Knöpfen über dem Raster, denn ein Zug ist eine Spalte, kein Feld
+Hangman
+ein grosses Label für das Wort, darunter ein Raster aus Buchstabenknöpfen
+Kartenspiel
+eine Reihe aus Knöpfen, einer je Handkarte, dazu Labels für die Ablage
+Rundenbasierter Kampf
+wenige Aktionsknöpfe, dazu Labels für Lebenspunkte und Kampfverlauf
+Mühle
+ein Raster von sieben mal sieben, in dem nur die 24 gültigen Positionen einen Knopf bekommen. Die übrigen Zellen bleiben leer.
+Der letzte Fall ist der interessante. Mühle sieht nicht nach einem Raster aus, lässt sich aber in eines legen. Das ist fast immer einfacher, als frei zu zeichnen. Wenn es wirklich nicht geht, steht in Kapitel 6.3 der Ausweg.
+Kapitel 3Vom Klick zur Nachricht
+3.1 command
+Ein Knopf bekommt mit command= eine Funktion, die beim Klick aufgerufen wird. Wichtig: ohne Klammern. command=zug_senden übergibt die Funktion. command=zug_senden() ruft sie sofort auf und übergibt ihr Ergebnis, also meistens None.
+3.2 Die Schleifenfalle
+Sie erzeugen neun Knöpfe in einer Schleife, und jeder soll seine eigene Feldnummer schicken. Der naheliegende Weg ist falsch:
+for i in range(3):                                  # FALSCH
+    tk.Button(w, command=lambda: gedrueckt.append(i)).pack()
+
+for i in range(3):                                  # RICHTIG
+    tk.Button(w, command=lambda i=i: gedrueckt.append(i)).pack()
+Drei Knöpfe der ersten Sorte und drei der zweiten, alle nacheinander gedrückt:
+[('falsch', 2), ('falsch', 2), ('falsch', 2),
+ ('richtig', 0), ('richtig', 1), ('richtig', 2)]
+Alle drei falschen Knöpfe melden die Zwei. Der Grund: Das lambda merkt sich nicht den Wert von i, sondern die Variable i. Wenn der Klick kommt, ist die Schleife längst fertig und i steht auf ihrem letzten Wert.
+lambda i=i: macht aus dem Wert einen Standardwert des Lambdas. Standardwerte werden beim Erzeugen festgelegt, nicht beim Aufruf, und damit hält jeder Knopf seine eigene Zahl fest.
+Häufiger Irrtum
+«Bei mir geht es auch ohne i=i, ich habe es probiert.»
+Dann hatten Sie genau einen Knopf, oder Sie haben den letzten gedrückt. Bei einem einzigen Knopf stimmt der letzte Wert zufällig. Beim Raster fällt es sofort auf, weil alle neun Felder dasselbe schicken.
+3.3 Was der Knopf nicht tut
+Jetzt der Punkt, an dem die Oberflächenprogrammierung auf alles trifft, was Sie in Block 2 gelernt haben. Die naheliegende Knopffunktion sieht so aus:
+def geklickt(self, feld):                 # FALSCH
+    self.knoepfe[feld].config(text="X")   # Anzeige selbst aendern
+    sende(self.sock, {"type": "move", "feld": feld})
+Das fühlt sich richtig an und ist der häufigste Entwurfsfehler in diesem Meilenstein. Die Anzeige zeigt dann ein X, bevor der Server den Zug gesehen hat. War der Zug ungültig, steht auf Ihrem Bildschirm etwas, das es auf dem Brett des Servers nicht gibt. Ihr Gegner sieht ein anderes Spiel als Sie.
+Richtig ist, dass der Knopf nur schickt und sonst nichts tut:
+def zug_senden(self, feld):               # RICHTIG
+    sende(self.sock, {"type": "move", "feld": feld})
+Die Anzeige ändert sich erst, wenn der neue Stand vom Server eintrifft. Das ist derselbe Satz wie in Block 2, nur jetzt mit Knöpfen:
+Der Server ist die Wahrheit. Der Knopf schickt einen Wunsch, er führt ihn nicht aus.
+Kapitel 4Die Anzeige folgt dem Zustand
+4.1 Eine einzige Zeichenfunktion
+Wenn der Client nichts selbst ändert, dann gibt es nur einen Anlass, etwas neu zu zeichnen: eine Zustandsnachricht vom Server. Also gibt es auch nur eine Funktion, die zeichnet.
+def zeichnen(self, zustand):
+    """Die einzige Stelle, die das Brett anzeigt."""
+    for knopf, wert in zip(self.knoepfe, zustand["board"]):
+        knopf.config(text=wert)
+    dran = zustand["currentPlayer"] == self.spieler_id
+    self.zeile.config(text="Du bist am Zug" if dran else "Gegner ist am Zug")
+Diese Funktion nimmt den Zustand und schreibt ihn vollständig in die Oberfläche. Sie fragt nicht, was sich geändert hat. Sie setzt alle neun Beschriftungen, auch die acht, die gleich geblieben sind.
+4.2 Warum alles neu zeichnen
+Der sparsame Weg wäre, nur das geänderte Feld zu setzen. Dagegen sprechen drei Dinge.
+Erstens müsste der Client dann wissen, was sich geändert hat. Er müsste also den alten Zustand mit dem neuen vergleichen oder dem Server glauben, der ihm eine Änderung meldet. Im zweiten Fall rechnet der Client wieder mit, und genau das wollen wir nicht.
+Zweitens driften die beiden Anzeigen auseinander, sobald eine Nachricht verloren geht oder ein Spieler später dazukommt. Wer immer den ganzen Zustand zeichnet, ist nach der nächsten Nachricht wieder richtig.
+Drittens geht es um neun Felder. Bei zehn mal zehn sind es hundert. Das kostet nichts.
+Der Client rechnet nicht. Er zeichnet, was angekommen ist.
+Kapitel 5Zwei Fäden, ein Fenster
+5.1 Das Problem
+Ihr Client hat seit Block 2 einen zweiten Faden, der in leser auf Nachrichten wartet. Das muss auch so bleiben, denn nach Kapitel 1.3 darf im Tk-Faden nichts warten.
+Damit steht der Netzthread vor einem Problem. Er bekommt den neuen Spielstand, und er darf ihn nicht anzeigen.
+5.2 Die Regel
+Kein Zugriff auf ein Widget aus einem fremden Faden. Weder lesend noch schreibend.
+Die Oberfläche gehört dem Faden, in dem mainloop() läuft. Das ist bei Ihnen der Hauptfaden.
+5.3 Warum es trotzdem oft funktioniert
+Jetzt kommt der unangenehme Teil, und Sie kennen ihn schon. Ein Programm, das diese Regel bricht, wurde dreimal gestartet:
+$ python3 fremdthread.py
+kein Fehler, diesmal
+$ python3 fremdthread.py
+kein Fehler, diesmal
+$ python3 fremdthread.py
+kein Fehler, diesmal
+Dreimal gutgegangen. In einem anderen Lauf, bei dem die Ereignisschleife gerade nicht lief, kam stattdessen das hier:
+RuntimeError: main thread is not in main loop
+Dasselbe Programm, einmal fehlerfrei und einmal abgestürzt. Dazwischen liegen noch die Fälle, in denen das Fenster ohne Meldung einfriert oder der Prozess kommentarlos verschwindet. Was eintritt, hängt davon ab, was die Ereignisschleife gerade tut, wenn der fremde Faden zuschlägt.
+Das ist dieselbe Fehlerklasse wie der verlorene Zählschritt aus Block 1 und der doppelt belegte Spielzug aus Block 2. Kein Absturz, keine Meldung, nicht reproduzierbar. Dass es meistens gutgeht, ist keine Entwarnung, sondern der Grund, warum der Fehler so spät gefunden wird.
+5.4 Der Briefkasten
+Die Lösung ist dieselbe wie in Block 1: Die beiden Fäden fassen nichts Gemeinsames an, sondern reichen sich etwas über eine Warteschlange weiter.
+import queue
+
+self.posteingang = queue.Queue()
+
+# Netzthread: schreibt nur, zeichnet nie
+def empfangen(self):
+    for nachricht in leser(self.sock):
+        self.posteingang.put(nachricht)
+
+# Tk-Thread: holt ab und zeichnet
+def posteingang_leeren(self):
+    while True:
+        try:
+            nachricht = self.posteingang.get_nowait()
+        except queue.Empty:
+            break
+        self.verarbeiten(nachricht)
+    self.wurzel.after(100, self.posteingang_leeren)
+queue.Queue ist für genau diesen Zweck gebaut und bereits gegen gleichzeitigen Zugriff gesichert. Sie brauchen hier kein eigenes Lock.
+after(100, funktion) lässt Tk die Funktion in hundert Millisekunden aufrufen, einmal. Dass sie sich am Ende selbst wieder anmeldet, macht daraus eine Schleife.
+get_nowait() wirft queue.Empty, statt zu warten. Darum die Schleife mit break: Sie leert den Briefkasten vollständig und kehrt sofort zurück. Würde hier get() stehen, wären Sie wieder bei Kapitel 1.3.
+Die Schleife holt immer alle Nachrichten ab, nicht nur eine. Sonst wachsen Rückstände an, sobald einmal mehrere Nachrichten kurz hintereinander eintreffen.
+5.5 Warum after und nicht sleep
+Der Unterschied ist der aus Kapitel 1.3. time.sleep(0.1) hält den Faden an, in dem es steht. Steht es im Tk-Faden, steht die Oberfläche. after(100, ...) hält niemanden an. Es trägt einen Termin in die Ereignisschleife ein und kehrt sofort zurück. Die Schleife arbeitet in der Zwischenzeit Klicks ab und ruft die Funktion auf, wenn die Zeit um ist.
+Kapitel 6Bilder und freies Zeichnen
+6.1 PNG laden
+tkinter lädt PNG ohne Zusatzpaket:
+bild = tk.PhotoImage(file="bilder/stein.png")
+klein = bild.subsample(2, 2)            # 64 Pixel werden 32
+
+knopf.config(image=klein, text="")
+knopf.bild = klein                      # Referenz festhalten
+6.2 Zwei Fallen mit Bildern
+Die Referenz. Wenn Sie das Bildobjekt nirgends festhalten, räumt Pythons Speicherverwaltung es weg, und Tk kennt es nicht mehr. Zwei Knöpfe, einer mit festgehaltener Referenz und einer ohne, nach einem Aufräumlauf:
+A ohne Referenz, Bild noch da? False
+B mit  Referenz, Bild noch da? True
+Das Bild verschwindet also tatsächlich, und zwar ohne Fehlermeldung. Deshalb die Zeile knopf.bild = klein: Sie hängt das Bild an das Widget und lässt es so lange leben wie dieses.
+Die Skalierung. subsample und zoom rechnen nur mit ganzen Faktoren:
+Original: 64 x 64
+subsample(2): 32 x 32
+subsample(3): 22 x 22
+Aus 64 werden bei Faktor drei nicht 21,33, sondern 22. Es gibt keine Zwischengrössen. Erzeugen Sie Ihre Bilder deshalb gleich in der Grösse, die Sie brauchen. Für beliebige Skalierung bräuchten Sie Pillow, und das brauchen Sie für dieses Projekt nicht.
+6.3 Canvas, wenn kein Raster passt
+Ein Raster aus Knöpfen deckt fast alles ab. Wenn Ihr Spielfeld wirklich keines ist, nehmen Sie tk.Canvas. Dort zeichnen Sie mit create_line, create_oval, create_rectangle und create_image an freie Pixelkoordinaten, und ein Mausklick liefert Ihnen Pixel, die Sie selbst in eine Feldnummer umrechnen.
+Das ist mehr Arbeit, und Sie sollten es nur tun, wenn das Raster scheitert. Bei Mühle lohnt der Versuch mit dem Raster zuerst.
+RückblickDie fünf Sätze des Abends
+Ihr Code läuft innerhalb der Ereignisschleife. Alles, was wartet, friert das Fenster ein.
+Label, Button und Frame genügen. grid macht daraus ein Raster, und fast jedes Spiel hier ist ein Raster.
+Ein Knopf in einer Schleife braucht lambda i=i, sonst schicken alle Knöpfe dieselbe Zahl.
+Der Knopf schickt nur. Gezeichnet wird erst, wenn der neue Stand vom Server kommt, und dann vollständig.
+Kein Widget aus einem fremden Faden anfassen. Der Netzthread schreibt in eine Queue, after holt sie ab.
+HFTM · Block 3 · Oberflächen mit tkinter · SkriptAlle Beispiele und Messwerte geprüft unter Python 3.12 mit Tk 8.6 
+

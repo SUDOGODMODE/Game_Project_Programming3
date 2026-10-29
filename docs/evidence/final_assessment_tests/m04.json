@@ -1,0 +1,911 @@
+{
+  "environment": {
+    "python": "3.14.10 (main, Oct 25 2026, 17:12:00) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "tk": "9.1"
+  },
+  "selection": "04",
+  "started_at": "2026-10-27T16:51:55.352661+00:00",
+  "duration_seconds": 1.3564671249987441,
+  "tests": [
+    {
+      "id": "tests.meilenstein_04.test_demo_tool.DemoEvidenceTests.test_clean_completed_game_is_saved_as_pass",
+      "status": "passed",
+      "duration_seconds": 0.0012315830026636831,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_demo_tool.DemoEvidenceTests.test_existing_evidence_directory_is_refused_without_modifying_any_file",
+      "status": "passed",
+      "duration_seconds": 0.05270162500164588,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_demo_tool.DemoEvidenceTests.test_private_payload_in_log_is_saved_as_failure_even_after_completed_game",
+      "status": "passed",
+      "duration_seconds": 0.0015490000005229376,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_all_target_buttons_send_their_own_coordinate_without_drawing",
+      "status": "passed",
+      "duration_seconds": 0.30311250000158907,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_error_is_readable_and_does_not_change_boards",
+      "status": "passed",
+      "duration_seconds": 0.06661016699945321,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_full_state_renders_both_boards_including_incoming_misses_and_clears",
+      "status": "passed",
+      "duration_seconds": 0.03624533300171606,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_get_state_button_sends_request",
+      "status": "passed",
+      "duration_seconds": 0.03339129199957824,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_idle_socket_does_not_block_tk_after_callbacks",
+      "status": "passed",
+      "duration_seconds": 0.05005137500120327,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_lobby_events_preserve_confirmed_boards_until_server_state",
+      "status": "passed",
+      "duration_seconds": 0.04171354199934285,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_opponent_leaving_clears_boards_and_replacement_enables_placement",
+      "status": "passed",
+      "duration_seconds": 0.042842541999561945,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_placement_controls_send_individual_fleet_without_speculative_drawing",
+      "status": "passed",
+      "duration_seconds": 0.04021087500223075,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_randomize_produces_valid_varying_candidates_only",
+      "status": "passed",
+      "duration_seconds": 0.047458375000132946,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_receive_queue_drains_on_main_thread_and_renders_last_message",
+      "status": "passed",
+      "duration_seconds": 0.0810932500025956,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_results_and_acknowledgements_do_not_draw_before_state",
+      "status": "passed",
+      "duration_seconds": 0.03832795899870689,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_server_close_disables_requests_and_is_visible",
+      "status": "passed",
+      "duration_seconds": 0.06699629200011259,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_stalled_send_runs_in_worker_and_does_not_block_tk",
+      "status": "passed",
+      "duration_seconds": 0.05114895799852093,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_waiting_turn_and_winner_status",
+      "status": "passed",
+      "duration_seconds": 0.03993862500283285,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_window_cross_closes_socket_and_workers_promptly",
+      "status": "passed",
+      "duration_seconds": 0.03393587499886053,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "duration_seconds": 0.0037871249987802003,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "duration_seconds": 0.0006280419984250329,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_assertion_failure_returns_failure_and_keeps_reason",
+      "status": "passed",
+      "duration_seconds": 0.013552166001318255,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_class_skip_does_not_invent_executed_test_records",
+      "status": "passed",
+      "duration_seconds": 0.0005344169985619374,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_existing_report_is_refused_before_running_suite",
+      "status": "passed",
+      "duration_seconds": 0.0002732920002017636,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_normal_mode_reports_skip_but_strict_mode_rejects_it",
+      "status": "passed",
+      "duration_seconds": 0.000663417002215283,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_accepts_executed_marked_test",
+      "status": "passed",
+      "duration_seconds": 0.00035349999961908907,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_gui_subtest_skip",
+      "status": "passed",
+      "duration_seconds": 0.00034987500112038106,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_suite_with_no_gui_tests",
+      "status": "passed",
+      "duration_seconds": 0.0003407080002943985,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_requires_passing_gui_not_expected_failure",
+      "status": "passed",
+      "duration_seconds": 0.0005459999993036035,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_subtest_and_class_error_are_failures_without_fake_test_totals",
+      "status": "passed",
+      "duration_seconds": 0.0010697500001697335,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_runner.RunnerTests.test_success_report_identifies_real_test_and_environment",
+      "status": "passed",
+      "duration_seconds": 0.0003154580008413177,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_departure_pushes_empty_state_and_replacement_gets_fresh_round",
+      "status": "passed",
+      "duration_seconds": 0.0005642919968522619,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_each_successful_join_sends_lobby_then_full_state_to_every_player",
+      "status": "passed",
+      "duration_seconds": 0.00023383300140267238,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_place_and_shot_push_separate_complete_views_after_direct_reply",
+      "status": "passed",
+      "duration_seconds": 0.00038704200051142834,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states",
+      "status": "passed",
+      "duration_seconds": 0.0004274160019122064,
+      "reason": ""
+    },
+    {
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_server_logs_metadata_without_fleets_or_untrusted_type_and_error_text",
+      "status": "passed",
+      "duration_seconds": 0.0003070419988944195,
+      "reason": ""
+    }
+  ],
+  "events": [
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_lobby_events_preserve_confirmed_boards_until_server_state (event='gameStart')",
+      "parent_id": "tests.meilenstein_04.test_gui.GuiTests.test_lobby_events_preserve_confirmed_boards_until_server_state",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_gui.GuiTests.test_lobby_events_preserve_confirmed_boards_until_server_state (event='opponentLeft')",
+      "parent_id": "tests.meilenstein_04.test_gui.GuiTests.test_lobby_events_preserve_confirmed_boards_until_server_state",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=3)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=4)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=5)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=6)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=7)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=8)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=9)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=10)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=11)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=12)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=13)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=14)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=15)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=16)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=17)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=18)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=19)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=20)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=21)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=22)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=23)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=24)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=25)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=26)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=27)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=28)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=29)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=30)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=31)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset (shot=32)",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_complete_documented_game_preserves_recipients_order_and_reset",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='join')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='welcome')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='waiting')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='gameStart')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='place')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='placeAck')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='shoot')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='result')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='getState')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='state')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='leave')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='opponentLeft')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='gameOver')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (catalog='JSON', message='error')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"join\",\"player\":\"Alice\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"welcome\",\"slot\":\"A\",\"player\":\"Alice\",\"phase\":\"waiting\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"waiting\",\"reason\":\"warte auf Gegner\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"gameStart\",\"phase\":\"placing\",\"players\":[{\"slot\":\"A\",\"player\":\"Alice\"},{\"slot\":\"B\",\"player\":\"Bob\"}]}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"place\",\"ships\":[{\"type\":\"Carrier\",\"start\":\"A1\",\"direction\":\"h\"},{\"type\":\"Battleship\",\"start\":\"A2\",\"direction\":\"h\"},{\"type\":\"Cruiser\",\"start\":\"A3\",\"direction\":\"h\"},{\"type\":\"Submarine\",\"start\":\"A4\",\"direction\":\"h\"},{\"type\":\"Destroyer\",\"start\":\"A5\",\"direction\":\"h\"}]}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"placeAck\",\"phase\":\"placing\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"shoot\",\"field\":\"C5\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"result\",\"field\":\"C5\",\"result\":\"miss\",\"sunk\":null,\"turn\":\"B\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"getState\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"state\",\"phase\":\"shooting\",\"turn\":\"A\",\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A1\",\"B1\",\"C1\",\"D1\",\"E1\"],\"hits\":[]},{\"type\":\"Battleship\",\"cells\":[\"A2\",\"B2\",\"C2\",\"D2\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A3\",\"B3\",\"C3\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A4\",\"B4\",\"C4\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A5\",\"B5\"],\"hits\":[]}],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"leave\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"opponentLeft\",\"slot\":\"B\",\"player\":\"Bob\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"gameOver\",\"winner\":\"A\",\"reason\":\"sunk\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='{\"type\":\"error\",\"code\":\"UNKNOWN_TYPE\",\"message\":\"unbekannter Typ: nonsense\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='A → S  {\"type\":\"join\",\"player\":\"Alice\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"welcome\",\"slot\":\"A\",\"player\":\"Alice\",\"phase\":\"waiting\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"waiting\",\"reason\":\"warte auf Gegner\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"waiting\",\"turn\":null,\"ownShips\":[],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='B → S  {\"type\":\"join\",\"player\":\"Bob\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"welcome\",\"slot\":\"B\",\"player\":\"Bob\",\"phase\":\"placing\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A/B  {\"type\":\"gameStart\",\"phase\":\"placing\",\"players\":[{\"slot\":\"A\",\"player\":\"Alice\"},{\"slot\":\"B\",\"player\":\"Bob\"}]}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"placing\",\"turn\":null,\"ownShips\":[],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"state\",\"phase\":\"placing\",\"turn\":null,\"ownShips\":[],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='A → S  {\"type\":\"place\",\"ships\":[{\"type\":\"Carrier\",\"start\":\"A1\",\"direction\":\"h\"},{\"type\":\"Battleship\",\"start\":\"A2\",\"direction\":\"h\"},{\"type\":\"Cruiser\",\"start\":\"A3\",\"direction\":\"h\"},{\"type\":\"Submarine\",\"start\":\"A4\",\"direction\":\"h\"},{\"type\":\"Destroyer\",\"start\":\"A5\",\"direction\":\"h\"}]}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"placeAck\",\"phase\":\"placing\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"placing\",\"turn\":null,\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A1\",\"B1\",\"C1\",\"D1\",\"E1\"],\"hits\":[]},{\"type\":\"Battleship\",\"cells\":[\"A2\",\"B2\",\"C2\",\"D2\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A3\",\"B3\",\"C3\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A4\",\"B4\",\"C4\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A5\",\"B5\"],\"hits\":[]}],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"state\",\"phase\":\"placing\",\"turn\":null,\"ownShips\":[],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='B → S  {\"type\":\"place\",\"ships\":[{\"type\":\"Carrier\",\"start\":\"A6\",\"direction\":\"h\"},{\"type\":\"Battleship\",\"start\":\"A7\",\"direction\":\"h\"},{\"type\":\"Cruiser\",\"start\":\"A8\",\"direction\":\"h\"},{\"type\":\"Submarine\",\"start\":\"A9\",\"direction\":\"h\"},{\"type\":\"Destroyer\",\"start\":\"A10\",\"direction\":\"h\"}]}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"placeAck\",\"phase\":\"shooting\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"shooting\",\"turn\":\"A\",\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A1\",\"B1\",\"C1\",\"D1\",\"E1\"],\"hits\":[]},{\"type\":\"Battleship\",\"cells\":[\"A2\",\"B2\",\"C2\",\"D2\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A3\",\"B3\",\"C3\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A4\",\"B4\",\"C4\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A5\",\"B5\"],\"hits\":[]}],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"state\",\"phase\":\"shooting\",\"turn\":\"A\",\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A6\",\"B6\",\"C6\",\"D6\",\"E6\"],\"hits\":[]},{\"type\":\"Battleship\",\"cells\":[\"A7\",\"B7\",\"C7\",\"D7\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A8\",\"B8\",\"C8\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A9\",\"B9\",\"C9\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A10\",\"B10\"],\"hits\":[]}],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='A → S  {\"type\":\"shoot\",\"field\":\"A6\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"result\",\"field\":\"A6\",\"result\":\"hit\",\"sunk\":null,\"turn\":\"B\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"shooting\",\"turn\":\"B\",\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A1\",\"B1\",\"C1\",\"D1\",\"E1\"],\"hits\":[]},{\"type\":\"Battleship\",\"cells\":[\"A2\",\"B2\",\"C2\",\"D2\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A3\",\"B3\",\"C3\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A4\",\"B4\",\"C4\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A5\",\"B5\"],\"hits\":[]}],\"shotsAtOpponent\":{\"A6\":\"hit\"},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"state\",\"phase\":\"shooting\",\"turn\":\"B\",\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A6\",\"B6\",\"C6\",\"D6\",\"E6\"],\"hits\":[\"A6\"]},{\"type\":\"Battleship\",\"cells\":[\"A7\",\"B7\",\"C7\",\"D7\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A8\",\"B8\",\"C8\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A9\",\"B9\",\"C9\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A10\",\"B10\"],\"hits\":[]}],\"shotsAtOpponent\":{},\"shotsAtSelf\":{\"A6\":\"hit\"},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='B → S  {\"type\":\"shoot\",\"field\":\"F1\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"result\",\"field\":\"F1\",\"result\":\"miss\",\"sunk\":null,\"turn\":\"A\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"shooting\",\"turn\":\"A\",\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A1\",\"B1\",\"C1\",\"D1\",\"E1\"],\"hits\":[]},{\"type\":\"Battleship\",\"cells\":[\"A2\",\"B2\",\"C2\",\"D2\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A3\",\"B3\",\"C3\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A4\",\"B4\",\"C4\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A5\",\"B5\"],\"hits\":[]}],\"shotsAtOpponent\":{\"A6\":\"hit\"},\"shotsAtSelf\":{\"F1\":\"miss\"},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"state\",\"phase\":\"shooting\",\"turn\":\"A\",\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A6\",\"B6\",\"C6\",\"D6\",\"E6\"],\"hits\":[\"A6\"]},{\"type\":\"Battleship\",\"cells\":[\"A7\",\"B7\",\"C7\",\"D7\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A8\",\"B8\",\"C8\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A9\",\"B9\",\"C9\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A10\",\"B10\"],\"hits\":[]}],\"shotsAtOpponent\":{\"F1\":\"miss\"},\"shotsAtSelf\":{\"A6\":\"hit\"},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='A → S  {\"type\":\"shoot\",\"field\":\"B10\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"result\",\"field\":\"B10\",\"result\":\"sunk\",\"sunk\":\"Destroyer\",\"turn\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"gameOver\",\"winner\":\"A\",\"reason\":\"sunk\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"finished\",\"turn\":null,\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A1\",\"B1\",\"C1\",\"D1\",\"E1\"],\"hits\":[]},{\"type\":\"Battleship\",\"cells\":[\"A2\",\"B2\",\"C2\",\"D2\"],\"hits\":[]},{\"type\":\"Cruiser\",\"cells\":[\"A3\",\"B3\",\"C3\"],\"hits\":[]},{\"type\":\"Submarine\",\"cells\":[\"A4\",\"B4\",\"C4\"],\"hits\":[]},{\"type\":\"Destroyer\",\"cells\":[\"A5\",\"B5\"],\"hits\":[]}],\"shotsAtOpponent\":{\"A6\":\"hit\",\"B6\":\"hit\",\"C6\":\"hit\",\"D6\":\"hit\",\"E6\":\"sunk\",\"A7\":\"hit\",\"B7\":\"hit\",\"C7\":\"hit\",\"D7\":\"sunk\",\"A8\":\"hit\",\"B8\":\"hit\",\"C8\":\"sunk\",\"A9\":\"hit\",\"B9\":\"hit\",\"C9\":\"sunk\",\"A10\":\"hit\",\"B10\":\"sunk\"},\"shotsAtSelf\":{\"F1\":\"miss\",\"G1\":\"miss\",\"H1\":\"miss\",\"I1\":\"miss\",\"J1\":\"miss\",\"F2\":\"miss\",\"G2\":\"miss\",\"H2\":\"miss\",\"I2\":\"miss\",\"J2\":\"miss\",\"F3\":\"miss\",\"G3\":\"miss\",\"H3\":\"miss\",\"I3\":\"miss\",\"J3\":\"miss\",\"F4\":\"miss\"},\"winner\":\"A\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → B  {\"type\":\"state\",\"phase\":\"finished\",\"turn\":null,\"ownShips\":[{\"type\":\"Carrier\",\"cells\":[\"A6\",\"B6\",\"C6\",\"D6\",\"E6\"],\"hits\":[\"A6\",\"B6\",\"C6\",\"D6\",\"E6\"]},{\"type\":\"Battleship\",\"cells\":[\"A7\",\"B7\",\"C7\",\"D7\"],\"hits\":[\"A7\",\"B7\",\"C7\",\"D7\"]},{\"type\":\"Cruiser\",\"cells\":[\"A8\",\"B8\",\"C8\"],\"hits\":[\"A8\",\"B8\",\"C8\"]},{\"type\":\"Submarine\",\"cells\":[\"A9\",\"B9\",\"C9\"],\"hits\":[\"A9\",\"B9\",\"C9\"]},{\"type\":\"Destroyer\",\"cells\":[\"A10\",\"B10\"],\"hits\":[\"A10\",\"B10\"]}],\"shotsAtOpponent\":{\"F1\":\"miss\",\"G1\":\"miss\",\"H1\":\"miss\",\"I1\":\"miss\",\"J1\":\"miss\",\"F2\":\"miss\",\"G2\":\"miss\",\"H2\":\"miss\",\"I2\":\"miss\",\"J2\":\"miss\",\"F3\":\"miss\",\"G3\":\"miss\",\"H3\":\"miss\",\"I3\":\"miss\",\"J3\":\"miss\",\"F4\":\"miss\"},\"shotsAtSelf\":{\"A6\":\"hit\",\"B6\":\"hit\",\"C6\":\"hit\",\"D6\":\"hit\",\"E6\":\"sunk\",\"A7\":\"hit\",\"B7\":\"hit\",\"C7\":\"hit\",\"D7\":\"sunk\",\"A8\":\"hit\",\"B8\":\"hit\",\"C8\":\"sunk\",\"A9\":\"hit\",\"B9\":\"hit\",\"C9\":\"sunk\",\"A10\":\"hit\",\"B10\":\"sunk\"},\"winner\":\"A\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='B → S  {\"type\":\"leave\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"opponentLeft\",\"slot\":\"B\",\"player\":\"Bob\"}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples (example='S → A  {\"type\":\"state\",\"phase\":\"waiting\",\"turn\":null,\"ownShips\":[],\"shotsAtOpponent\":{},\"shotsAtSelf\":{},\"winner\":null}')",
+      "parent_id": "tests.meilenstein_04.test_protocol.ProtocolTests.test_json_and_markdown_catalogs_have_complete_consistent_examples",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states (code='NOT_YOUR_TURN')",
+      "parent_id": "tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states (code='CELL_OUT_OF_BOUNDS')",
+      "parent_id": "tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states",
+      "status": "passed",
+      "reason": ""
+    },
+    {
+      "kind": "subtest",
+      "id": "tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states (code='WRONG_PHASE')",
+      "parent_id": "tests.meilenstein_04.test_server_states.StateTests.test_rejections_are_private_and_preserve_both_complete_states",
+      "status": "passed",
+      "reason": ""
+    }
+  ],
+  "summary": {
+    "tests_run": 35,
+    "passed": 35,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gui": {
+    "required": true,
+    "discovered": 15,
+    "executed": 15,
+    "skipped": 0,
+    "issues": []
+  },
+  "success": true
+}

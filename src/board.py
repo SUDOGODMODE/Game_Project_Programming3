@@ -219,10 +219,12 @@ class BattleshipGame:
     def state(self, slot: str) -> dict:
         """Eine unabhaengige Kopie der eigenen Sicht, ohne gegnerische Schiffe."""
         player = self._player(slot)
+        opponent = self.players["B" if slot == "A" else "A"]
         return {
             "phase": self.phase,
             "turn": self.turn,
             "ownShips": deepcopy(player["ships"]),
             "shotsAtOpponent": dict(player["shots_at_opponent"]),
+            "shotsAtSelf": dict(opponent["shots_at_opponent"]),
             "winner": self.winner,
         }

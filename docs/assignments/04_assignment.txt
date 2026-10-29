@@ -1,0 +1,88 @@
+Auftrag meilenstein 4
+
+
+
+
+HFTM · Projekt · Meilenstein 4
+Das Brett auf dem Bildschirm
+Dein Spiel bekommt ein Spielfeld und ein Fenster. Ein Klick wird zu einem Zug, und beide Spieler sehen dasselbe.
+Teil 1Ausgangslage
+Nach dem letzten Meilenstein hält dein Server beide Spieler gleichzeitig, kennt sie beim Namen und kann von sich aus zu beiden sprechen. Was ihm fehlt, ist etwas, worüber er sprechen könnte. Es gibt noch kein Spielfeld, und dein Client ist ein Terminal, das Zeilen untereinanderschreibt.
+Ein Spielstand ist aber ein Bild, und ein Terminal kann ein Bild nicht ändern. Deshalb kommen in diesem Meilenstein zwei Dinge zusammen: der Spielstand in den Server und ein Fenster in den Client.
+Teil 2Der Auftrag
+Auftrag
+Ergänze deinen Server um das Spielfeld deines Spiels und um eine Nachricht, mit der ein Spieler einen Zug anfordert. Der Server prüft den Zug, ändert sein Spielfeld und schickt den neuen Stand an beide Spieler. Ersetze deinen Konsolenclient durch einen Client mit Fenster, der den Stand anzeigt und bei einem Klick einen Zug anfordert. Weise nach, dass eine Partie über zwei Rechner läuft und dass beide Fenster nach jedem Zug dasselbe zeigen.
+Der Kern des Auftrags steckt in einem Satz, und an ihm entscheidet sich, ob deine Lösung trägt:
+Der Knopf schickt einen Wunsch. Gezeichnet wird, was der Server zurückschickt.
+Ein Klick ändert dein Fenster nicht. Er schickt eine Nachricht. Dein Fenster ändert sich erst, wenn der neue Stand eintrifft, und im selben Moment ändert sich das Fenster deines Gegners. Wer stattdessen im Klick die Anzeige setzt, sieht auf seinem Bildschirm Züge, die der Server abgelehnt hat.
+Was der Server prüfen muss
+Drei Dinge, bevor er einen Zug ausführt: Ist der Absender überhaupt am Zug? Liegt das angefragte Feld auf dem Spielfeld? Ist es noch frei, beziehungsweise bei deinem Spiel: noch verdeckt, noch nicht beschossen, noch nicht gesetzt? Jede abgelehnte Anfrage bekommt einen Grund, und dieser Grund geht nur an den Absender. Der neue Spielstand geht an alle.
+Was in diesem Meilenstein bewusst fehlt
+Die Spielregeln. Niemand gewinnt, bei Vier gewinnt fällt noch kein Stein nach unten, und bei Memory werden noch keine Paare erkannt. Das gehört in den Spielkern und ist der nächste Meilenstein. Heute geht es darum, dass der Kreis aus Klick, Prüfung und Anzeige auf zwei Rechnern steht. Ein Spiel ohne Regeln, das sichtbar funktioniert, ist an dieser Stelle mehr wert als Regeln, die niemand sieht.
+So gehen Sie vor
+Der Auftrag ist in zwei Teile geteilt.
+Die Vorbereitung Das Brett in den Server machst du vorher und allein. Dort bekommt dein Server das Spielfeld und die Zugnachricht, und dein Spiel wird im Terminal spielbar. Dieser Teil bringt kein neues Konzept: ziehen hat dieselbe Form wie dein beitreten, und der Zustandsrundruf ist eine Kopie deines Rundrufs beim Spielstart. Ohne diesen Stand kannst du am Unterrichtsabend nicht mitarbeiten, weil jeder Kontrollpunkt dort einen funktionierenden Server voraussetzt.
+Die Anleitung Das Brett auf dem Bildschirm führt in neun Schritten durch den Rest. Die Schritte 1 bis 6 bauen das Fenster und sind in drei Abschnitte geteilt, die dem Unterricht folgen. Die Schritte 7 bis 9 machst du danach allein: dein eigenes Spielfeld, der Lauf über zwei Rechner und der Nachweis. Für Schritt 8 brauchst du jemanden aus der Klasse, verabredet euch rechtzeitig.
+Zur Reihenfolge: Nach jedem Schritt kannst du etwas starten und etwas sehen. Dass zuerst das ganze Spiel im Terminal läuft und erst danach das Fenster dazukommt, ist Absicht. Wenn später im Fenster etwas nicht stimmt, kannst du prüfen, ob es im Terminal noch geht, und weisst sofort, auf welcher Seite der Fehler liegt. Lösch deinen Konsolenclient deshalb nicht.
+Die Grundlagen zu tkinter stehen im Skript Oberflächen mit tkinter. Du brauchst daraus drei Bausteine und zwei Anordnungen, mehr nicht.
+ 
+Teil
+Stand am Ende
+vorher
+Vorbereitung, Schritt 1 und 2
+Dein Spiel ist im Terminal spielbar, mit Ablehnungen und Rundruf.
+1
+Anleitung, Abschnitt 1
+Ein Fenster mit Knöpfen, die ihre Nummer melden.
+2
+Anleitung, Abschnitt 2
+Das Fenster hängt am Netz und bleibt dabei bedienbar.
+3
+Anleitung, Abschnitt 3
+Zwei Fenster spielen gegeneinander auf einem Rechner.
+danach
+Anleitung, Schritt 7 bis 9
+Dein eigenes Spielfeld, Lauf über zwei Rechner, Nachweis.
+Verborgene Information
+Wenn dein Spiel etwas kennt, das ein Spieler nicht sehen darf, dann darf das nicht im Spielstand stehen, den dieser Spieler bekommt. Bei Memory sind es die verdeckten Motive, bei Schiffe versenken und Minensucher die Positionen des Gegners.
+Es genügt nicht, diese Angaben im Client auszublenden. Sie dürfen nicht gesendet werden. Prüf das an deinem eigenen Mitschnitt: Wenn dort etwas steht, das der Empfänger nicht wissen darf, reicht ein zweites Terminalfenster, um dein Spiel zu gewinnen.
+Teil 3Abgabe
+ 
+Was
+Wozu
+1
+Ein Bild der beiden Fenster nach demselben Zug
+zeigt, dass beide Spieler dasselbe sehen
+2
+Die Ausgabe des Server-Terminals aus einem Lauf über zwei Rechner, mit zwei verschiedenen fremden IP-Adressen
+zeigt, dass es verteilt läuft und nicht nur auf deinem Rechner
+3
+Ein Nachweis für eine abgelehnte Anfrage ausser der Reihe und einer für eine abgelehnte Anfrage auf ein belegtes Feld
+zeigt, dass der Server prüft und nicht nur weiterleitet
+4
+netz.py, server.py, client_gui.py
+der Code
+5
+Die aktualisierte Protokolldatei mit den beiden neuen Nachrichten, je mit Richtung, Pflichtfeldern und einem vollständigen Beispiel
+Code und Protokoll müssen übereinstimmen
+Zu Punkt 5 gehört auch, was genau in deinem Spielstand steht und was ein leeres Feld bedeutet. Wer das nicht aufschreibt, kann später den eigenen Mitschnitt nicht mehr lesen.
+Teil 4Beurteilung
+Geprüft wird
+Erwartung
+Wer entscheidet
+Keine Spielregel im Client. Der Klick schickt und tut sonst nichts. Der Server prüft jede Anfrage, auch wenn der Client sie schon geprüft hat.
+Eine Anzeige, eine Wahrheit
+Gezeichnet wird an einer einzigen Stelle, und dort immer der ganze Zustand. Kein zweites config auf ein Spielfeld irgendwo sonst.
+Die Fäden
+Kein Zugriff auf ein Widget aus dem Netzthread. Der Netzthread schreibt in eine Queue, die Oberfläche holt sie ab.
+Wer was erfährt
+Ablehnungen gehen nur an den Absender, der Spielstand an alle. Verborgene Information verlässt den Server nicht.
+Nachweis
+Die Partie ist über zwei Rechner belegt, nicht nur über 127.0.0.1.
+Protokoll
+Beide neuen Nachrichten sind eingetragen und stimmen mit dem Code überein.
+Teil 5Wie es weitergeht
+Nach diesem Meilenstein hast du ein Spiel, das man anschauen und bedienen kann und das sich auf zwei Rechnern gleich verhält. Was fehlt, sind die Regeln.
+Als Nächstes kommt der Spielkern: eine Klasse, die dein Spiel kennt und von Sockets und Fenstern nichts weiss. Sie prüft, ob ein Zug erlaubt ist, führt ihn aus und sagt, ob jemand gewonnen hat. Weil sie nichts vom Netz weiss, kannst du sie mit gewöhnlichen Tests prüfen, ohne etwas zu starten. Im Server verschwinden dafür die Prüfungen aus der Zugbehandlung, und an ihre Stelle tritt ein Aufruf des Spielkerns. Der Server wird dabei kürzer, nicht länger.
+HFTM · Projekt «Verteiltes Spiel» · Meilenstein 4 · Abgabefrist: ____________Mitgeltende Unterlagen: Vorbereitung «Das Brett in den Server» · Anleitung «Das Brett auf dem Bildschirm» · Skript «Oberflächen mit tkinter» 
+

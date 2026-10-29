@@ -1,0 +1,7 @@
+test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest (tests.meilenstein_08.test_packaging.PackagingTests.test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest) ... ok
+test_existing_archive_is_preserved_byte_for_byte (tests.meilenstein_08.test_packaging.PackagingTests.test_existing_archive_is_preserved_byte_for_byte) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.011s
+
+OK

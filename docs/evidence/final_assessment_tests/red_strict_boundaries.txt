@@ -1,0 +1,25 @@
+test_strict_mode_rejects_gui_subtest_skip (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_gui_subtest_skip) ... FAIL
+test_strict_mode_requires_passing_gui_not_expected_failure (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_requires_passing_gui_not_expected_failure) ... FAIL
+
+======================================================================
+FAIL: test_strict_mode_rejects_gui_subtest_skip (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_rejects_gui_subtest_skip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 83, in test_strict_mode_rejects_gui_subtest_skip
+    self.assertNotEqual(code, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_strict_mode_requires_passing_gui_not_expected_failure (tests.meilenstein_04.test_runner.RunnerTests.test_strict_mode_requires_passing_gui_not_expected_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/tests/meilenstein_04/test_runner.py", line 95, in test_strict_mode_requires_passing_gui_not_expected_failure
+    self.assertNotEqual(code, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.220s
+
+FAILED (failures=2)

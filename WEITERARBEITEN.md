@@ -1,90 +1,130 @@
 # Projektstand für die nächste Arbeitseinheit
 
-Gesichert am 13.10.2026, Europe/Zurich.
+Gesichert am 27.10.2026, Europe/Zurich. Projekt: Schiffe versenken, Programming 3, Max Rufener.
 
-## Projekt und Arbeitsweise
+## Arbeitsweise und Quellen
 
-- Projekt: Schiffe versenken, Programming 3 an der HFTM, Max Rufener.
 - Repository: `/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3`.
-- Origin: `https://github.com/SUDOGODMODE/Game_Project_Programming3.git`.
-- Letzter geprüfter HEAD: `a23f73e43964d106fd2289ac27a863be666d2f34`. Zu Beginn der Arbeit stimmte er mit GitHub überein.
-- Die Änderungen sind noch nicht committet. Beim Sichern waren die bisherigen Projektänderungen bereits gestagt. Vor weiteren Änderungen den aktuellen Status neu lesen und den Index erhalten.
-- Nur lokale Änderungen; abschliessende Git-Schritte übernimmt der Projektverantwortliche.
-- Spielwahl Schiffe versenken ausdrücklich bestätigt. Bisher hat niemand Regeln oder Protokoll gegengelesen.
+- Branch `main`; Änderungen dieser Arbeitseinheit sind lokal und uncommittet. Keine Staging-, Commit-, Push-, PR- oder GitHub-Schritte durchgeführt. Vor weiterer Arbeit Status prüfen und vorhandene Änderungen erhalten.
+- Zuerst `AGENTS.md`, README, `docs/status/04_rubric_requirements.md` und `docs/status/final_test_verdict.md` lesen. Der M4-Abgleich bleibt als Teilabgleich erhalten.
+- Ursprüngliche Word-Unterlagen bleiben unter `../Dokumente/`; neue textgetreue Auszüge unter `docs/assignments/04_*.txt`.
+- Zwei Nummerierungen: neue einzelne Kursaufgabe 4 verlangt die GUI; im alten Projektablauf gehören diese Teile zu M4/M6. Nur neu beauftragten Umfang bearbeiten.
+- Aktuelle macOS-/Linux-Startbefehle verwenden `python3`; `.venv` in jedem Terminal aktivieren. In dieser Umgebung starten python und python3 beide Python 3.14.10. Windows-Abweichung im Setup dokumentiert. `.gitignore` schliesst Venv/Caches/lokale Konfigurationen aus, erhält aber Quellen/Vorlagen/Nachweise; geprüft. Benutzer testet den Stand anschliessend selbst.
+- Der Benutzer will auf einem Gerät oder je nach Infrastruktur verteilt spielen. README und Setup erklären ein, zwei und drei Geräte. Ein-Gerät-Betrieb über 127.0.0.1 ist tatsächlich geprüft; keine separate Infrastruktur nötig.
 
-## Zwei Nummerierungen
+## Jetzt umgesetzt
 
-1. `docs/assignments/project_flow.txt`: M0 Werkzeuge/Echo, M1 Spielwahl/Regeln, M2 Spielkern ohne Netz, M3 Protokoll, danach M4–M8.
-2. Einzelaufgaben: `02_first_handshake.txt` ist «Der erste Handschlag»; `03_two_players.txt` ist «Zwei Spieler, ein Tisch».
+- Netzunabhängiger `BattleshipGame`-Kern, bestehende Regeln unverändert: 10×10, Flotte 5/4/3/3/2, A beginnt, jeder gültige Schuss wechselt den Spieler, kein Extrazug bei Treffer.
+- Server sendet nach join/place/shoot/reset je eine vollständige gefilterte Sicht an alle belegten Slots. Direkte Antwort steht vor dem zugehörigen state. Ablehnungen bleiben privat und verändern nichts.
+- `state` enthält phase, turn, ownShips, shotsAtOpponent, shotsAtSelf und winner. shotsAtSelf enthält auch gegnerische Fehlschüsse. Keine vollständige Gegnerflotte in einer Clientansicht.
+- Server protokolliert ausschliesslich bekannte Metadaten; keine Flotten/Zustandspayloads oder freie Clienttexte. netz.read_messages beendet harte Socketabbrüche sauber und schliesst seinen Stream.
+- `src/client_gui.py`: zwei Raster, individuelle bearbeitbare Zufallsflotte als Eingabevorschlag, Klick sendet nur Anfrage. Ein draw_state zeichnet ganze bestätigte Sicht; Queue/after verbindet Tk-Hauptthread und getrennte Sender-/Empfangsworker.
+- Worker halten keine Tk-Objekte. Fensterkreuz beendet die Verbindung und gibt Tk-Variablen im Hauptthread frei. Server reset, Abbruchanzeige und Ersatzbeitritt geprüft.
+- Konsolenclients, lokale Partie und Echo bleiben erhalten. Konsolen-Spielclient verwendet weiterhin seine bekannte Standardflotte als Diagnosehilfe.
+- Protokoll Version 0.5 in Markdown und JSON; vollständiger 33-Schuss-Ablauf mit verschiedenen Beispiel-Flotten und automatisiertem Codeabgleich.
 
-Der letzte Auftrag umfasste beide Nummerierungen bis einschliesslich M3. Eine neue Meilenstein-Datei ist vor weiterer Umsetzung gegen den Projektablauf abzugleichen.
+## Struktur und Prüfung
 
-## Umgesetzt
-
-- `board.BattleshipGame`: netzunabhängige Regeln, Phasen, Flottenprüfung, Zugfolge, Treffer, Sieg und gefilterte Zustandskopien.
-- `server.py`: ein Thread pro Verbindung; gemeinsame Sperre um Prüfen, Ändern und Senden. Zwei Plätze A/B, `waiting`, `gameStart`, Ablehnung eines dritten Spielers und `opponentLeft`.
-- `client.py`: dauerhafter Empfangsthread, Eingabeschleife, q beendet; Host, Name und Port konfigurierbar.
-- `play.py`: vorhandener Netzwerk-Spielclient, setzt Standardflotte nach `gameStart` und nach Ersatzbeitritt erneut. `state` fragt den Zustand ab.
-- `test_angriff.py`: begründete Fehler geprüft; ungefragte Lobbymeldungen verschieben die Antwortzuordnung nicht.
-- `echo_server.py` / `echo_client.py`: M0-Grundversuch mit vollständigem Lesen langer Antworten.
-- `local_game.py`: vollständige Zweipersonenpartie an einer Tastatur ohne Netzwerk, Platzierung und Schüsse über den Kern.
-- `REGELN.md`: Regeln, ungültige Aktionen, Ende, Zugunfähigkeit, Abbruch und Oberflächenskizze.
-- `PROTOKOLL.md` / `docs/protocol/protocol.json`: Version 0.4, 14 einzelne Typen und vollständiger Partieablauf.
-- README, Journal, Anforderungsabgleich, Erwartungen vor dem erneuten Prüflauf und echte lokale Rohlogs vorhanden.
-- `netz.py`, ursprüngliche Aufgabenstellungen und historische Nachweise unverändert.
-
-## Festgelegte Entscheidungen
-
-- Raster 10 × 10, fünf Schiffe mit Grössen 5/4/3/3/2; je ein Carrier, Battleship, Cruiser, Submarine und Destroyer.
-- A beginnt nach beiden gültigen Platzierungen. Jeder gültige Schuss wechselt den Spieler; Treffer geben keinen Extrazug.
-- Koordinaten werden vereinheitlicht; beispielsweise bezeichnet `a01` dasselbe Feld wie A1 und erlaubt keinen Doppelbeschuss.
-- Abgang: Platz sofort freigeben, beide Flotten/Schüsse/Ergebnis zurücksetzen. Ersatzspieler beginnt eine neue Partie. Diese Regel ersetzt die ältere Idee von 30 Sekunden Wartefrist und Aufgabe aus dem Vorschlag.
-- `state` ist derzeit eine Antwort auf `getState`. Automatische gefilterte Zustände nach Spielaktionen fehlen noch und gehören zur weiteren Serverphase M4.
-- `gameOver` wird bei versenkter Flotte an den Verlierer gesendet; der Gewinner erkennt das Ende an `result.turn == null`.
-- Standardport 5000, Ersatzport 5100 bei Belegung; Server und Clients verwenden denselben Port.
-
-## Verifikation und Start
-
-Vorhandene `.venv`: Python 3.14.8, nur Standardbibliothek. Letzter vollständiger Prüflauf: **57 bestanden**, keine Fehler oder übersprungenen Tests — 9 Brett-, 12 Kern-, 26 Netzwerk-/CLI-, 5 Transport- und 5 Werkzeugtests. Erste Prüfung zusätzlich unter Python 3.15.0.
+- Programme unter `src/`, Tests unter `tests/meilenstein_00/`, `02/`, `03/`, `04/`. M1 hat keine eigene technische Suite. Gemeinsame feste Testdaten: `tests/fixtures.py`.
+- `tools/run_tests.py` startet alles oder `--milestone 04`; alle neun früheren Funktions-Bretttests sind jetzt in unittest eingebunden. Unterprozesspfade funktionieren auch nach dem Umzug.
+- `tools/check_handshake.py` prüft einen separat gestarteten Server.
+- `tools/run_gui_demo.py` lehnt vorhandene Ausgabeordner vor Schreibzugriff ab und speichert PASS erst nach dem letzten Logcheck. Ohne --output entsteht ein neuer zeitgestempelter Ordner. Es startet Server und zwei echte GUI/TCP-Clients und spielt eine vollständige Partie mit Ablehnungen, Reset und Ersatz durch. Für neue Läufe neuen Ausgabeordner wählen.
+- Am 27.10.2026: **84 Tests bestanden, keine Fehler/Skips**, Python 3.14.10 / Tk 9.1 auf macOS. Vollständige echte lokale GUI/TCP-Partie nach abschliessender Werkzeugkorrektur: PASS, 33 Schüsse; separat unter `docs/evidence/04_final_run/`. Zusätzlich M2 aus fremdem Arbeitsverzeichnis: 26 bestanden.
+- Nachweise: `docs/evidence/04_local_output.md`, Rohlogs/Bilder unter `docs/evidence/04_local/`. Zwei Originalbilder desselben Zuges; gemeinsame automatische Screenaufnahme war nicht verfügbar, fehlgeschlagener Teilversuch getrennt unter `04_diagnostics/` erhalten.
+- Sandbox kann TCP-Bind/Tk blockieren. Echte Tests benötigten gezielte Freigabe. Solche Umgebungsfehler nicht als Spieldefekt oder bestandenen GUI-Test ausgeben.
 
 ```bash
-.venv/bin/python src/test_board.py
-.venv/bin/python src/test_game.py
-.venv/bin/python src/test_transport.py
-.venv/bin/python src/test_tools.py
-.venv/bin/python src/test_network.py
+.venv/bin/python3 tools/run_tests.py
+.venv/bin/python3 -u src/server.py --host 127.0.0.1 --port 5100
+.venv/bin/python3 src/client_gui.py 127.0.0.1 Alice --port 5100
+.venv/bin/python3 src/client_gui.py 127.0.0.1 Bob --port 5100
 ```
 
-Netzwerktests öffnen lokale TCP-Ports. In der bisherigen Sandbox war dafür eine gezielte Freigabe nötig; ein Bind-Verbot ist nicht mit einem Programmfehler gleichzusetzen.
+## Offen / ausdrücklich später
 
-```bash
-# Drei Terminals für den Lobbyversuch
-.venv/bin/python -u src/server.py --port 5100
-.venv/bin/python -u src/client.py 127.0.0.1 Alice --port 5100
-.venv/bin/python -u src/client.py 127.0.0.1 Bob --port 5100
-```
+- Benutzer verschiebt den echten Schulnetzversuch auf später. Checkliste: `docs/evidence/04_school_network_checklist.md`. Gefordert: Server und zwei andere Clientrechner, zwei verschiedene fremde IPs, ganze Partie, gemeinsames Bild beider Ansichten, private Ablehnungen und Server-Terminalausgabe.
+- Menschliche Lesepartnerschaft, Regeln/Protokoll gegenlesen, echte Zweipersonenpartie an einer Tastatur und ältere Echo-/Handshake-Fremdrechnernachweise bleiben offen. KI-Review und Skripte ersetzen diese Aufgaben nicht.
+- Python 3.12 / Windows / Linux noch nicht selbst geprüft; blanke Abgabefrist unbekannt. Keine Personen, Freigaben oder Tests erfinden.
+- Neuer ausdrücklicher Benutzerauftrag: Verbesserungen anhand der gesamten Bewertung bis zur Endabgabe M8 sind freigegeben. Keine zusätzlichen Regelvarianten, kein Reconnect-Umbau.
+- Das alte `Meilenstein_3.zip` auf dem Desktop bleibt ein unverändertes Zeitpunktpaket und enthält den neuen Stand nicht. Für M4 wurde kein neues Abgabearchiv behauptet.
 
-Aktuelle Nachweise: `docs/evidence/03_followup_output.md` und Rohdateien unter `docs/evidence/03_followup/`. Ergebnisse nicht mit einem neuen Prüflauf überschreiben; neue Ausgaben separat ablegen.
 
-## Noch notwendig bis M3
+## Ergänzter Gesamtprojektstand bis zur Endabgabe
 
-- Lesepartnerschaft vereinbaren und Regeln sowie Protokoll gegenlesen lassen; tatsächliche Person und Ergebnis eintragen.
-- Vollständige Partie mit zwei Personen an einer Tastatur durchführen.
-- Echo und Handschlag über fremde Rechner ausprobieren, danach die Rollen tauschen.
-- Server auf einem Rechner, zwei Clients auf zwei anderen Rechnern: zwei unterschiedliche fremde Adressen und Spielstart-Ausgaben beider Clients sammeln.
+Der Benutzer hat den Umfang nach dem M4-Abgleich auf die späteren Phasen bis
+zur Endabgabe erweitert. Zuerst komplette ZIP-Sicherung erstellt und isoliert
+wiederhergestellt: `docs/guides/rollback.md`; unveränderte Sicherung unter
+`/Users/max/Desktop/Gaming_Backups/`. Danach Rolle 1 Anforderungen aus
+Originalbewertung, Rolle 2 Umsetzung, Rolle 3 unabhängige Tests/Testbewertung.
 
-Die Suche in den vorhandenen Kursordnern fand keine entsprechenden alten Nachweise. Alle gespeicherten tatsächlichen Client-Adressen sind `127.0.0.1`. Die lokale Technik ist vorbereitet; die gesamten Anforderungen bis M3 sind deshalb noch nicht abgeschlossen.
+- M6: ImageGen-Original und freigegeben skalierte transparente 256-Pixel-
+  Ableitung in `bilder/`, Tk-Anzeige 64 Pixel. Herkunft und tatsächliche
+  Werkzeuggrössen dokumentiert. Dekoration, keine Änderung der Spielregeln.
+- M7: `src/event_log.py` protokolliert jede empfangene/erfolgreich gesendete
+  Nachricht sofort in exklusive JSONL-Dateien mit UTC-Zeit, Richtung,
+  Verbindung/Slot, bekanntem Typ und ggf. Fehlercode. Keine privaten Payloads.
+  Server schreibt standardmässig nach `logs/`, `--log-file` wählt einen neuen
+  Pfad. Lokale Laufzeitlogs sind ignoriert, Kursnachweise bleiben erhalten.
+- `tools/run_tests.py --require-gui --report-json "<neuer_bericht.json>"` verlangt
+  tatsächliche bestandene GUI-Prüfungen, erhält alte Reports und trennt
+  ausgeführte Tests von Klassen-/Subtestereignissen. Neue Gruppen 06/07/08.
+- `tools/build_submission.py` erstellt neue ZIPs samt SHA256-Manifest/Prüfsumme
+  und offenem Abgabestatus, ohne Git/Venv/Caches/Secrets/Laufzeitlogs.
+- Technische Materialsammlung: `docs/report/abschlussbericht.md`; Vorführung:
+  `docs/report/vorfuehrung.md`. **Benutzer ergänzt seine eigene Reflexion in
+  `docs/report/meine_reflexion.md` selbst.** README weist ausdrücklich darauf hin.
+- Frische unabhängige Prüfung: 101 Tests, 16 echte GUI-Prüfungen, keine
+  Fehler/Skips. Sieben Pflichtangriffe sowie komplette Konsolen-/GUI-Partien
+  bestanden. Der entpackte Paketkandidat bestand dieselben 101 Prüfungen aus
+  einer frischen Venv und einem fremden Arbeitsverzeichnis; Manifest und
+  Originalquellenlinks geprüft. Massgebende Ergebnisse stehen im Testurteil
+  und `docs/evidence/final_assessment_tests/`.
+- Spielkern und sämtliche vor dieser Runde vorhandenen Rohbelege sind zum
+  gesicherten Ausgangsstand bytegleich. Drahtprotokoll bleibt Version 0.5.
 
-## Abgabepaket
+**Weiterhin offen:** alle oben genannten echten Personen-/Fremdrechneraufgaben,
+wechselseitiger Fremdclienttest, Livevorführung, eigene Reflexion und die
+persönlich geprüfte/erklärbare Berichtsendfassung. Keine volle Punktezahl oder
+vollständig erfüllte Endabgabe behaupten. Keine neuen Git-Schreiboperationen.
 
-`/Users/max/Desktop/Meilenstein_3.zip`, geprüft, 16 Dateien. Enthalten sind die drei verlangten Programme plus `board.py`, Protokoll, Regelblatt, Aufgabenstellung, lokale Lobby-Ausgaben, eine paketbezogene README und Schulnetz-Checkliste. Der fehlende Fremdrechner-Nachweis ist ausdrücklich gekennzeichnet.
+## Auslieferung dieses technischen Stands
 
-SHA256: `7623a94f6d5edb0affdf4bf9d1fa0a8b297a802de09f00dfce9cfe7b3cdb52a0`.
+Endgültiger Archivpfad: `/Users/max/Desktop/Gaming_Abgabe/Schiffe_versenken_Abgabestand_2026-10-27_18-03-27.zip`.
+Die eigene Prüfbestätigung dieses erst nach dem Dokumentationsabschluss
+erstellten ZIP wird daneben unter `/Users/max/Desktop/Gaming_Abgabe/Schiffe_versenken_Abgabestand_2026-10-27_18-03-27.verification/result.json`
+abgelegt. Sie prüft seinen eigenen Hash, Manifest, frische entpackte Venv,
+strenge Tests und Laufzeitverhalten. Der Archivstand enthält deshalb nicht
+seine erst nach Erstellung gemessene eigene Prüfung.
 
-Eine identische Arbeitskopie liegt unter `/Users/max/Desktop/Shared_Folder_Desktop/Meilenstein_3.zip`. Das ZIP ist ein Zeitpunktpaket; spätere Projektänderungen aktualisieren es nicht automatisch.
+Abschliessender Kriterienreview: `docs/status/final_rubric_review.md`;
+unabhängiges Testurteil: `docs/status/final_test_verdict.md`. Der Benutzer
+prüft nun selbst, ergänzt seine Reflexion und verantwortet die ausstehenden
+Personen-/Fremdrechnerleistungen.
 
-## Nächste technische Schritte nach neuem Auftrag
 
-M4: gefilterte Zustandsmeldungen nach Platzierung und Schuss an beide Clients, vollständige Konsolenpartie und reproduzierbare Testspieler. Danach M5 Robustheit, M6 GUI, M7 Fremdtest und zeitgestempelte Logs, M8 Bericht und Demo. Keine dieser späteren Aufgaben ist allein durch diesen Projektstand beauftragt.
+## Neuester Stand: 29.10.2026 — SVG-Grafik und Sprengung
 
-Detailabgleich: `docs/status/03_requirements.md`. Weitere Entscheidungen und Arbeitseinheiten stehen in `journal.md`.
+Zusätzlicher Benutzerauftrag lokal umgesetzt: maritime Oberfläche in Meerblau,
+fünf gezeichnete SVG-Schiffe und kurze Sprengung beim Besitzer nach dem letzten
+bestätigten Treffer. Neue Module `src/ship_art.py`, `src/sea_cell.py` und
+`src/ship_effects.py`, Assets `bilder/flotte/`. Kein Zusatzpaket nötig;
+das bestehende ImageGen-PNG und alle Spielregeln/Servernachrichten bleiben
+bestehen. Canvas-Zielfelder mit Maus, Pfeilen, Eingabe und Leertaste bedienbar.
+
+`ShipEffects.observe` erhält nur `ownShips`. Erst ein bekannter Übergang von
+unversenkt zu vollständig getroffen startet die etwa 1,15 Sekunden lange
+Animation; kein Effekt beim ersten bereits versenkten Snapshot oder dessen
+Wiederholung. Der Effektschalter beendet nur Bilder und bewahrt die Historie;
+Reset leert auch die Historie. Disconnect/Schliessen räumen Callbacks auf.
+
+Letzte tatsächliche Prüfung: **114 Tests bestanden, darunter 28 echte
+GUI-Prüfungen, keine Fehler/Skips**; komplette lokale 33-Schuss-Partie PASS.
+Neue Tests unter `tests/meilenstein_06/`; unabhängiges Agentenreview, kein
+menschliches Gegenlesen. Nachweise und Bildschirmvorschau unter
+`docs/evidence/06_graphics_2026-10-29/`. Python 3.14.10 / Tk 9.1 auf macOS;
+weitere Plattformen nicht neu geprüft.
+
+Alle Änderungen weiterhin lokal, kein Staging/Commit/Push. Vorhandene
+Abgabearchive enthalten diesen neueren Grafikstand nicht und wurden nicht
+überschrieben. Sämtliche zuvor offenen Personen-/Fremdrechneraufgaben und
+die eigene Reflexion bleiben unverändert offen.
