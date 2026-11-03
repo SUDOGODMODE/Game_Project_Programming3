@@ -282,8 +282,9 @@ class NetworkTests(unittest.TestCase):
             if index == len(FLEET_CELLS) - 1:
                 self.assertEqual(result, {"type": "result", "field": "B5", "result": "sunk",
                                           "sunk": "Destroyer", "turn": None})
-                self.assert_message(bob, "gameOver", winner="A", reason="sunk")
                 self.assert_state(bob, "finished", turn=None, winner="A")
+                self.assert_message(alice, "gameOver", winner="A", reason="sunk")
+                self.assert_message(bob, "gameOver", winner="A", reason="sunk")
             else:
                 self.assertEqual(result["turn"], "B")
                 self.assertIn(result["result"], ("hit", "sunk"))

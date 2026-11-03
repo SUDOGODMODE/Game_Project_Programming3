@@ -4,6 +4,17 @@ Python-Projekt im Modul Programming 3 an der HFTM, Max Rufener. Zwei Spieler ver
 
 Kursmeilenstein 4 **„Das Brett auf dem Bildschirm“** ergänzt die tkinter-Oberfläche, automatische Zustandsmeldungen und lokale Nachweise. Der Versuch mit zwei fremden Clientrechnern ist für später vorbereitet und bleibt offen. Der [Anforderungsabgleich](docs/status/04_requirements.md) trennt Umsetzung, Prüfung und noch fehlende praktische Nachweise.
 
+Kursmeilenstein 5 **„Die Regeln“** überträgt die Lehrschritte auf das
+bereits gewählte Schiffe versenken; das Tic-Tac-Toe-Beispiel der
+Aufgabenstellung ist kein zweites Spiel dieses Projekts. Der
+[M5-Anforderungsabgleich](docs/status/05_requirements.md) nennt die
+tatsächlich ausgeführten lokalen Prüfungen und den weiterhin offenen
+Zweirechnerbeleg. Dieser echte Versuch bleibt auf Wunsch des
+Projektverantwortlichen verschoben.
+
+Die [Vergleichsliste zu Meilenstein 5 und beiden Varianten](docs/status/05_coverage_comparison.md)
+stellt jede Forderung, ihren Beleg und die offenen Verbesserungen gegenüber.
+
 Der anschliessend freigegebene Umfang bis M8 ergänzt das eigene Bild,
 dauerhafte Nachrichtenlogs, strenge Testabnahme und ein Abgabewerkzeug.
 **Vor der Abgabe selbst ergänzen:** [meine persönliche Reflexion](docs/report/meine_reflexion.md).
@@ -16,75 +27,75 @@ Der [Bewertungsabgleich](docs/status/04_rubric_requirements.md) und das
 [unabhängige Testurteil](docs/status/final_test_verdict.md) trennen diese
 Aufgaben von tatsächlichen lokalen Ergebnissen.
 
-## Schnellstart
+## Variante wählen
 
-Du kannst **Server und beide Clients auf einem einzigen Gerät** laufen lassen.
-Nach der Einrichtung brauchst du dafür weder Internet noch WLAN noch einen
-separaten Serverrechner. Derselbe Spielcode funktioniert auch verteilt im LAN:
+Die beiden Startprofile verwenden **denselben Spielkern, Server, GUI-Client,
+Bilder und dasselbe Protokoll**. Sie unterscheiden sich darin, wo die drei
+Prozesse laufen und an welche Adresse sie sich binden beziehungsweise
+verbinden. Python **3.12 oder neuer** mit tkinter ist erforderlich; weitere
+Python-Pakete braucht das Spiel nicht.
 
-| Verfügbare Geräte | Startvariante |
-|---|---|
-| Ein Gerät | Server und zwei Spielfenster lokal über `127.0.0.1` |
-| Zwei Geräte im LAN | Server + erster Client auf Gerät 1, zweiter Client auf Gerät 2 |
-| Drei Geräte im LAN | Server auf Gerät 1, Clients auf Gerät 2 und 3; Schulnetz-Topologie |
+| Variante | Geräte | Startanleitung |
+|---|---|---|
+| **localhost** | Server und zwei Spielfenster auf einem Gerät, auch ohne LAN | [Auf einem Gerät starten](varianten/localhost/START.md) |
+| **zwei Rechner** | Server und erster Client auf Rechner 1, zweiter Client auf Rechner 2 | [Auf zwei Rechnern starten](varianten/zwei_rechner/START.md) |
 
-Die folgenden Befehle zeigen den Ein-Gerät-Betrieb. Vollständige Alternativen
-stehen in der [Startanleitung](docs/guides/setup.md).
+Im Repository liegen die beiden Einstiege unter `varianten/localhost/` und
+`varianten/zwei_rechner/`. Die beiden endgültigen Profil-ZIPs unter
+`dist/Schiffe_versenken_localhost_2026-11-03_freigabe.zip` und
+`dist/Schiffe_versenken_zwei_rechner_2026-11-03_freigabe.zip` enthalten
+jeweils ein eigenes `start.py` und
+`START_HIER.md` im inneren Projektordner; die
+[gemeinsame Einrichtung](docs/guides/setup.md) erklärt Python, virtuelle
+Umgebung und tkinter; die beiden Startanleitungen enthalten die
+vollständigen Befehle für macOS/Linux und Windows.
 
-Python **3.12 oder neuer** mit tkinter, keine weiteren Python-Pakete. Im Projektordner eine virtuelle Umgebung erstellen oder die vorhandene verwenden. Details für macOS, Linux und Windows in der [Installationsanleitung](docs/guides/setup.md). Die Bash-Beispiele verwenden `python3`; unter Windows nach Aktivierung der Umgebung `python` verwenden.
+Die separaten Prüfberichte liegen unter
+`dist/Schiffe_versenken_localhost_2026-11-03_freigabe.verification/` und
+`dist/Schiffe_versenken_zwei_rechner_2026-11-03_freigabe.verification/`
+neben den ZIPs. Sie prüfen SHA256, Manifest, Start-Hilfe, Kerntest und die
+strenge Gesamtsuite aus jedem entpackten Paket. Das Localhost-Paket wurde
+zusätzlich mit einer vollständigen lokalen Tk/TCP-Partie geprüft; das
+Zwei-Rechner-Paket mit einem lokalen TCP-Beitritt. `dist/` selbst gehört
+nicht zum Inhalt der Pakete.
 
-Falls `.venv` noch nicht existiert, einmal `python3 -m venv .venv` ausführen.
-Mit `source .venv/bin/activate` und anschliessend `python3 -m tkinter` die
-GUI-Unterstützung prüfen; das kleine Testfenster danach schliessen.
+Ein [vollständiger lokaler Profil-Serverlauf](docs/evidence/two_versions_2026-11-03/localhost_full_profile_game/result.json)
+bestand zusätzlich mit zwei echten Tk-Fenstern und 33 Schüssen. Dabei
+startete der Server über `varianten/localhost/start.py`; die Clientwrapper
+waren zuvor separat bis `gameStart` geprüft. Der neue strenge
+[Gesamtlauf](docs/evidence/two_versions_2026-11-03/full_final.json) bestand
+155/155 Tests, darunter 29 echte GUI-Prüfungen. Ältere ZIP-Kandidaten und
+deren Prüfberichte bleiben als historische Zwischenstände erhalten.
 
-**Drei separate Terminals im Projektordner öffnen.** Den Server zuerst
-starten und laufen lassen, danach die beiden Clients:
-
-**Terminal 1 — Server:**
-
-```bash
-source .venv/bin/activate
-python3 -u src/server.py --host 127.0.0.1 --port 5100
-```
-
-**Terminal 2 — erster Client:**
-
-```bash
-source .venv/bin/activate
-python3 src/client_gui.py 127.0.0.1 Alice --port 5100
-```
-
-**Terminal 3 — zweiter Client:**
-
-```bash
-source .venv/bin/activate
-python3 src/client_gui.py 127.0.0.1 Bob --port 5100
-```
-
-`127.0.0.1` ist localhost: Alle drei Programme laufen auf deinem Gerät.
-Nach Alices Start ist „Warte auf Gegner“ normal; Bobs Start öffnet die
-Flottenplanung in beiden Fenstern. In **beiden** Fenstern „Flotte senden“
-klicken; danach beginnt Alice (Spieler A). Zum Beenden die zwei Fenster
-schliessen und den Server in Terminal 1 mit **Ctrl+C** stoppen.
-
-Jeder Spieler passt seine vorgeschlagene Flotte an und klickt „Flotte senden“. Nach beiden gültigen Platzierungen beginnt A. Zum Schiessen ein Feld im Zielraster anklicken oder mit den Pfeiltasten auswählen und mit Enter/Leertaste auslösen. Die Anzeige folgt ausschliesslich dem bestätigten Serverzustand. Das Fensterkreuz beendet die Verbindung. Das [Benutzerhandbuch](docs/guides/user_manual.md) erklärt Platzierung, Symbole, Zugfolge und Abbruch.
-
-Standardport ist 5000; die Beispiele verwenden 5100 wegen möglicher Belegung auf macOS. Für fremde Clients den Server ohne `--host 127.0.0.1` starten und die tatsächliche Server-IP verwenden. Die [Schulnetz-Checkliste](docs/evidence/04_school_network_checklist.md) beschreibt den Versuch mit Server und zwei anderen Clientrechnern.
+Im localhost-Profil bindet der Server nur an `127.0.0.1`. Für zwei Rechner
+bindet er auf Rechner 1 an `0.0.0.0`, während der zweite Client eine
+**ausdrücklich eingegebene tatsächliche IPv4-Adresse von Rechner 1**
+benötigt. Diese Adresse ist noch unbekannt. Der echte Zweirechnerlauf mit
+Server-Terminalausgabe aus Kursmeilenstein 5 ist weiterhin offen und wird
+nicht durch eine lokale Paket- oder Startprüfung ersetzt. Der
+[M5-Anforderungsabgleich](docs/status/05_requirements.md) und der
+[Abgleich der zwei Varianten](docs/status/two_versions.md) führen die
+Nachweise getrennt.
 
 ## Projektstruktur
 
 ```text
-src/                          Spielprogramme und Netzwerk
+src/                          Spielprogramme und Netzwerk; spiel.py ist der Regelkern,
+                              board.py bietet den älteren Importnamen an
 tests/
   fixtures.py                 Gemeinsame feste Testdaten
   meilenstein_00/             Echo / Werkzeugbasis
   meilenstein_02/             Brett, Spielkern, lokale Partie
   meilenstein_03/             Transport, Lobby, TCP/CLI, Angriffstest
   meilenstein_04/             Zustandsverteilung und echte GUI-Tests
+  meilenstein_05/             Regelkern und Endfolge
   meilenstein_06/             PNG, SVG-Flotte, Grafikeffekte und Tk-Lebensdauer
   meilenstein_07/             Persistentes privates Nachrichtenlog
   meilenstein_08/             Abgabepaket und Manifest
 tools/                        Gemeinsamer Teststart und lokale Nachweise
+varianten/
+  localhost/                 Startprofil und Anleitung für ein Gerät
+  zwei_rechner/              Startprofil und Anleitung für zwei Geräte
 bilder/                       ImageGen-PNG, Herkunft und SVG-Flotte
 docs/
   assignments/                Unveränderte Aufgaben-Texte aus den Unterlagen
@@ -96,7 +107,7 @@ docs/
   report/                     Technischer Entwurf, persönliche Reflexion, Vorführung
   superpowers/                Technische Spezifikation und Arbeitsplan
 REGELN.md                     Verbindliche Spielregeln
-PROTOKOLL.md                  Lesbarer Nachrichtenkatalog, Version 0.5
+PROTOKOLL.md                  Lesbarer Nachrichtenkatalog, Version 0.6
 journal.md                    Tatsächliche Arbeitsschritte und Prüfungen
 WEITERARBEITEN.md             Übergabe für die nächste Arbeitseinheit
 ```
@@ -108,8 +119,17 @@ M1 hat Dokumentations- und Freigabeaufgaben, keine eigene technische Testsuite. 
 ```bash
 python3 tools/run_tests.py
 python3 tools/run_tests.py --milestone 04
+python3 tools/run_tests.py --milestone 05
 python3 tools/run_tests.py --require-gui --report-json "<neuer_testbericht.json>"
 ```
+
+Der Originalbefehl aus Kursmeilenstein 5 lautet im Ordner `src` mit
+aktivierter Projektumgebung: `python3 -m unittest -v test_spiel.py`. Die
+[grüne Rohausgabe mit 19 Tests](docs/evidence/05_final_2026-11-03/test_spiel_green.txt)
+und die [roten Mutationsausgaben](docs/evidence/05_mutation_2026-11-03/result.json)
+sind getrennt belegt; die absichtlichen Fehler liefen in isolierten Kopien
+und wurden nicht in den Projektkern übernommen. Die [abschliessende vollständige Suite](docs/evidence/05_final_2026-11-03/full_release.json)
+bestand mit 139/139 Tests, davon 29 echte GUI-Prüfungen, ohne Fehler oder Skips.
 
 TCP-Tests benötigen lokale Portbindungen, GUI-Tests eine grafische Sitzung. Ein GUI-Skip ersetzt keine Funktionsprüfung. Befehle, Testzuordnung und Nachweisgrenzen stehen in der [Testanleitung](docs/development/testing.md).
 

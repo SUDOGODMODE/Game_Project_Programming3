@@ -17,10 +17,13 @@ class PackagingTests(unittest.TestCase):
         repo = base / 'Game_Project_Programming3'
         files = {
             'README.md': 'See ../Dokumente/source.txt\n', 'REGELN.md': 'rules', 'PROTOKOLL.md': 'protocol',
-            'src/board.py': 'CORE = True\n', 'src/netz.py': 'TRANSPORT = True\n',
+            'src/board.py': 'COMPAT = True\n', 'src/spiel.py': 'CORE = True\n',
+            'src/test_spiel.py': 'CORE_TESTS = True\n', 'src/netz.py': 'TRANSPORT = True\n',
             'src/server.py': 'SERVER = True\n', 'src/client_gui.py': 'GUI = True\n',
             'tests/meilenstein_02/test_core.py': 'test fixture', 'tools/run_tests.py': 'runner',
             'bilder/ship.png': 'image bytes fixture', 'docs/status/open.md': 'External tests pending',
+            'docs/status/05_requirements.md': 'M5 results',
+            'docs/evidence/05_end.png': 'image evidence fixture',
             '.git/config': 'git secret', '.venv/bin/python': 'venv', 'src/__pycache__/board.pyc': 'cache',
             '.env': 'SECRET=x', 'docs/.env.local': 'SECRET=y', '.pytest_cache/cache': 'cache',
             'logs/local.jsonl': 'runtime', 'docs/evidence/original.txt': 'immutable original',
@@ -44,11 +47,14 @@ class PackagingTests(unittest.TestCase):
             with zipfile.ZipFile(output) as archive:
                 names = set(archive.namelist())
                 prefix = repo.name + '/'
-                for name in ('README.md', 'src/board.py', 'src/netz.py', 'src/server.py', 'src/client_gui.py', 'tests/meilenstein_02/test_core.py', 'bilder/ship.png', 'docs/evidence/original.txt'):
+                for name in ('README.md', 'src/board.py', 'src/spiel.py', 'src/test_spiel.py', 'src/netz.py', 'src/server.py', 'src/client_gui.py', 'tests/meilenstein_02/test_core.py', 'bilder/ship.png', 'docs/evidence/original.txt', 'docs/status/05_requirements.md', 'docs/evidence/05_end.png'):
                     self.assertIn(prefix + name, names)
                 self.assertIn('Dokumente/source.txt', names)
                 self.assertEqual(archive.read('Dokumente/source.txt'), b'original source')
-                self.assertEqual(archive.read(prefix + 'src/board.py'), b'CORE = True\n')
+                self.assertEqual(archive.read(prefix + 'src/spiel.py'), b'CORE = True\n')
+                status = archive.read(prefix + 'ABGABESTATUS.md').decode('utf-8')
+                self.assertIn('docs/status/05_requirements.md', status)
+                self.assertIn('Zweirechnerlauf', status)
                 for name in names:
                     parts = Path(name).parts
                     self.assertFalse(any(part in ('.git', '.venv', '__pycache__', '.pytest_cache', 'logs') or part.startswith('.env') for part in parts), name)

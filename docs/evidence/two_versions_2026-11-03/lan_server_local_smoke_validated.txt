@@ -1,0 +1,7 @@
+Nachrichtenlog: /Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/logs/20261103T152119_474647Z_b6ce9a5a.jsonl
+Server wartet auf Port 54842
+verbunden: ('127.0.0.1', 54843)
+  <- [('127.0.0.1', 54843)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state

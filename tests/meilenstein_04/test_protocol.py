@@ -62,7 +62,7 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(
             set(self.required), expected_types, "Der Katalog hat 14 Spielnachrichtentypen"
         )
-        self.assertEqual(self.protocol["version"], "0.5", "M4 verwendet Protokollversion 0.5")
+        self.assertEqual(self.protocol["version"], "0.6", "M5 verwendet Protokollversion 0.6")
         self.assertIn(
             f'Protokoll {self.protocol["version"]}', self.markdown,
             "Markdown- und JSON-Version müssen übereinstimmen",

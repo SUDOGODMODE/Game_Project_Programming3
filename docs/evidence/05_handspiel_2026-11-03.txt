@@ -1,0 +1,10 @@
+Start: shooting A None
+Vorabpruefung B auf A1: ('NOT_YOUR_TURN', 'Spieler B ist nicht am Zug')
+Zug 1 A: {'field': 'A1', 'result': 'hit', 'sunk': None, 'turn': 'B'}
+Zug 2 B: {'field': 'J1', 'result': 'miss', 'sunk': None, 'turn': 'A'}
+Doppelter Schuss: DUPLICATE_SHOT auf A1 wurde bereits geschossen
+Nach Ablehnung unveraendert: True
+Letzter Zug: {'field': 'B5', 'result': 'sunk', 'sunk': 'Destroyer', 'turn': None}
+Ende: finished None A 33
+Schuss nach Ende: WRONG_PHASE aktuelle Phase ist finished, nicht shooting
+Nach Ende-Ablehnung unveraendert: True

@@ -37,21 +37,21 @@ Die Ausgabe verwendet Koordinaten A1 bis J10. ASCII-Kleinbuchstaben und führend
 
 | Aktion / Grund | Prüfung im Kern |
 |---|---|
-| Platzieren ausserhalb der Platzierungsphase | `BattleshipGame.place_fleet`, `WRONG_PHASE` |
-| Flotte des Spielers steht schon | `BattleshipGame.place_fleet`, `WRONG_PHASE` |
+| Platzieren ausserhalb der Platzierungsphase | `spiel.BattleshipGame.place_fleet`, `WRONG_PHASE` |
+| Flotte des Spielers steht schon | `spiel.BattleshipGame.place_fleet`, `WRONG_PHASE` |
 | Falsche Anzahl, fehlende/doppelte oder unbekannte Schiffstypen | `validate_placement`, `INVALID_PLACEMENT` |
 | Ungültiger Start oder ungültige Richtung | `validate_placement` / `ship_cells`, `INVALID_PLACEMENT` |
 | Überlappung oder Rasterüberstand | `validate_placement`, `INVALID_PLACEMENT` |
-| Schiessen vor beiden Flotten oder nach Spielende | `BattleshipGame.check_shot`, `WRONG_PHASE` |
-| Falscher Spieler am Zug | `BattleshipGame.check_shot`, `NOT_YOUR_TURN` |
-| Fehlendes, falsch typisiertes oder ausserhalb liegendes Feld | `BattleshipGame.check_shot`, `CELL_OUT_OF_BOUNDS` |
-| Bereits beschossenes Feld | `BattleshipGame.check_shot`, `DUPLICATE_SHOT` |
+| Schiessen vor beiden Flotten oder nach Spielende | `spiel.BattleshipGame.check_shot`, `WRONG_PHASE` |
+| Falscher Spieler am Zug | `spiel.BattleshipGame.check_shot`, `NOT_YOUR_TURN` |
+| Fehlendes, falsch typisiertes oder ausserhalb liegendes Feld | `spiel.BattleshipGame.check_shot`, `CELL_OUT_OF_BOUNDS` |
+| Bereits beschossenes Feld | `spiel.BattleshipGame.check_shot`, `DUPLICATE_SHOT` |
 
 Unbekannte Spieler lehnt der Kern mit `INVALID_PLAYER` ab. Im Netzwerk vergibt der Server die Identität anhand der Verbindung; ein Client kann sie nicht durch ein zusätzliches Feld ändern. Ungültiges JSON, unbekannte Nachrichtentypen und Anfragen vor dem Beitritt sind Protokollfehler, beschrieben in [PROTOKOLL.md](PROTOKOLL.md).
 
 ## Verborgene Information
 
-Ein Spieler sieht seine eigenen Schiffe und deren Treffer sowie die Ergebnisse seiner eigenen Schüsse und alle gegnerischen Schüsse auf sein Raster (auch Fehlschüsse). Die gegnerischen Schiffspositionen werden nicht ausgegeben. `BattleshipGame.state(slot)` liefert diese Sicht als Kopie; eine Änderung der zurückgegebenen Daten verändert die Partie nicht.
+Ein Spieler sieht seine eigenen Schiffe und deren Treffer sowie die Ergebnisse seiner eigenen Schüsse und alle gegnerischen Schüsse auf sein Raster (auch Fehlschüsse). Die gegnerischen Schiffspositionen werden nicht ausgegeben. `spiel.BattleshipGame.state(slot)` liefert diese Sicht als Kopie; eine Änderung der zurückgegebenen Daten verändert die Partie nicht. `src/board.py` bietet nur den bisherigen Importnamen an und enthält keine zweite Regelimplementierung.
 
 ## Ende, Zugunfähigkeit und Abbruch
 
@@ -65,7 +65,7 @@ Geht im Netzwerk ein Spieler, wird sein Platz sofort frei. Beide Flotten, Treffe
 
 Eine Partie ohne Server startet mit `python3 src/local_game.py`. Jeder Spieler setzt seine Flotte und schiesst danach abwechselnd. Für eine Netzwerkpartie wird der Server mit zwei Instanzen von `client_gui.py` gestartet; `play.py` bleibt als Konsolendiagnose erhalten; Startbefehle stehen im [README](README.md).
 
-`tests/meilenstein_02/test_board.py` prüft Brett und Platzierung. `tests/meilenstein_02/test_game.py` prüft Phasen, Zugfolge, Sieg, ungültige Aktionen, Reset und den im Vorschlag benannten schwierigen Fall: getrennte Spielersichten, die keine gegnerischen Schiffe enthalten und keine internen Daten verändern können. `tests/meilenstein_03/test_network.py` prüft diese Zuordnung zusätzlich über echte TCP-Verbindungen.
+`tests/meilenstein_02/test_board.py` prüft Brett und Platzierung. `tests/meilenstein_02/test_game.py` prüft Phasen, Zugfolge, Sieg, ungültige Aktionen, Reset und den im Vorschlag benannten schwierigen Fall: getrennte Spielersichten, die keine gegnerischen Schiffe enthalten und keine internen Daten verändern können. `src/test_spiel.py` ergänzt die für Kursmeilenstein 5 geforderten Regeltests mit dem Originalbefehl im Ordner `src`; der gemeinsame Teststarter findet sie unter `tests/meilenstein_05/`. `tests/meilenstein_03/test_network.py` prüft die Sichtzuordnung zusätzlich über TCP-Verbindungen.
 
 ## Oberflächenskizze für die Spielwahl
 

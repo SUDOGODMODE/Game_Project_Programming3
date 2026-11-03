@@ -1,0 +1,41 @@
+test_anfang_und_start_trennen_warten_vom_platzieren (test_spiel.TestSpiel.test_anfang_und_start_trennen_warten_vom_platzieren) ... ok
+test_doppelter_schuss_verbraucht_keinen_zug (test_spiel.TestSpiel.test_doppelter_schuss_verbraucht_keinen_zug) ... ok
+test_falsche_schiffszahl_wird_abgelehnt (test_spiel.TestSpiel.test_falsche_schiffszahl_wird_abgelehnt) ... ok
+test_falscher_spieler_verbraucht_keinen_zug (test_spiel.TestSpiel.test_falscher_spieler_verbraucht_keinen_zug) ... ok
+test_geheime_flotte_bleibt_auch_im_endzustand_verborgen (test_spiel.TestSpiel.test_geheime_flotte_bleibt_auch_im_endzustand_verborgen) ... ok
+test_gesamte_flotte_versenkt_beendet_ohne_spielerwechsel (test_spiel.TestSpiel.test_gesamte_flotte_versenkt_beendet_ohne_spielerwechsel) ... ok
+test_letztes_schiffsfeld_meldet_versenkt (test_spiel.TestSpiel.test_letztes_schiffsfeld_meldet_versenkt) ... FAIL
+test_nach_beiden_platzierungen_beginnt_a (test_spiel.TestSpiel.test_nach_beiden_platzierungen_beginnt_a) ... ok
+test_nach_dem_sieg_wird_auch_ein_freies_feld_abgelehnt (test_spiel.TestSpiel.test_nach_dem_sieg_wird_auch_ein_freies_feld_abgelehnt) ... ok
+test_platzieren_vor_start_wird_ohne_aenderung_abgelehnt (test_spiel.TestSpiel.test_platzieren_vor_start_wird_ohne_aenderung_abgelehnt) ... ok
+test_rasterueberstand_wird_abgelehnt (test_spiel.TestSpiel.test_rasterueberstand_wird_abgelehnt) ... ok
+test_schiessen_vor_beiden_flotten_wird_abgelehnt (test_spiel.TestSpiel.test_schiessen_vor_beiden_flotten_wird_abgelehnt) ... ok
+test_treffer_wechselt_den_spieler (test_spiel.TestSpiel.test_treffer_wechselt_den_spieler) ... ok
+test_ueberlappung_wird_abgelehnt (test_spiel.TestSpiel.test_ueberlappung_wird_abgelehnt) ... ok
+test_unbekannter_spieler_wird_abgelehnt (test_spiel.TestSpiel.test_unbekannter_spieler_wird_abgelehnt) ... ok
+test_ungueltiges_feld_und_bool_werden_abgelehnt (test_spiel.TestSpiel.test_ungueltiges_feld_und_bool_werden_abgelehnt) ... ok
+test_wasser_wechselt_den_spieler (test_spiel.TestSpiel.test_wasser_wechselt_den_spieler) ... ok
+test_zustand_ist_eine_unabhaengige_kopie (test_spiel.TestSpiel.test_zustand_ist_eine_unabhaengige_kopie) ... ok
+test_zweite_platzierung_wird_abgelehnt (test_spiel.TestSpiel.test_zweite_platzierung_wird_abgelehnt) ... ok
+
+======================================================================
+FAIL: test_letztes_schiffsfeld_meldet_versenkt (test_spiel.TestSpiel.test_letztes_schiffsfeld_meldet_versenkt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/4y/bt0fdtys2dz_gd1x4xybzttw0000gn/T/m5_mutation_qrsmq1n3/test_spiel.py", line 116, in test_letztes_schiffsfeld_meldet_versenkt
+    self.assertEqual(spiel.shoot("A", "B5"),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+                     {"field": "B5", "result": "sunk", "sunk": "Destroyer", "turn": None})
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'field': 'B5', 'result': 'hit', 'sunk': None, 'turn': None} != {'field': 'B5', 'result': 'sunk', 'sunk': 'Destroyer', 'turn': None}
+- {'field': 'B5', 'result': 'hit', 'sunk': None, 'turn': None}
+?                            ^^^           ^ ^
+
++ {'field': 'B5', 'result': 'sunk', 'sunk': 'Destroyer', 'turn': None}
+?                            ^^^^           ^^^^^^ ^ ++
+
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.003s
+
+FAILED (failures=1)

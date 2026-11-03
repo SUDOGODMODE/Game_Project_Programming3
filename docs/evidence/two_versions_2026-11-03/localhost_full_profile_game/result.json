@@ -1,0 +1,31 @@
+{
+  "started": "2026-11-03T16:30:28.791849+01:00",
+  "scope": "Automatisierte lokale TCP-Partie mit zwei echten Tk-Fenstern",
+  "server_profile": "localhost",
+  "checks": [
+    "Beitritt, Warten und ungefragter Spielstart",
+    "Individuelle Flotten und serverbestaetigte Platzierung",
+    "Klick B6 aktualisiert beide Fenster ohne getState",
+    "Beide Ablehnungen privat; beide Zustaende unveraendert",
+    "Vollstaendige 33-Schuss-Partie, Sieg und Niederlage in beiden Fenstern",
+    "Server laeuft nach dem Spielende weiter",
+    "Echter Klick nach Spielende wird privat ohne Zustandsaenderung abgelehnt",
+    "Fensterkreuz, Abbruchanzeige, leerer Reset und Ersatzbeitritt",
+    "Alle echten Zustandsnachrichten enthalten ausschliesslich die jeweilige eigene Flotte"
+  ],
+  "result": "PASS",
+  "server_start_entry": "varianten/localhost/start.py",
+  "server_port": 55418,
+  "window_size": [
+    784,
+    899
+  ],
+  "out_of_turn": "Fehler NOT_YOUR_TURN: Spieler A ist nicht am Zug",
+  "duplicate_shot": "Fehler DUPLICATE_SHOT: auf B6 wurde bereits geschossen",
+  "end_status": {
+    "Alice": "Gewonnen!",
+    "Bob": "Verloren. Partie beendet."
+  },
+  "post_game_rejection": "Fehler WRONG_PHASE: aktuelle Phase ist finished, nicht shooting",
+  "finished": "2026-11-03T16:30:32.342315+01:00"
+}

@@ -1,4 +1,4 @@
-"""Spielserver: verwaltet Verbindungen; die Spielregeln stehen in board.py."""
+"""Spielserver: verwaltet Verbindungen; die Spielregeln stehen in spiel.py."""
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
@@ -6,7 +6,7 @@ import socket
 import threading
 from uuid import uuid4
 
-import board
+import spiel
 from netz import send, read_messages
 from event_log import EventLog, MESSAGE_TYPES
 
@@ -33,7 +33,7 @@ def new_game(log_file=None) -> dict:
     return {
         "event_log": EventLog(log_file),
         "lock": threading.Lock(),
-        "core": board.BattleshipGame(),
+        "core": spiel.BattleshipGame(),
         "taken": [],
         "players": {
             slot: {
@@ -111,13 +111,14 @@ def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
 
 
 def handle(message: dict, connection: dict, game: dict, sock) -> None:
-    # Kritischer Abschnitt: pruefen, aendern und senden bleiben zusammen.
+    # Die Sperre schuetzt den gesamten Spielkern: pruefen, aendern und senden
+    # bleiben zusammen. Der Kern selbst kennt keine Threads oder Sperren.
     # Kein freier Platz kann doppelt vergeben werden; welcome kommt
     # immer vor dem gameStart fuer dieselbe Verbindung.
     with game["lock"]:
         try:
             response = process(message, connection, game, sock)
-        except board.RuleError as exc:
+        except spiel.RuleError as exc:
             response = {"type": "error", "code": exc.code, "message": str(exc)}
         if response is None:
             return
@@ -141,13 +142,15 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
                         for s in SLOTS
                     ],
                 })
-        elif response["type"] == "result" and game["core"].winner is not None:
-            # Der Schuetze erkennt das Ende an result.turn == None.
-            opponent = next(s for s in SLOTS if s != slot)
-            send_to(game, opponent, {"type": "gameOver", "winner": slot, "reason": "sunk"})
-
         if response["type"] in ("welcome", "placeAck", "result"):
             send_states(game)
+        if response["type"] == "result" and game["core"].winner is not None:
+            # Nach dem letzten Zug sehen beide erst ihren bestaetigten Zustand.
+            broadcast(game, {
+                "type": "gameOver",
+                "winner": game["core"].winner,
+                "reason": game["core"].reason,
+            })
 
 
 def remove_player(connection: dict, game: dict) -> None:

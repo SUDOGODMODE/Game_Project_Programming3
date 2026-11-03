@@ -1,6 +1,6 @@
 # Technischer Abschlussbericht — Material zur eigenen Endfassung
 
-Stand: 27.10.2026. Dieses Dokument wurde mit KI-Unterstützung aus dem
+Stand: 03.11.2026. Dieses Dokument wurde mit KI-Unterstützung aus dem
 tatsächlichen Projektstand erstellt. Es ist eine technische Materialsammlung;
 der Projektverantwortliche muss die Erklärungen vor der Abgabe selbst prüfen,
 überarbeiten und vertreten. Die [persönliche Reflexion](meine_reflexion.md)
@@ -19,14 +19,16 @@ wartet auf Ersatz. Der frühere 30-Sekunden-Reconnect-Vorschlag gilt nicht.
 
 ## Architektur und Verantwortung
 
-`src/board.py` enthält den netz- und fensterunabhängigen `BattleshipGame`.
+`src/spiel.py` enthält den netz- und fensterunabhängigen `BattleshipGame`;
+`src/board.py` stellt lediglich den älteren Importnamen bereit.
 `src/netz.py` liest und schreibt UTF-8-JSON-Zeilen. `src/server.py` bindet
 Verbindungen an A/B, ruft den Kern auf und verteilt Antworten und Sichten.
 `src/client_gui.py` stellt Eingaben und bestätigte Zustände dar. Die
 Konsolenprogramme bleiben zum Spielen und zur Diagnose erhalten.
 
-Der Server entscheidet verbindlich über Platzierung, Schuss, Treffer,
-Zugrecht und Sieg. Ein zusätzlicher vom Client behaupteter Slot oder Treffer
+Der Spielkern entscheidet verbindlich über Platzierung, Schuss, Treffer,
+Zugrecht und Sieg. Der Server bindet die Anfrage an den Slot der Verbindung
+und hält die Spielsperre. Ein zusätzlicher vom Client behaupteter Slot oder Treffer
 wird nicht zur Autorität. Die GUI sendet bei einem Klick eine Anfrage; sie
 zeichnet einen Zug erst nach `state`. `draw_state` zeichnet alle Felder neu,
 damit ein Reset keine alten Markierungen stehen lässt. Die eigene Flotte ist
@@ -39,7 +41,7 @@ nach tatsächlicher Ausführung als geprüft.
 
 ## Protokollentwurf
 
-Das [Protokoll 0.5](../../PROTOKOLL.md) und sein
+Das [Protokoll 0.6](../../PROTOKOLL.md) und sein
 [JSON-Katalog](../protocol/protocol.json) enthalten Richtung, Pflichtfelder,
 Fehler, Beispiele und eine vollständige 33-Schuss-Partie. JSON Lines trennt
 mehrere Nachrichten auf einer langlebigen TCP-Verbindung ohne Annahmen über
@@ -48,7 +50,9 @@ sich aus der Verbindung, das Ergebnis aus dem Kern.
 
 Nach einem erfolgreichen Beitritt, einer Platzierung oder einem Schuss
 sendet der Server zuerst die direkte Antwort und danach jedem belegten Slot
-seine vollständige Sicht. Nach Abbruch folgen `opponentLeft` und die neue
+seine vollständige Sicht. Beim Sieg folgt nach dem `result` zuerst der
+individuelle Endzustand an beide und anschliessend `gameOver` an beide.
+Nach Abbruch folgen `opponentLeft` und die neue
 Wartesicht. Ablehnungen bleiben privat und verändern keinen Spielzustand.
 `ownShips` enthält eigene Schiffe, `shotsAtOpponent` eigene Schüsse und
 `shotsAtSelf` eingehende Schüsse einschliesslich Wasser. Ein fehlendes
@@ -116,6 +120,14 @@ Rohdateien dokumentieren frühere lokale Prüfungen. Neue Endprüfungen stehen
 getrennt unter `docs/evidence/final_assessment_tests/`; ein neuer Bericht
 darf alte Testzahlen nicht als neue Ausführung ausgeben. Der
 [Vorführleitfaden](vorfuehrung.md) beschreibt die wiederholbaren Schritte.
+
+Für den neuen Kursmeilenstein 5 stehen [Anforderungsabgleich](../status/05_requirements.md),
+[grüne Kerntests und abschliessende Gesamtsuite](../evidence/05_final_2026-11-03/full_release.txt),
+[rote Mutationsläufe](../evidence/05_mutation_2026-11-03/result.json) und
+[lokale Tk/TCP-Partie mit Endbild](../evidence/05_gui_verified_2026-11-03/result.json)
+getrennt bereit. Diese lokalen Prüfungen ersetzen den ausdrücklich
+verschobenen echten Zweirechner-Terminalbeleg nicht. Die alten M4-Nachweise
+bleiben Ergebnisse der damaligen Protokollversion 0.5.
 
 Offen sind: echte Lesepartnerschaft und Regel-/Protokoll-Gegenlesen, eine
 reale Zweipersonenpartie an einer Tastatur, Echo/Handshake-Fremdrechnertests

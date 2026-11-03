@@ -7,6 +7,7 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
+VARIANTS = ("localhost", "zwei_rechner")
 EXCLUDED_DIRS = {
     ".git", ".venv", "venv", "env", "ENV", "__pycache__", ".pytest_cache",
     ".mypy_cache", ".ruff_cache", ".tox", ".nox", ".idea", ".vscode",
@@ -39,8 +40,10 @@ def _files(root):
                 yield path, relative
 
 
-def build_submission(repo_root, output):
-    """Package actual files; exclusive output/checksum creation, no source changes."""
+def build_submission(repo_root, output, *, variant=None):
+    """Package actual files; optional profile gets its own entry and outer root."""
+    if variant is not None and variant not in VARIANTS:
+        raise ValueError(f"Unbekanntes Profil: {variant}")
     repo_root = Path(repo_root).resolve()
     output = Path(output)
     checksum_path = output.with_name(output.name + ".sha256")
@@ -48,24 +51,55 @@ def build_submission(repo_root, output):
         raise FileExistsError(f"Ausgabe existiert bereits: {output} oder {checksum_path}")
     if not repo_root.is_dir():
         raise FileNotFoundError(repo_root)
+    if variant is None:
+        project_prefix = repo_root.name
+        documents_prefix = "Dokumente"
+        selected_files = ()
+    else:
+        outer = f"Schiffe_versenken_{variant}"
+        project_prefix = f"{outer}/{repo_root.name}"
+        documents_prefix = f"{outer}/Dokumente"
+        profile_dir = repo_root / "varianten" / variant
+        selected_files = (
+            (profile_dir / "start.py", "start.py"),
+            (profile_dir / "START.md", "START_HIER.md"),
+        )
+        for source, _ in selected_files:
+            if not source.is_file() or source.is_symlink():
+                raise FileNotFoundError(source)
     output.parent.mkdir(parents=True, exist_ok=True)
     manifest = {}
+    checksum_created = False
     with output.open("xb") as stream:
         try:
             with checksum_path.open("x", encoding="utf-8") as checksum_stream:
+                checksum_created = True
                 with zipfile.ZipFile(stream, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-                    roots = [(repo_root, repo_root.name)]
+                    roots = [(repo_root, project_prefix)]
                     originals = repo_root.parent / "Dokumente"
                     if originals.is_dir():
-                        roots.append((originals, "Dokumente"))
+                        roots.append((originals, documents_prefix))
                     for root, prefix in roots:
                         for path, relative in _files(root):
                             if path.resolve() in (output.resolve(), checksum_path.resolve()):
+                                continue
+                            if variant is not None and root == repo_root and relative.as_posix() in (
+                                    "start.py", "START_HIER.md", "PROFIL.txt"):
                                 continue
                             member = f"{prefix}/{relative.as_posix()}"
                             data = path.read_bytes()
                             archive.writestr(member, data)
                             manifest[member] = hashlib.sha256(data).hexdigest()
+                    if variant is not None:
+                        for source, destination in selected_files:
+                            member = f"{project_prefix}/{destination}"
+                            data = source.read_bytes()
+                            archive.writestr(member, data)
+                            manifest[member] = hashlib.sha256(data).hexdigest()
+                        member = f"{project_prefix}/PROFIL.txt"
+                        data = (variant + "\n").encode("utf-8")
+                        archive.writestr(member, data)
+                        manifest[member] = hashlib.sha256(data).hexdigest()
                     status = (
                         "# Abgabestatus\n\n"
                         "Technisches Paket aus tatsächlich vorhandenen Dateien.\n"
@@ -74,14 +108,15 @@ def build_submission(repo_root, output):
                         "eigene Prüfung/Überarbeitung und Erklärung des technischen Berichts; "
                         "menschliches Regel-/Protokoll-Gegenlesen, Lesepartnerschaft, reale "
                         "Zweipersonenpartie, Echo/Handshake-Fremdtests mit Rollenwechsel, "
-                        "Dreirechnerpartie mit fremden IPs und gemeinsamem Bild, gegenseitiger "
+                        "Dreirechnerpartie mit fremden IPs und gemeinsamem Bild, "
+                        "Zweirechnerlauf mit Server-Terminalausgabe aus Kursmeilenstein 5, gegenseitiger "
                         "Fremdclienttest und Livevorführung. Keine vollständige Abgabeerfüllung "
                         "oder Punktezahl wird behauptet.\n\n"
-                        "Aktuelle tatsächliche lokale Ergebnisse siehe docs/status/final_test_verdict.md "
-                        "und docs/evidence; historische Belege behalten ihren ursprünglichen Stand. "
+                        "Aktuelle M5-Ergebnisse siehe docs/status/05_requirements.md und docs/evidence; "
+                        "ältere Testurteile unter docs/status/final_test_verdict.md behalten ihren ursprünglichen Stand. "
                         "Das Vorhandensein einer Datei ist keine Behauptung über einen neuen Testlauf.\n"
                     ).encode("utf-8")
-                    member = f"{repo_root.name}/ABGABESTATUS.md"
+                    member = f"{project_prefix}/ABGABESTATUS.md"
                     archive.writestr(member, status)
                     manifest[member] = hashlib.sha256(status).hexdigest()
                     archive.writestr("SHA256SUMS.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
@@ -93,17 +128,22 @@ def build_submission(repo_root, output):
             # Only remove the newly-created incomplete archive, never old evidence.
             stream.close()
             output.unlink(missing_ok=True)
+            if checksum_created:
+                checksum_path.unlink(missing_ok=True)
             raise
     return output
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    default = ROOT / "dist" / ("Schiffe_versenken_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ") + ".zip")
-    parser.add_argument("--output", type=Path, default=default, help="Neues ZIP; Standard zeitgestempelt unter dist/")
+    parser.add_argument("--output", type=Path, help="Neues ZIP; Standard zeitgestempelt unter dist/")
+    parser.add_argument("--variant", choices=VARIANTS,
+                        help="Profilpaket mit eigenem Einstieg und START_HIER.md")
     args = parser.parse_args()
+    default = ROOT / "dist" / ("Schiffe_versenken_" + (args.variant + "_" if args.variant else "")
+                               + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ") + ".zip")
     try:
-        path = build_submission(ROOT, args.output)
+        path = build_submission(ROOT, args.output or default, variant=args.variant)
     except OSError as exc:
         parser.exit(1, f"Abgabepaket konnte nicht erstellt werden: {exc}\n")
     print(path)

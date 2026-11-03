@@ -1,13 +1,14 @@
 # Architektur und Datenfluss
 
-Python >=3.12, Standardbibliothek. Der Spielkern kennt weder Sockets noch
-Fenster. Der Server ist die verbindliche Quelle für Zustand und Aktionsprüfung.
+Python >=3.12, Standardbibliothek. `src/spiel.py` enthält den netzfreien
+Spielkern und entscheidet über die Spielregeln. Der Server bindet Aktionen an
+Verbindungen und verteilt ausschliesslich die vom Kern erzeugten Sichten.
 
 ```mermaid
 flowchart LR
     A[GUI A] -->|Ausgangsqueue und Sendethread| S[Server mit Spielsperre]
     B[GUI B] -->|Ausgangsqueue und Sendethread| S
-    S --> K[BattleshipGame]
+    S --> K[spiel.BattleshipGame]
     K --> S
     S -->|Sicht A über TCP, Empfangsqueue, after| A
     S -->|Sicht B über TCP, Empfangsqueue, after| B
@@ -15,7 +16,8 @@ flowchart LR
 
 | Datei | Aufgabe |
 |---|---|
-| `src/board.py` | Koordinaten, Flottenprüfung, Platzierung, Schüsse, Zugfolge, Sieg, gefilterte Kopien |
+| `src/spiel.py` | Koordinaten, Flottenprüfung, Platzierung, Schüsse, Zugfolge, Sieg, gefilterte Kopien; keine Netz-, Tk- oder Threadimporte |
+| `src/board.py` | Kompatibilitätseinstieg für ältere Importe; keine zweite Regelimplementierung |
 | `src/netz.py` | UTF-8-JSON-Zeilen senden/lesen, ungültige Objekte markieren, Verbindungsende behandeln |
 | `src/server.py` | Spieler an Verbindungen binden, Sperre, private Antworten, Zustandsverteilung, Reset |
 | `src/event_log.py` | Exklusiv erzeugtes JSONL-Metadatenlog, Schreibsperre, Flush und geschütztes Schliessen |
@@ -38,8 +40,9 @@ Der erste freie Platz A/B wird serverseitig vergeben. Spätere Nachrichten
 verwenden die Identität der Verbindung; zusätzliche Slotfelder wählen keinen
 anderen Spieler. Direkte Antworten gehen vor den dazugehörigen Zuständen
 hinaus. Nach join, place, shoot und Reset folgt die vollständige erlaubte
-Sicht jedes verbundenen Spielers. Fehler gehen nur an den Absender und
-verändern den Spielzustand nicht.
+Sicht jedes verbundenen Spielers. Beim siegreichen Schuss gehen nach `result`
+zuerst die individuellen Endzustände an beide, danach `gameOver` an beide.
+Fehler gehen nur an den Absender und verändern den Spielzustand nicht.
 
 ## Geheimhaltung
 

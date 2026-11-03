@@ -1,6 +1,6 @@
-# Schiffe versenken — Protokoll 0.5
+# Schiffe versenken — Protokoll 0.6
 
-Katalog des lokalen A/B-Protokolls für Kursmeilenstein 4, Version 0.5; strukturierte Fassung: [protocol.json](docs/protocol/protocol.json). Das Gegenlesen steht aus. Die Beispiele erläutern das Format; Ausführungsnachweise stehen unter `docs/evidence/`.
+Katalog des lokalen A/B-Protokolls für Kursmeilenstein 5, Version 0.6; strukturierte Fassung: [protocol.json](docs/protocol/protocol.json). Das Gegenlesen steht aus. Die Beispiele erläutern das Format; Ausführungsnachweise stehen unter `docs/evidence/`. Frühere Nachweise zu Version 0.5 bleiben Belege für ihren damaligen Stand.
 
 ## Transport und Identität
 
@@ -14,7 +14,7 @@ Clients lesen dauerhaft in einem Empfangsthread und unterscheiden die Nachrichte
 
 ## Nachrichtenaufzeichnung auf dem Server
 
-Die Drahtnachrichten bleiben Version 0.5. Zusätzlich erzeugt jeder
+Die Nachrichtenfolge am Spielende entspricht Version 0.6. Zusätzlich erzeugt jeder
 Serverstart eine neue JSONL-Datei unter projektlokalem `logs/`; `--log-file`
 wählt eine ausdrücklich neue Datei. Es gibt kein Anhängen an frühere Logs.
 Pro empfangener und erfolgreich gesendeter Nachricht wird eine vollständige,
@@ -44,7 +44,7 @@ Alle genannten Felder sind Pflichtfelder für den beschriebenen Nachrichtentyp; 
 | `state` | S → C | `phase`, `turn`, `ownShips`, `shotsAtOpponent`, `shotsAtSelf`, `winner` | Nach Beitritt, erfolgreicher Platzierung, erfolgreichem Schuss oder Reset an jeden verbundenen Spieler; auf getState nur an den Anfragenden. Immer individuell gefiltert. | ja, auch Antwort auf getState |
 | `leave` | C → S | keine | Ein beigetretener Client verlässt die Runde bewusst. | nein |
 | `opponentLeft` | S → C | `slot`, `player` | Ein beigetretener Spieler geht per leave, q, EOF oder erkanntem Socket-Abbruch; einmal an den verbliebenen Spieler. | ja |
-| `gameOver` | S → C | `winner`, `reason` | Sobald der letzte erfolgreiche Schuss die gesamte gegnerische Flotte versenkt; nur an den unterlegenen Gegner. | ja |
+| `gameOver` | S → C | `winner`, `reason` | Nach den individuellen Endzuständen an beide Spieler, wenn der letzte erfolgreiche Schuss die gegnerische Flotte versenkt hat. | ja |
 | `error` | S → C | `code`, `message` | Eine Anfrage ist ungültig oder passt nicht zum aktuellen Zustand; nur an ihren Absender. | nein |
 
 ### join
@@ -125,7 +125,7 @@ Der Server prüft Phase, Zug, Feld und Doppelbeschuss. Antwort: `result` oder `e
 
 `type`: string, genau result; `field`: beschossenes Feld, kanonisch A1–J10; `result`: miss, hit oder sunk; `sunk`: Schiffstyp bei sunk, sonst null; `turn`: A/B als nächster Spieler; null bei Spielende
 
-Beim letzten Treffer sind `result: "sunk"` und `turn: null` gesetzt. Der Gewinner erhält kein zusätzliches `gameOver`. Nach result und gegebenenfalls gameOver folgen die vollständigen state-Nachrichten an beide Spieler.
+Beim letzten Treffer sind `result: "sunk"` und `turn: null` gesetzt. Danach folgen die vollständigen individuellen `state`-Nachrichten und anschliessend `gameOver` an beide Spieler. Der Schütze erhält somit `result`, `state` und `gameOver` in dieser Reihenfolge.
 
 ### getState
 
@@ -182,7 +182,7 @@ Der Server gibt den Slot frei und setzt die Runde zurück; siehe «Reihenfolge u
 
 `type`: string, genau gameOver; `winner`: A oder B; `reason`: sunk
 
-Der Gewinner erkennt das Spielende an `result` mit `turn: null`. Danach erhalten beide automatisch ihren gefilterten Endzustand; winner im state benennt denselben Gewinner. Eine zusätzliche getState-Abfrage bleibt möglich.
+Beide Spieler erhalten zuerst ihren gefilterten Endzustand mit demselben `winner`, danach je eine `gameOver`-Nachricht. Der Gewinner kann das Ende bereits an `result` mit `turn: null` erkennen. Eine zusätzliche `getState`-Abfrage bleibt möglich.
 
 ### error
 
@@ -205,7 +205,7 @@ Phasen: `waiting` → `placing` → `shooting` → `finished`. Nach beiden gült
 - Erster Beitritt: welcome, waiting, danach state an den beitretenden Client.
 - Zweiter Beitritt: dessen welcome, danach gameStart an beide, danach je ein individueller state an beide.
 - Platzierung: placeAck nur an den Akteur; danach je ein individueller state an beide.
-- Schuss: result nur an den Akteur. Beim letzten Treffer danach gameOver nur an den Gegner. Anschliessend je ein individueller state an beide.
+- Schuss: `result` nur an den Akteur, danach je ein individueller `state` an beide. Beim letzten Treffer folgt anschliessend `gameOver` an beide.
 - Ablehnung: error mit Grund ausschliesslich an den Absender, kein state-Push und keine Zustandsänderung.
 - getState: ein individueller state ausschliesslich an den Anfragenden.
 - Abgang: einmal opponentLeft an den Verbliebenen, danach dessen zurückgesetzter state. Kein zusätzlicher waiting-Nachrichtentyp.
@@ -262,7 +262,7 @@ Nach jedem erfolgreichen Ereignis treffen die beiden state-Nachrichten ohne getS
 
 ### Alle Schüsse
 
-Für jede Tabellenzeile sendet der genannte Spieler shoot mit dem angegebenen field; er erhält result mit den vier angegebenen Feldern. Bei Zug 33 erhält anschliessend B gameOver. Nach **jeder** Tabellenzeile erhalten A und B den vollständigen eigenen state, auch wenn B nichts sendet. Die Beispiele schreiben A vor B; diese Reihenfolge zwischen verschiedenen Clientverbindungen ist keine Protokollzusage.
+Für jede Tabellenzeile sendet der genannte Spieler shoot mit dem angegebenen field; er erhält result mit den vier angegebenen Feldern. Nach **jeder** Tabellenzeile erhalten A und B den vollständigen eigenen state, auch wenn B nichts sendet. Bei Zug 33 folgt nach diesen beiden Endzuständen `gameOver` an A und B. Die Beispiele schreiben A vor B; diese Reihenfolge zwischen verschiedenen Clientverbindungen ist keine Protokollzusage.
 
 Der state nach Zeile n ist vollständig festgelegt: phase ist shooting und turn der Tabellenwert (nach Zeile 33: finished, turn null, winner A). shotsAtOpponent enthält alle bisherigen Schüsse des Empfängers aus Zeile 1 bis n; shotsAtSelf enthält alle bisherigen Schüsse des anderen Spielers, jeweils mit dem Tabellenwert result. ownShips entspricht der eigenen Platzierung, ergänzt um alle bisherigen Treffer auf diese Schiffe in hits. Alle vorherigen Schusseinträge bleiben erhalten; vor Spielende ist winner null. Die ersten zwei und die letzte Zeile sind unten mit vollständigen Zuständen ausgeschrieben.
 
@@ -324,9 +324,10 @@ Nach den Tabellenzeilen 1–32 folgt ohne zusätzliche Zustandsabfrage:
 ```text
 A → S  {"type":"shoot","field":"B10"}
 S → A  {"type":"result","field":"B10","result":"sunk","sunk":"Destroyer","turn":null}
-S → B  {"type":"gameOver","winner":"A","reason":"sunk"}
 S → A  {"type":"state","phase":"finished","turn":null,"ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{"A6":"hit","B6":"hit","C6":"hit","D6":"hit","E6":"sunk","A7":"hit","B7":"hit","C7":"hit","D7":"sunk","A8":"hit","B8":"hit","C8":"sunk","A9":"hit","B9":"hit","C9":"sunk","A10":"hit","B10":"sunk"},"shotsAtSelf":{"F1":"miss","G1":"miss","H1":"miss","I1":"miss","J1":"miss","F2":"miss","G2":"miss","H2":"miss","I2":"miss","J2":"miss","F3":"miss","G3":"miss","H3":"miss","I3":"miss","J3":"miss","F4":"miss"},"winner":"A"}
 S → B  {"type":"state","phase":"finished","turn":null,"ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":["A6","B6","C6","D6","E6"]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":["A7","B7","C7","D7"]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":["A8","B8","C8"]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":["A9","B9","C9"]},{"type":"Destroyer","cells":["A10","B10"],"hits":["A10","B10"]}],"shotsAtOpponent":{"F1":"miss","G1":"miss","H1":"miss","I1":"miss","J1":"miss","F2":"miss","G2":"miss","H2":"miss","I2":"miss","J2":"miss","F3":"miss","G3":"miss","H3":"miss","I3":"miss","J3":"miss","F4":"miss"},"shotsAtSelf":{"A6":"hit","B6":"hit","C6":"hit","D6":"hit","E6":"sunk","A7":"hit","B7":"hit","C7":"hit","D7":"sunk","A8":"hit","B8":"hit","C8":"sunk","A9":"hit","B9":"hit","C9":"sunk","A10":"hit","B10":"sunk"},"winner":"A"}
+S → A  {"type":"gameOver","winner":"A","reason":"sunk"}
+S → B  {"type":"gameOver","winner":"A","reason":"sunk"}
 B → S  {"type":"leave"}
 S → A  {"type":"opponentLeft","slot":"B","player":"Bob"}
 S → A  {"type":"state","phase":"waiting","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}

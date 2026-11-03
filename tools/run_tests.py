@@ -140,7 +140,7 @@ def run_suite(suite, *, require_gui=False, report_json=None, selection=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--milestone", choices=("00", "02", "03", "04", "06", "07", "08"))
+    parser.add_argument("--milestone", choices=("00", "02", "03", "04", "05", "06", "07", "08"))
     parser.add_argument("--require-gui", action="store_true", help="Alle gefundenen GUI-Tests müssen tatsächlich laufen")
     parser.add_argument("--report-json", type=Path, help="Neue JSON-Berichtsdatei (kein Überschreiben)")
     args = parser.parse_args()

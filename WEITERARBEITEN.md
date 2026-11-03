@@ -1,5 +1,87 @@
 # Projektstand für die nächste Arbeitseinheit
 
+## Aktuelle Ergänzung: zwei Startvarianten, 03.11.2026
+
+Der neue Auftrag ergänzt getrennte Einstiege und Anleitungen für
+[localhost](varianten/localhost/START.md) und
+[zwei Rechner](varianten/zwei_rechner/START.md) aus derselben Codebasis.
+Die [Statusmatrix](docs/status/two_versions.md) trennt technische Prüfung
+vom weiterhin offenen echten Zweirechnerlauf. Der
+[Vergleich der Soll- und Ist-Abdeckung](docs/status/05_coverage_comparison.md)
+steht als eigene Liste bereit. Der neue strenge
+[Gesamtlauf](docs/evidence/two_versions_2026-11-03/full_final.json) bestand
+155/155 Tests, darunter 29 echte GUI-Prüfungen, ohne Fehler oder Skips.
+Ein [echter lokaler Profilstart](docs/evidence/two_versions_2026-11-03/localhost_startup_server.txt)
+startete Server und zwei Tk-Clientprozesse über den localhost-Einstieg;
+zwei Joins und `gameStart` sind im Servermitschnitt sichtbar. Eine ganze
+Partie über beide Clientwrapper ist dadurch noch nicht belegt.
+Ein [lokaler LAN-Server-Smoke](docs/evidence/two_versions_2026-11-03/lan_server_local_smoke_validated.txt)
+über den Zwei-Rechner-Einstieg bestand mit TCP-`join`/`welcome` auf demselben
+Gerät; [ungültige Bob-IP-Aufrufe](docs/evidence/two_versions_2026-11-03/lan_invalid_ip.json)
+wurden vor einem Verbindungsversuch abgelehnt. Dies ist kein Fremdrechnerbeleg.
+Zwei endgültige Profil-ZIPs liegen unter
+`dist/Schiffe_versenken_localhost_2026-11-03_freigabe.zip` und
+`dist/Schiffe_versenken_zwei_rechner_2026-11-03_freigabe.zip`.
+Die zugehörigen Prüfverzeichnisse mit demselben Namen und dem Suffix
+`.verification/` liegen daneben. Aus jedem entpackten Paket bestanden
+Manifest-/Hashprüfung, Start-Hilfe, Kerntest sowie 155/155 Tests mit
+29 echten GUI-Prüfungen. Das Localhost-Paket durchlief zusätzlich eine
+ganze Partie, das Zwei-Rechner-Paket einen lokalen TCP-Beitritt.
+Ein weiterer [vollständiger lokaler Tk/TCP-Lauf](docs/evidence/two_versions_2026-11-03/localhost_full_profile_game/result.json)
+bestand mit Serverstart über den localhost-Profilwrapper, zwei echten
+Tk-Fenstern und 33 Schüssen bis Sieg/Niederlage. Die Clientwrapper wurden
+separat nur bis `gameStart` geprüft. Ältere Kandidaten und Zwischenberichte
+bleiben erhalten; der echte Zweirechnerlauf bleibt offen.
+Die älteren M5-Ergebnisse und die historische Übergabe unten behalten ihren
+damaligen Stand.
+
+## Aktuelle Arbeitseinheit: 03.11.2026 — Kursmeilenstein 5
+
+Der Originalauftrag liegt unverändert unter `../Dokumente/auftrag_Meilenstein5`;
+`docs/assignments/05_assignment.txt` ist eine bytegleiche Kopie.
+Der Projektverantwortliche hat die Übertragung der Tic-Tac-Toe-Lehrschritte
+auf Schiffe versenken bestätigt; ein zweites Spiel wird nicht gebaut. Der
+echte Zweirechnerlauf bleibt ausdrücklich auf später verschoben. Die
+Abgabefrist im Auftrag ist leer. [M5-Anforderungsabgleich](docs/status/05_requirements.md)
+und [M5-Spezifikation](docs/superpowers/specs/2026-11-03-milestone-5-design.md)
+trennen den beauftragten Umfang vom älteren Projektablauf.
+
+Ein neuer lokaler M5-Paketkandidat liegt unter
+`dist/Schiffe_versenken_Meilenstein_5_2026-11-03.zip`; seine unabhängige
+Prüfung steht daneben unter
+`dist/Schiffe_versenken_Meilenstein_5_2026-11-03.verification/result.json`.
+Die entpackte Suite bestand 139/139 Tests mit 29 echten GUI-Prüfungen.
+Dieser Kandidat enthält die vorliegende spätere Ergänzung zur Paketprüfung
+noch nicht. Der echte Zweirechnerlauf bleibt offen.
+
+Ein tatsächlicher lokaler Vorlauf mit zwei Tk/TCP-Fenstern bestand vor
+Änderungen: [Ergebnis](docs/evidence/05_preflight_2026-11-03/result.json).
+Die für M5 vereinbarte Endfolge lautet `result` an den Schützen, dann
+individuelle `state` an beide, dann `gameOver` an beide. Der
+Nachrichtenkatalog beschreibt sie als Version 0.6. Die früheren Belege
+zu Version 0.5 bleiben historische Ergebnisse. Tatsächlich durchgeführt:
+[interaktive Kernpartie](docs/evidence/05_final_2026-11-03/interactive_core.txt)
+mit 33 Zügen und Ablehnungen ohne Zustandsänderung; [zwei absichtliche rote
+Mutationen](docs/evidence/05_mutation_2026-11-03/result.json) in isolierten
+Kopien (1 bzw. 7 vorhergesagte rote Tests); anschliessend [19/19 grüne
+Kerntests](docs/evidence/05_final_2026-11-03/test_spiel_green.txt) und
+[139/139 Tests](docs/evidence/05_final_2026-11-03/full_release.json), darunter
+29 echte GUI-Prüfungen, keine Fehler oder Skips. Der [verifizierte lokale
+Tk/TCP-Lauf](docs/evidence/05_gui_verified_2026-11-03/result.json) belegt
+33 Schüsse, Sieg/Niederlage, einen echten Zielbutton-Klick nach Spielende
+mit privater `WRONG_PHASE`-Ablehnung und den weiterlaufenden Server. Das
+[gemeinsame Endbild](docs/evidence/05_gui_verified_2026-11-03/two_windows_finished.png)
+zeigt beide Tk-Fenster eng nebeneinander. Ein früherer kompakter Bildversuch
+war ungültig; seine unveränderte Ergebnisdatei meldete den Screenshot
+fälschlich PASS. Einzelheiten im [M5-Abgleich](docs/status/05_requirements.md).
+Der echte Zweirechner-Terminalbeleg bleibt offen.
+Nach der letzten M5-Paketstatuskorrektur ist
+`docs/evidence/05_final_2026-11-03/full_release.json` der massgebende
+strenge Gesamtlauf. Das Abgabewerkzeug nennt den offenen Zweirechnerlauf
+und verlinkt den M5-Abgleich; beide M8-Pakettests sind grün. Ältere
+M5-Reports bleiben als Zwischenstände erhalten. Kein neues M5-Abgabearchiv
+oder Fremdrechnerergebnis wird behauptet.
+
 Gesichert am 27.10.2026, Europe/Zurich. Projekt: Schiffe versenken, Programming 3, Max Rufener.
 
 ## Arbeitsweise und Quellen

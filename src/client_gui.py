@@ -18,7 +18,7 @@ except ImportError:
     ttk = None
     SEA = "#143c50"
 
-from board import COLUMNS, FLEET, ship_cells
+from spiel import COLUMNS, FLEET, ship_cells
 from netz import read_messages, send
 from ship_art import draw_svg, SHIP_NAMES
 from ship_effects import ShipEffects
@@ -312,7 +312,7 @@ class BattleshipWindow:
             symbol = symbols.get(state.get("shotsAtOpponent", {}).get(field), "")
             button.set_content(
                 symbol, background=colors[symbol],
-                state="normal" if self.connected and phase == "shooting" else "disabled",
+                state="normal" if self.connected and phase in ("shooting", "finished") else "disabled",
             )
         total = len(ships)
         self.own_summary.configure(text=f"{total - len(hits)} von {total} Schiffsfeldern intakt" if total else "Deine Schiffe erscheinen nach der Bestätigung.")

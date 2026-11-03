@@ -1,7 +1,7 @@
 {
   "protocol": "BattleshipGame",
-  "version": "0.5",
-  "status": "Protokoll für Kursmeilenstein 4 (Das Brett auf dem Bildschirm). Gegenlesen und fremde Rechnernachweise ausstehend; aktueller Stand: README.md.",
+  "version": "0.6",
+  "status": "Protokoll für Kursmeilenstein 5 (Die Regeln). Gegenlesen und fremde Rechnernachweise ausstehend; aktueller Stand: README.md. Frühere Nachweise zu Version 0.5 bleiben historisch.",
   "transport": {
     "protocol": "TCP/IPv4",
     "encoding": "UTF-8",
@@ -11,7 +11,7 @@
     "internalMarker": "netz.read_messages liefert broken intern für ungültiges JSON oder Nicht-Objekte. broken ist keine reguläre Spielnachricht; die Antwort über TCP ist error/INVALID_JSON.",
     "clientReading": "Ein Client liest dauerhaft und unterscheidet nach type. Ungefragte individuell gefilterte state-Nachrichten folgen auf Beitritt, erfolgreiche Platzierung, erfolgreichen Schuss und Reset. getState bleibt eine zusätzliche private Abfrage. Die nächste Nachricht ist nicht zwingend die direkte Antwort auf die letzte Anfrage.",
     "disconnectReading": "Ein erkannter harter Socket-Abbruch beendet read_messages wie EOF.",
-    "serverLogging": "Neue exklusive JSONL-Datei pro Serverstart unter logs/ oder --log-file. Jede empfangene/erfolgreich gesendete Nachricht: UTC-ISO-Zeit mit Zeitzone, Richtung, Verbindung/Slot, bekannter Typ (sonst unknown); nur bei ausgehenden Fehlern bekannter Servercode. Sofortiger Flush, serialisierte Schreiber, kein Anhängen/Überschreiben. Keine Namen, freien Clienttexte, Flotten oder vollständigen Zustands-Payloads. Geheimhaltung an tatsächlich je Client empfangenen Nachrichten prüfen. Drahtformat bleibt 0.5."
+    "serverLogging": "Neue exklusive JSONL-Datei pro Serverstart unter logs/ oder --log-file. Jede empfangene/erfolgreich gesendete Nachricht: UTC-ISO-Zeit mit Zeitzone, Richtung, Verbindung/Slot, bekannter Typ (sonst unknown); nur bei ausgehenden Fehlern bekannter Servercode. Sofortiger Flush, serialisierte Schreiber, kein Anhängen/Überschreiben. Keine Namen, freien Clienttexte, Flotten oder vollständigen Zustands-Payloads. Protokollversion 0.6."
   },
   "rules": {
     "grid": "10x10; ausgegebene Felder kanonisch A1-J10. Eingaben akzeptieren ASCII-Kleinbuchstaben und führende Nullen (a01 -> A1); Unicode-Ziffern werden abgelehnt. Doppelbeschuss wird mit kanonischen Feldern geprüft.",
@@ -235,7 +235,7 @@
         "turn": "B"
       },
       "unsolicited": false,
-      "note": "Beim letzten Treffer result sunk, turn null; danach gameOver nur an den Gegner. Danach states an beide. Kein zusätzliches gameOver an den Gewinner."
+      "note": "Beim letzten Treffer result sunk, turn null; danach individuelle states an beide und anschliessend gameOver an beide. Der Schütze erhält result, state und gameOver in dieser Reihenfolge."
     },
     "getState": {
       "from": "Client -> Server",
@@ -356,7 +356,7 @@
     "gameOver": {
       "from": "Server -> Client",
       "direction": "server_to_client",
-      "trigger": "Sobald der letzte erfolgreiche Schuss die gesamte gegnerische Flotte versenkt; nur an den unterlegenen Gegner.",
+      "trigger": "Nach den individuellen Endzuständen an beide Spieler, wenn der letzte erfolgreiche Schuss die gesamte gegnerische Flotte versenkt hat.",
       "requiredFields": {
         "type": "string, genau gameOver",
         "winner": "A oder B",
@@ -368,7 +368,7 @@
         "reason": "sunk"
       },
       "unsolicited": true,
-      "note": "Gewinner erkennt das Ende an result.turn null. Danach erhält jeder automatisch seinen vollständigen gefilterten Endzustand mit winner. getState bleibt möglich."
+      "note": "Beide erhalten zuerst ihren vollständigen gefilterten Endzustand mit winner, danach je gameOver. Der Gewinner kann das Ende bereits an result.turn null erkennen. getState bleibt möglich."
     },
     "error": {
       "from": "Server -> Client",
@@ -405,7 +405,7 @@
     "Erster join: welcome, waiting, state an diesen Client.",
     "Zweiter join: welcome an den zweiten Client, gameStart an beide, danach je ein individueller state an beide.",
     "Erfolgreiches place: placeAck nur an den Akteur, danach je ein individueller state an beide.",
-    "Erfolgreiches shoot: result nur an den Akteur, beim Sieg gameOver nur an den Gegner, danach je ein individueller state an beide.",
+    "Erfolgreiches shoot: result nur an den Akteur, danach je ein individueller state an beide; beim Sieg anschliessend gameOver an beide.",
     "Ablehnung: nur error an den Absender; kein state-Push und keine Zustandsänderung.",
     "getState: genau ein individueller state nur an den Anfragenden.",
     "Abgang: genau ein opponentLeft an den Verbliebenen, danach sein zurückgesetzter state; kein zusätzlicher waiting-Nachrichtentyp.",
