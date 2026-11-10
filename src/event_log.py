@@ -1,4 +1,4 @@
-"""Serialized, privacy-preserving JSONL message metadata; no message payloads."""
+"""Schreibt Nachrichtenmetadaten als JSONL, ohne private Nachrichteninhalte."""
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -17,10 +17,10 @@ ERROR_CODES = frozenset({
 
 
 class EventLog:
-    """Own one exclusively created file. record/close share a separate lock.
+    """Besitzt eine exklusiv neu angelegte Datei; record/close teilen eine Sperre.
 
-    A completed record is flushed before returning. close is idempotent;
-    late workers during server shutdown cannot write to a closed handle.
+    Jeder Eintrag wird vor der Rueckgabe geflusht. Wiederholtes close ist
+    erlaubt; spaete Serverworker schreiben nicht in die geschlossene Datei.
     """
 
     def __init__(self, path):
@@ -30,6 +30,11 @@ class EventLog:
         self._file = self.path.open("x", encoding="utf-8")
 
     def record(self, direction, peer, message, slot=None):
+        """Schreibt erlaubte Metadaten; False, wenn das Log schon geschlossen ist.
+
+        Unbekannte Typen werden als unknown protokolliert. Nur bekannte,
+        ausgehende Fehlercodes kommen ins Log, keine freien Clienttexte.
+        """
         if direction not in ("<-", "->"):
             raise ValueError("direction must be <- or ->")
         kind = message.get("type")

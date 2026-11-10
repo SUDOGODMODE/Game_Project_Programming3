@@ -3,6 +3,8 @@ import contextlib
 import io
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -10,6 +12,71 @@ from tools import run_tests
 
 
 class RunnerTests(unittest.TestCase):
+    def test_core_cli_starts_no_foreign_processes_with_or_without_report(self):
+        # A fresh interpreter keeps platform's caches from hiding process starts.
+        bootstrap = """
+import json
+import runpy
+import sys
+
+process_starts = []
+def record_process_start(event, args):
+    if event in ('subprocess.Popen', 'os.system', 'os.posix_spawn', 'os.fork', 'os.forkpty'):
+        process_starts.append(event + ': ' + repr(args[0]) if args else event)
+
+sys.addaudithook(record_process_start)
+sys.argv = sys.argv[1:]
+try:
+    runpy.run_path(sys.argv[0], run_name='__main__')
+except SystemExit as exc:
+    code = exc.code
+print(json.dumps(process_starts))
+raise SystemExit(code)
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            for with_report in (False, True):
+                with self.subTest(with_report=with_report):
+                    report_path = Path(directory) / 'core.json'
+                    command = [sys.executable, '-c', bootstrap,
+                               str(run_tests.ROOT / 'tools' / 'run_tests.py'), '--core']
+                    if with_report:
+                        command.extend(['--report-json', str(report_path)])
+                    completed = subprocess.run(command, capture_output=True, text=True, timeout=30)
+                    self.assertEqual(completed.returncode, 0, completed.stderr)
+                    self.assertEqual(json.loads(completed.stdout), [])
+                    if with_report:
+                        report = json.loads(report_path.read_text(encoding='utf-8'))
+                        self.assertEqual(report['summary']['tests_run'], 41)
+                        self.assertTrue(report['success'])
+                        self.assertTrue(report['environment']['platform'])
+
+    def test_core_cli_runs_only_board_game_and_standalone_course_tests(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report_path = Path(directory) / 'core.json'
+            command = [sys.executable, str(run_tests.ROOT / 'tools' / 'run_tests.py'),
+                       '--core', '--report-json', str(report_path)]
+            completed = subprocess.run(command, capture_output=True, text=True, timeout=30)
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            report = json.loads(report_path.read_text(encoding='utf-8'))
+        self.assertEqual(report['selection'], 'core')
+        ids = {row['id'] for row in report['tests']}
+        self.assertTrue(any(test_id.startswith('tests.meilenstein_02.test_board.') for test_id in ids))
+        self.assertTrue(any(test_id.startswith('tests.meilenstein_02.test_game.') for test_id in ids))
+        self.assertTrue(any(test_id.startswith('src.test_spiel.') for test_id in ids))
+        self.assertTrue(all(test_id.startswith(('tests.meilenstein_02.test_board.',
+                                               'tests.meilenstein_02.test_game.',
+                                               'src.test_spiel.')) for test_id in ids))
+        self.assertEqual(report['summary']['tests_run'], len(ids))
+        self.assertEqual(report['summary']['skipped'], 0)
+        self.assertEqual(report['gui']['discovered'], 0)
+
+    def test_core_and_milestone_are_mutually_exclusive(self):
+        command = [sys.executable, str(run_tests.ROOT / 'tools' / 'run_tests.py'),
+                   '--core', '--milestone', '02']
+        completed = subprocess.run(command, capture_output=True, text=True, timeout=10)
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn('not allowed', completed.stderr)
+
     def run_controlled(self, case, *, strict=False):
         self.assertTrue(callable(getattr(run_tests, 'run_suite', None)), 'Shared strict/report runner is missing')
         directory = tempfile.TemporaryDirectory()
@@ -84,7 +151,8 @@ class RunnerTests(unittest.TestCase):
         self.assertFalse(report['success'])
         self.assertEqual(report['summary']['tests_run'], 1)
         self.assertEqual(report['summary']['skipped'], 1)
-        self.assertNotEqual(report['tests'][0]['status'], 'running', 'Completed test with skipped subtest needs an honest final outcome')
+        self.assertEqual(report['tests'][0]['status'], 'partial_skip')
+        self.assertEqual(report['summary']['passed'], 0)
         self.assertTrue(report['gui']['issues'])
 
     def test_strict_mode_requires_passing_gui_not_expected_failure(self):

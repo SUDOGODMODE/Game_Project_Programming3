@@ -1,0 +1,11 @@
+--- src/server.py
++++ isolated/a_no_state.py
+@@ -155,7 +155,7 @@
+                         for s in SLOTS
+                     ],
+                 })
+-        if response["type"] in ("welcome", "placeAck", "result"):
++        if response["type"] in ("welcome", "placeAck"): 
+             send_states(game)
+         if response["type"] == "result" and game["core"].winner is not None:
+             # Nach dem letzten Zug sehen beide erst ihren bestaetigten Zustand.

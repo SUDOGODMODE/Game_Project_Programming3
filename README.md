@@ -1,5 +1,12 @@
 # Schiffe versenken
 
+Die Entwicklung verwendet lokal **Spec Kit 1.3.3**. Projektgrundsätze stehen
+in [.specify/memory/constitution.md](.specify/memory/constitution.md); die
+Codex-Skills liegen unter `.agents/skills/`. Der
+[Einrichtungsstand](docs/development/spec_kit_research.md) beschreibt die
+Installation. Die bisherigen Spezifikationen unter `docs/superpowers/`
+bleiben als historische Arbeitsunterlagen erhalten.
+
 Python-Projekt im Modul Programming 3 an der HFTM, Max Rufener. Zwei Spieler verbinden sich mit einem zentralen Server. Der Server entscheidet über jede Aktion und verteilt die vollständige erlaubte Sicht an beide Clients.
 
 Kursmeilenstein 4 **„Das Brett auf dem Bildschirm“** ergänzt die tkinter-Oberfläche, automatische Zustandsmeldungen und lokale Nachweise. Der Versuch mit zwei fremden Clientrechnern ist für später vorbereitet und bleibt offen. Der [Anforderungsabgleich](docs/status/04_requirements.md) trennt Umsetzung, Prüfung und noch fehlende praktische Nachweise.
@@ -15,8 +22,13 @@ Projektverantwortlichen verschoben.
 Die [Vergleichsliste zu Meilenstein 5 und beiden Varianten](docs/status/05_coverage_comparison.md)
 stellt jede Forderung, ihren Beleg und die offenen Verbesserungen gegenüber.
 
-Der anschliessend freigegebene Umfang bis M8 ergänzt das eigene Bild,
-dauerhafte Nachrichtenlogs, strenge Testabnahme und ein Abgabewerkzeug.
+Der aktuelle Kurs umfasst Meilenstein 0 bis 6. Kursmeilenstein 6
+**„Testen und abschliessen“** überträgt die Tic-Tac-Toe-Lehrschritte auf
+Schiffe versenken. Die [M6-Netztests](src/test_netz.py) starten für jeden
+Fall einen eigenen Serverprozess; der [M6-Anforderungsabgleich](docs/status/06_requirements.md)
+trennt bestandene Prüfungen vom noch offenen Paketnachweis. Frühere
+Bezeichnungen als M7/M8 gehören zur historischen Planung und sind keine
+weiteren aktuellen Kursmeilensteine.
 **Vor der Abgabe selbst ergänzen:** [meine persönliche Reflexion](docs/report/meine_reflexion.md).
 Der Benutzer erledigt sie ausdrücklich selbst; die Datei enthält nur offene
 Leitfragen. Der [technische Berichtsentwurf](docs/report/abschlussbericht.md)
@@ -39,6 +51,22 @@ Python-Pakete braucht das Spiel nicht.
 |---|---|---|
 | **localhost** | Server und zwei Spielfenster auf einem Gerät, auch ohne LAN | [Auf einem Gerät starten](varianten/localhost/START.md) |
 | **zwei Rechner** | Server und erster Client auf Rechner 1, zweiter Client auf Rechner 2 | [Auf zwei Rechnern starten](varianten/zwei_rechner/START.md) |
+
+Für einen schnellen Start auf **einem Gerät** im Projektordner drei
+Terminals öffnen und die Befehle in dieser Reihenfolge ausführen:
+
+```bash
+python3 src/server.py
+python3 src/client_gui.py 127.0.0.1 Alice
+python3 src/client_gui.py 127.0.0.1 Bob
+```
+
+Der Server verwendet ohne Angabe Port 5000; die Clients verbinden sich
+ebenfalls mit Port 5000. `PORT=5099 python3 src/server.py` wählt unter
+macOS/Linux einen anderen Serverport. Dann brauchen **beide** Clients
+zusätzlich `--port 5099`. Für zwei Rechner die tatsächliche IPv4-Adresse
+des Serverrechners einsetzen; die verlinkte Anleitung erklärt die
+Einrichtung und Windows-Befehle.
 
 Im Repository liegen die beiden Einstiege unter `varianten/localhost/` und
 `varianten/zwei_rechner/`. Die beiden endgültigen Profil-ZIPs unter
@@ -82,6 +110,7 @@ Nachweise getrennt.
 ```text
 src/                          Spielprogramme und Netzwerk; spiel.py ist der Regelkern,
                               board.py bietet den älteren Importnamen an
+  gui/                        Interne Brett-, SVG- und Effektmodule; client_gui.py bleibt Einstieg
 tests/
   fixtures.py                 Gemeinsame feste Testdaten
   meilenstein_00/             Echo / Werkzeugbasis
@@ -89,15 +118,15 @@ tests/
   meilenstein_03/             Transport, Lobby, TCP/CLI, Angriffstest
   meilenstein_04/             Zustandsverteilung und echte GUI-Tests
   meilenstein_05/             Regelkern und Endfolge
-  meilenstein_06/             PNG, SVG-Flotte, Grafikeffekte und Tk-Lebensdauer
-  meilenstein_07/             Persistentes privates Nachrichtenlog
-  meilenstein_08/             Abgabepaket und Manifest
+  meilenstein_06/             M6-Netz- und Porttests; ältere Grafikprüfungen
+  additional/                 Zusatzprüfungen für Nachrichtenlog und Abgabepaket
 tools/                        Gemeinsamer Teststart und lokale Nachweise
 varianten/
   localhost/                 Startprofil und Anleitung für ein Gerät
   zwei_rechner/              Startprofil und Anleitung für zwei Geräte
 bilder/                       ImageGen-PNG, Herkunft und SVG-Flotte
 docs/
+  README.md                   Wegweiser durch aktuelle und historische Unterlagen
   assignments/                Unveränderte Aufgaben-Texte aus den Unterlagen
   guides/                     Einrichtung und Bedienung
   development/                Architektur, Tests und Weiterentwicklung
@@ -106,34 +135,106 @@ docs/
   evidence/                   Erwartungen, Rohlogs, Bilder, Checklisten
   report/                     Technischer Entwurf, persönliche Reflexion, Vorführung
   superpowers/                Technische Spezifikation und Arbeitsplan
+specs/                        Neue Spec-Kit-Spezifikationen und Arbeitspläne
+.specify/                     Projektgrundsätze und Spec-Kit-Vorlagen
+.agents/skills/               Lokale Codex-Skills für Spec Kit
 REGELN.md                     Verbindliche Spielregeln
 PROTOKOLL.md                  Lesbarer Nachrichtenkatalog, Version 0.6
 journal.md                    Tatsächliche Arbeitsschritte und Prüfungen
 WEITERARBEITEN.md             Übergabe für die nächste Arbeitseinheit
 ```
 
+`tests/meilenstein_06/` bindet die eigenständigen M6-Netztests unter `src/`
+ein und prüft die Portwahl. Die älteren Grafikprüfungen bleiben als
+Regressionen erhalten.
+
 M1 hat Dokumentations- und Freigabeaufgaben, keine eigene technische Testsuite. Bestehende Tests bleiben beim ursprünglichen Schwerpunkt; sie prüfen als Regression auch spätere Erweiterungen. Historische Rohlogs behalten ihre damaligen Dateipfade. Die originalen Word-Unterlagen liegen unverändert im benachbarten Ordner `../Dokumente/`.
 
 ## Tests
 
+Wenn du den Code als Junior kennenlernen willst, beginne mit dem kurzen
+Kernlauf. Er prüft Brett, Platzierung, Schüsse und Zugfolge ohne Netzwerk,
+Tk-Fenster oder fremde Prozesse. Danach prüfst du den geänderten Teil und
+zum Schluss die vollständige Anwendung:
+
+Die [Lesereihenfolge durch den Code](docs/development/code_lesen.md) führt
+von einer Spielaktion über Server und Client bis zu den Nachweisen.
+
 ```bash
+python3 tools/run_tests.py --core
+python3 tools/run_tests.py --milestone 02
+python3 -m unittest discover
+python3 tools/run_tests.py --milestone 06 --require-gui
 python3 tools/run_tests.py
-python3 tools/run_tests.py --milestone 04
-python3 tools/run_tests.py --milestone 05
-python3 tools/run_tests.py --require-gui --report-json "<neuer_testbericht.json>"
+python3 tools/run_tests.py --require-gui
 ```
+
+Die zwei eigenständigen Kursdateien lassen sich im Ordner `src/` prüfen:
+
+```bash
+cd src
+python3 -m unittest -v test_spiel test_netz
+cd ..
+```
+
+`test_spiel.py` enthält **19 Regeltests**, `test_netz.py` **21 neue Tests
+mit echten TCP-Verbindungen und einem eigenen Serverprozess pro Fall**.
+Damit sind es 40 direkte Kurstests statt der 31 Tic-Tac-Toe-Tests aus der
+Lehrvorlage. Der [M6-Lauf](docs/evidence/06_final_2026-11-10/test_netz_green.txt)
+bestand 21/21; `python3 -m unittest discover` bestand
+[190/190](docs/evidence/06_final_2026-11-10/discover_green.txt). Der
+[strenge Gesamtbericht](docs/evidence/06_final_2026-11-10/full_strict.json)
+enthält 190/190 und 29/29 echte GUI-Prüfungen ohne Skip. Eine vollständige
+lokale [GUI/TCP-Demo](docs/evidence/06_final_2026-11-10/gui_demo_m6/result.json)
+mit 33 Schüssen bis Sieg/Niederlage bestand ebenfalls. Das Abgabearchiv
+`dist/Schiffe_versenken_Meilenstein_6_2026-11-10.zip` wurde gebaut, per
+SHA256 geprüft und in einem frischen fremden Zielordner entpackt: Manifest
+(336/336 Hashes), `--help`-Einstiege und die volle Suite bestanden dort mit
+**190/190 Tests, 29/29 echten GUI-Prüfungen, 0 Skips** unter Python 3.14.10;
+Beleg unter `dist/Schiffe_versenken_Meilenstein_6_2026-11-10.verification/`.
+Dies ist kein echter Fremdrechnernachweis, nur eine frische lokale Venv in
+einem anderen Arbeitsverzeichnis.
+
+**Gefundener Fehler und Korrektur:** Vor M6 ignorierte `server.py` die
+Umgebungsvariable `PORT`. Ein neuer Test schlug deshalb zunächst fehl.
+Der Server liest jetzt `PORT`; die vorhandene CLI-Option `--port` hat
+weiterhin Vorrang. Der Zählerfehler aus dem Unterrichtsbeispiel war hier
+bereits durch die Suche nach freien Plätzen A/B vermieden. Der
+[isolierte Fehlernachweis](docs/evidence/06_mutations_2026-11-10/result.md)
+zeigt, dass die neuen Netztests einen wieder eingeführten Zählerfehler
+erkennen.
+
+**Grenzen:** Es läuft jeweils nur eine Partie. Nach einem Verbindungsabbruch
+wird sie zurückgesetzt; ein Spieler kann nicht nahtlos auf seinen alten
+Platz zurückkehren. Nach einem Sieg gibt es keine automatische Revanche
+ohne neue Runde. Ein echter Fremdrechnerlauf ist noch offen.
+
+`--core` ist die schnelle Rückmeldung beim Lernen und Ändern der Regeln.
+`--milestone 02` enthält zusätzlich die lokale Konsolenpartie. Für Änderungen
+an Server oder Oberfläche reicht ein Kernlauf nicht; die Gesamtsuite braucht
+lokale TCP-Ports und für `--require-gui` eine grafische Sitzung. Ein
+übersprungener GUI-Test gilt nicht als bestandener GUI-Nachweis. Die
+[Testanleitung](docs/development/testing.md) nennt gezielte Befehle und eine
+vollständige lokale Partie mit zwei echten Fenstern.
 
 Der Originalbefehl aus Kursmeilenstein 5 lautet im Ordner `src` mit
 aktivierter Projektumgebung: `python3 -m unittest -v test_spiel.py`. Die
 [grüne Rohausgabe mit 19 Tests](docs/evidence/05_final_2026-11-03/test_spiel_green.txt)
 und die [roten Mutationsausgaben](docs/evidence/05_mutation_2026-11-03/result.json)
 sind getrennt belegt; die absichtlichen Fehler liefen in isolierten Kopien
-und wurden nicht in den Projektkern übernommen. Die [abschliessende vollständige Suite](docs/evidence/05_final_2026-11-03/full_release.json)
-bestand mit 139/139 Tests, davon 29 echte GUI-Prüfungen, ohne Fehler oder Skips.
+und wurden nicht in den Projektkern übernommen. Die
+[damalige M5-Suite](docs/evidence/05_final_2026-11-03/full_release.json)
+bestand mit 139/139 Tests. Der spätere
+[Profil-Abschlusslauf](docs/evidence/two_versions_2026-11-03/full_final.json)
+bestand mit 155/155 Tests, darunter 29 echte GUI-Prüfungen. Diese Zahlen
+beschreiben historische Stände; neue Änderungen benötigen einen eigenen Lauf.
 
 TCP-Tests benötigen lokale Portbindungen, GUI-Tests eine grafische Sitzung. Ein GUI-Skip ersetzt keine Funktionsprüfung. Befehle, Testzuordnung und Nachweisgrenzen stehen in der [Testanleitung](docs/development/testing.md).
 
 `<neuer_testbericht.json>` zuerst durch einen neuen Dateipfad ersetzen.
+Ein JSON-Bericht kann optional mit
+`python3 tools/run_tests.py --require-gui --report-json "<neuer_testbericht.json>"`
+erstellt werden.
 `--require-gui` scheitert bei fehlenden oder übersprungenen GUI-Prüfungen,
 auch bei übersprungenen Subtests und erwarteten Fehlern. Der normale Modus
 bleibt portabel. Bestehende JSON-Berichte werden vor Testbeginn abgelehnt.
@@ -184,7 +285,8 @@ Ohne `--output` erzeugt das Abgabewerkzeug einen Zeitstempelnamen in `dist/`.
 ZIP und `.sha256` werden neu erstellt. Das Paket enthält Programmcode,
 Bilder, Tests, Tools, Dokumentation, tatsächliche vorhandene Nachweise und
 die benachbarten Originalunterlagen `Dokumente/`. Es schliesst `.git`,
-virtuelle Umgebungen, Caches, lokale Geheimnisse und Laufzeitlogs aus;
+virtuelle Umgebungen, Caches, lokale Geheimnisse, Laufzeitlogs sowie die
+lokalen Entwicklungswerkzeuge `.agents/` und `.specify/` aus;
 bewusst abgelegte Nachweise unter `docs/evidence/` bleiben erhalten.
 `SHA256SUMS.json` enthält die Hashes aller übrigen ZIP-Dateien,
 `ABGABESTATUS.md` die offenen menschlichen Aufgaben. Das Paket ist eine

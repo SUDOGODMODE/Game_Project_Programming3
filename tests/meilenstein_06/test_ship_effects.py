@@ -5,11 +5,11 @@ import importlib.util
 import time
 import unittest
 
-from tests.meilenstein_04 import test_gui as gui_helpers
+from tests import gui_helpers
 
 tk = gui_helpers.tk
-if importlib.util.find_spec("ship_effects") is not None:
-    import ship_effects
+if importlib.util.find_spec("gui.ship_effects") is not None:
+    from gui import ship_effects
 else:
     ship_effects = None
 
@@ -18,12 +18,11 @@ def destroyer(hits=(), cells=("A1", "B1")):
     return {"type": "Destroyer", "cells": list(cells), "hits": list(hits)}
 
 
-class ShipEffectsTests(unittest.TestCase):
+class ShipEffectsTests(gui_helpers.TkDisplayTestCase):
     requires_gui = True
-    setUpClass = classmethod(gui_helpers.GuiTests.setUpClass.__func__)
 
     def setUp(self):
-        self.assertIsNotNone(ship_effects, "ship_effects.py mit ShipEffects fehlt")
+        self.assertIsNotNone(ship_effects, "gui/ship_effects.py mit ShipEffects fehlt")
         self.root = tk.Tk()
         self.root.withdraw()
         self.addCleanup(self.root.destroy)

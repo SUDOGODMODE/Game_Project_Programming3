@@ -1,6 +1,7 @@
 """Spielserver: verwaltet Verbindungen; die Spielregeln stehen in spiel.py."""
 import argparse
 from datetime import datetime, timezone
+import os
 from pathlib import Path
 import socket
 import threading
@@ -10,7 +11,8 @@ import spiel
 from netz import send, read_messages
 from event_log import EventLog, MESSAGE_TYPES
 
-HOST, PORT = "0.0.0.0", 5000
+HOST = "0.0.0.0"
+PORT = int(os.environ.get("PORT", "5000"))
 SLOTS = ("A", "B")
 
 
@@ -27,6 +29,12 @@ def log_message(direction: str, peer, message: dict, game=None, slot=None) -> No
 
 
 def new_game(log_file=None) -> dict:
+    """Legt die gemeinsame Serververwaltung fuer alle Verbindungsworker an.
+
+    players speichert Sockets und Namen, taken die belegten Slots. core
+    verwaltet die eigentlichen Spielregeln, Flotten und Schuesse. lock
+    schuetzt gemeinsame Aenderungen und die zugehoerige Nachrichtenfolge.
+    """
     if log_file is None:
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
         log_file = Path(__file__).resolve().parents[1] / "logs" / f"{stamp}_{uuid4().hex[:8]}.jsonl"
@@ -111,6 +119,11 @@ def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
 
 
 def handle(message: dict, connection: dict, game: dict, sock) -> None:
+    """Sendet die direkte Antwort, dann gegebenenfalls die gefilterten Sichten.
+
+    Nach dem letzten Schuss folgen auf result beide state und erst danach
+    gameOver. Abgelehnte Aktionen erhalten nur ihre private Fehlerantwort.
+    """
     # Die Sperre schuetzt den gesamten Spielkern: pruefen, aendern und senden
     # bleiben zusammen. Der Kern selbst kennt keine Threads oder Sperren.
     # Kein freier Platz kann doppelt vergeben werden; welcome kommt
@@ -193,7 +206,8 @@ def handle_connection(sock: socket.socket, address, game: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Schiffe-versenken-Server")
     parser.add_argument("--host", default=HOST, help="Bindeadresse (Standard: alle Netzwerkkarten)")
-    parser.add_argument("--port", type=int, default=PORT, help="TCP-Port (Standard: 5000)")
+    parser.add_argument("--port", type=int, default=PORT,
+                        help="TCP-Port (Standard: PORT-Umgebungsvariable oder 5000)")
     parser.add_argument("--log-file", type=Path, help="Neue JSONL-Datei; vorhandene Dateien werden abgelehnt")
     args = parser.parse_args()
     try:

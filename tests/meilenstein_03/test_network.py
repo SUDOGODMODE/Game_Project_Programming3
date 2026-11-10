@@ -9,11 +9,13 @@ import queue
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import unittest
 
 import server
+import play
 import os
 from tests.fixtures import FLEET, FLEET_CELLS, MISSES
 
@@ -70,15 +72,24 @@ class LoopbackServer:
     """Startet den lokalen Server und räumt Sockets und Threads auf."""
 
     def __init__(self):
-        self.game = server.new_game()
-        self.listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.temp = tempfile.TemporaryDirectory()
         try:
-            self.listener.bind(("127.0.0.1", 0))
-        except OSError:
-            self.listener.close()
+            self.game = server.new_game(log_file=Path(self.temp.name) / "server.jsonl")
+        except Exception:
+            self.temp.cleanup()
             raise
-        self.listener.listen()
-        self.listener.settimeout(0.1)
+        self.listener = None
+        try:
+            self.listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.listener.bind(("127.0.0.1", 0))
+            self.listener.listen()
+            self.listener.settimeout(0.1)
+        except OSError:
+            if self.listener is not None:
+                self.listener.close()
+            self.game["event_log"].close()
+            self.temp.cleanup()
+            raise
         self.address = self.listener.getsockname()
         self.stopped = threading.Event()
         self.handlers = []
@@ -107,21 +118,25 @@ class LoopbackServer:
             self.errors.put(error)
 
     def close(self):
-        self.stopped.set()
-        self.listener.close()
-        self.acceptor.join(TIMEOUT)
-        for sock in self.sockets:
-            try:
-                sock.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
-            sock.close()
-        for worker in self.handlers:
-            worker.join(TIMEOUT)
-        if any(worker.is_alive() for worker in self.handlers):
-            raise AssertionError("server handler failed to stop during cleanup")
-        if not self.errors.empty():
-            raise AssertionError(f"server handler raised: {self.errors.get()!r}")
+        try:
+            self.stopped.set()
+            self.listener.close()
+            self.acceptor.join(TIMEOUT)
+            for sock in self.sockets:
+                try:
+                    sock.shutdown(socket.SHUT_RDWR)
+                except OSError:
+                    pass
+                sock.close()
+            for worker in self.handlers:
+                worker.join(TIMEOUT)
+            if any(worker.is_alive() for worker in self.handlers):
+                raise AssertionError("server handler failed to stop during cleanup")
+            if not self.errors.empty():
+                raise AssertionError(f"server handler raised: {self.errors.get()!r}")
+        finally:
+            self.game["event_log"].close()
+            self.temp.cleanup()
 
 
 class CliClient:
@@ -192,6 +207,37 @@ class CliClient:
         self.reader.join(TIMEOUT)
         self.process.stdin.close()
         self.process.stdout.close()
+
+
+class PlayCommandTests(unittest.TestCase):
+    """Terminalbefehle und bestaetigte Resultattexte ohne Netzwerk pruefen."""
+
+    def test_empty_input_and_control_commands(self):
+        for text, expected in (
+            ("  ", None),
+            (" Q ", {"type": "leave"}),
+            ("quit", {"type": "leave"}),
+            (" StAtE ", {"type": "getState"}),
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(play.message_for_command(text), expected)
+
+    def test_shot_commands_are_normalized_and_left_for_server_validation(self):
+        for text, field in ((" c5 ", "C5"), ("k99", "K99")):
+            with self.subTest(text=text):
+                self.assertEqual(play.message_for_command(text), {"type": "shoot", "field": field})
+
+    def test_confirmed_result_text_describes_turn_and_final_sinking(self):
+        for result, expected in (
+            ({"field": "J10", "result": "miss", "sunk": None, "turn": "A"},
+             "Schuss auf J10: miss Du bist am Zug."),
+            ({"field": "A1", "result": "hit", "sunk": None, "turn": "B"},
+             "Schuss auf A1: hit Der Gegner ist am Zug."),
+            ({"field": "B5", "result": "sunk", "sunk": "Destroyer", "turn": None},
+             "Schuss auf B5: sunk - Destroyer versenkt! Gewonnen! q beendet den Client."),
+        ):
+            with self.subTest(result=result):
+                self.assertEqual(play.shot_result_text(result, "A"), expected)
 
 
 class NetworkTests(unittest.TestCase):

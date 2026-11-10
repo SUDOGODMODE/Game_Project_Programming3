@@ -1,0 +1,1060 @@
+verbunden: ('127.0.0.1', 12345)
+  <- [('127.0.0.1', 12345)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 12345)] type=broken
+  -> [A] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 12345)] type=getState
+  -> [A] type=state
+getrennt: ('127.0.0.1', 12345)
+.......................................verbunden: ('127.0.0.1', 55549)
+  <- [('127.0.0.1', 55549)] type=unknown
+  -> [('127.0.0.1', 55549)] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 55549)] type=unknown
+  -> [('127.0.0.1', 55549)] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 55549)] type=join
+  -> [('127.0.0.1', 55549)] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 55549)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55549)] type=join
+  -> [A] type=error code=ALREADY_JOINED
+  <- [('127.0.0.1', 55549)] type=broken
+  -> [A] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 55549)] type=broken
+  -> [A] type=error code=INVALID_JSON
+getrennt: ('127.0.0.1', 55549)
+.verbunden: ('127.0.0.1', 55551)
+verbunden: ('127.0.0.1', 55552)
+  <- [('127.0.0.1', 55551)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55552)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=place
+  -> [A] type=error code=INVALID_PLACEMENT
+  <- [('127.0.0.1', 55551)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=error code=NOT_YOUR_TURN
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55552)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=gameOver
+  -> [B] type=gameOver
+  <- [('127.0.0.1', 55551)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55552)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55551)] type=shoot
+  -> [A] type=error code=WRONG_PHASE
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55552)
+getrennt: ('127.0.0.1', 55551)
+.verbunden: ('127.0.0.1', 55554)
+verbunden: ('127.0.0.1', 55556)
+  <- [('127.0.0.1', 55554)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55556)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55554)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=gameOver
+  -> [B] type=gameOver
+  <- [('127.0.0.1', 55554)] type=leave
+  -> [B] type=opponentLeft
+  -> [B] type=state
+  <- [('127.0.0.1', 55556)] type=getState
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55554)
+verbunden: ('127.0.0.1', 55557)
+  <- [('127.0.0.1', 55557)] type=join
+  -> [A] type=welcome
+  -> [B] type=gameStart
+  -> [A] type=gameStart
+  -> [B] type=state
+  -> [A] type=state
+  <- [('127.0.0.1', 55556)] type=getState
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55556)
+getrennt: ('127.0.0.1', 55557)
+.verbunden: ('127.0.0.1', 55559)
+  <- [('127.0.0.1', 55559)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+verbunden: ('127.0.0.1', 55560)
+  <- [('127.0.0.1', 55560)] type=getState
+  -> [('127.0.0.1', 55560)] type=error code=NOT_JOINED
+getrennt: ('127.0.0.1', 55560)
+  <- [('127.0.0.1', 55559)] type=getState
+  -> [A] type=state
+verbunden: ('127.0.0.1', 55561)
+  <- [('127.0.0.1', 55561)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55559)
+getrennt: ('127.0.0.1', 55561)
+.verbunden: ('127.0.0.1', 55563)
+verbunden: ('127.0.0.1', 55564)
+  <- [('127.0.0.1', 55563)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55564)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55563)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55564)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55563)] type=shoot
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55564)
+  -> [A] type=error code=WRONG_PHASE
+  <- [('127.0.0.1', 55563)] type=getState
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55563)
+.verbunden: ('127.0.0.1', 55566)
+verbunden: ('127.0.0.1', 55567)
+  <- [('127.0.0.1', 55566)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55567)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55566)] type=join
+  -> [A] type=error code=ALREADY_JOINED
+  <- [('127.0.0.1', 55566)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55567)] type=getState
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55566)
+getrennt: ('127.0.0.1', 55567)
+.verbunden: ('127.0.0.1', 55569)
+verbunden: ('127.0.0.1', 55570)
+  <- [('127.0.0.1', 55569)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55570)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55569)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55570)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55569)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55570)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55569)] type=shoot
+  -> [A] type=error code=DUPLICATE_SHOT
+  <- [('127.0.0.1', 55569)] type=getState
+  -> [A] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55570)
+getrennt: ('127.0.0.1', 55569)
+.verbunden: ('127.0.0.1', 55572)
+  <- [('127.0.0.1', 55572)] type=join
+verbunden: ('127.0.0.1', 55573)
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55573)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55572)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55573)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55572)
+  <- [('127.0.0.1', 55573)] type=getState
+  -> [B] type=state
+verbunden: ('127.0.0.1', 55574)
+  <- [('127.0.0.1', 55574)] type=join
+  -> [A] type=welcome
+  -> [B] type=gameStart
+  -> [A] type=gameStart
+  -> [B] type=state
+  -> [A] type=state
+  <- [('127.0.0.1', 55573)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55574)] type=getState
+  -> [A] type=state
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55574)
+getrennt: ('127.0.0.1', 55573)
+.verbunden: ('127.0.0.1', 55576)
+verbunden: ('127.0.0.1', 55577)
+  <- [('127.0.0.1', 55576)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55577)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55576)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55577)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55576)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55577)] type=shoot
+  -> [B] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55577)] type=leave
+  -> [A] type=opponentLeft
+  -> [A] type=state
+  <- [('127.0.0.1', 55576)] type=getState
+getrennt: ('127.0.0.1', 55577)
+  -> [A] type=state
+verbunden: ('127.0.0.1', 55578)
+  <- [('127.0.0.1', 55578)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55578)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55576)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55578)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55578)
+getrennt: ('127.0.0.1', 55576)
+.verbunden: ('127.0.0.1', 55580)
+  <- [('127.0.0.1', 55580)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55580)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55580)] type=place
+  -> [A] type=error code=WRONG_PHASE
+getrennt: ('127.0.0.1', 55580)
+.verbunden: ('127.0.0.1', 55582)
+verbunden: ('127.0.0.1', 55583)
+  <- [('127.0.0.1', 55582)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55583)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55582)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55583)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55582)] type=broken
+  -> [A] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 55582)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55583)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55582)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55582)
+getrennt: ('127.0.0.1', 55583)
+.verbunden: ('127.0.0.1', 55585)
+  <- [('127.0.0.1', 55585)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+verbunden: ('127.0.0.1', 55586)
+  <- [('127.0.0.1', 55586)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55586)
+verbunden: ('127.0.0.1', 55587)
+  <- [('127.0.0.1', 55587)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55587)
+getrennt: ('127.0.0.1', 55585)
+.verbunden: ('127.0.0.1', 55589)
+  <- [('127.0.0.1', 55589)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55589)] type=leave
+getrennt: ('127.0.0.1', 55589)
+verbunden: ('127.0.0.1', 55590)
+  <- [('127.0.0.1', 55590)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55590)] type=getState
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55590)
+.verbunden: ('127.0.0.1', 55592)
+  <- [('127.0.0.1', 55592)] type=broken
+  -> [('127.0.0.1', 55592)] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 55592)] type=broken
+  -> [('127.0.0.1', 55592)] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 55592)] type=broken
+  -> [('127.0.0.1', 55592)] type=error code=INVALID_JSON
+  <- [('127.0.0.1', 55592)] type=unknown
+  -> [('127.0.0.1', 55592)] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 55592)] type=unknown
+  -> [('127.0.0.1', 55592)] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 55592)] type=join
+  -> [('127.0.0.1', 55592)] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 55592)] type=join
+  -> [('127.0.0.1', 55592)] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 55592)] type=join
+  -> [('127.0.0.1', 55592)] type=error code=MISSING_PLAYER
+  <- [('127.0.0.1', 55592)] type=getState
+  -> [('127.0.0.1', 55592)] type=error code=NOT_JOINED
+  <- [('127.0.0.1', 55592)] type=leave
+  -> [('127.0.0.1', 55592)] type=error code=NOT_JOINED
+  <- [('127.0.0.1', 55592)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55592)
+.verbunden: ('127.0.0.1', 55594)
+verbunden: ('127.0.0.1', 55595)
+  <- [('127.0.0.1', 55594)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55595)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55594)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55595)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55594)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55594)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55594)
+getrennt: ('127.0.0.1', 55595)
+.verbunden: ('127.0.0.1', 55597)
+verbunden: ('127.0.0.1', 55598)
+  <- [('127.0.0.1', 55597)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55598)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55597)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55598)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55597)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55597)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55598)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55597)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55597)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55598)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55597)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55597)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55598)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55597)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55597)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55598)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55597)
+getrennt: ('127.0.0.1', 55598)
+.verbunden: ('127.0.0.1', 55600)
+verbunden: ('127.0.0.1', 55601)
+  <- [('127.0.0.1', 55600)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55601)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55600)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55601)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55601)] type=shoot
+  -> [B] type=error code=NOT_YOUR_TURN
+  <- [('127.0.0.1', 55600)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55601)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55600)
+getrennt: ('127.0.0.1', 55601)
+..verbunden: ('127.0.0.1', 55604)
+  <- [('127.0.0.1', 55604)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+verbunden: ('127.0.0.1', 55605)
+  <- [('127.0.0.1', 55605)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55605)
+getrennt: ('127.0.0.1', 55604)
+.verbunden: ('127.0.0.1', 55607)
+  <- [('127.0.0.1', 55607)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55607)] type=getState
+  -> [A] type=state
+verbunden: ('127.0.0.1', 55608)
+  <- [('127.0.0.1', 55608)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  <- [('127.0.0.1', 55607)] type=place
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55608)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55608)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55608)
+  <- [('127.0.0.1', 55607)] type=getState
+  -> [A] type=state
+verbunden: ('127.0.0.1', 55609)
+  <- [('127.0.0.1', 55609)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  <- [('127.0.0.1', 55607)] type=place
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55609)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55609)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55607)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55607)] type=leave
+  -> [B] type=opponentLeft
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55607)
+getrennt: ('127.0.0.1', 55609)
+.verbunden: ('127.0.0.1', 55611)
+verbunden: ('127.0.0.1', 55612)
+  <- [('127.0.0.1', 55611)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55612)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55611)
+getrennt: ('127.0.0.1', 55612)
+.verbunden: ('127.0.0.1', 55614)
+verbunden: ('127.0.0.1', 55615)
+verbunden: ('127.0.0.1', 55616)
+verbunden: ('127.0.0.1', 55617)
+verbunden: ('127.0.0.1', 55618)
+verbunden: ('127.0.0.1', 55619)
+  <- [('127.0.0.1', 55619)] type=join
+  <- [('127.0.0.1', 55614)] type=join
+  <- [('127.0.0.1', 55615)] type=join
+  <- [('127.0.0.1', 55618)] type=join
+  <- [('127.0.0.1', 55617)] type=join
+  <- [('127.0.0.1', 55616)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  -> [('127.0.0.1', 55615)] type=error code=GAME_FULL
+  -> [('127.0.0.1', 55617)] type=error code=GAME_FULL
+  -> [('127.0.0.1', 55618)] type=error code=GAME_FULL
+  -> [('127.0.0.1', 55616)] type=error code=GAME_FULL
+  <- [('127.0.0.1', 55614)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55619)] type=getState
+  -> [A] type=state
+  -> [B] type=opponentLeft
+getrennt: ('127.0.0.1', 55618)
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55617)
+getrennt: ('127.0.0.1', 55619)
+getrennt: ('127.0.0.1', 55616)
+getrennt: ('127.0.0.1', 55615)
+getrennt: ('127.0.0.1', 55614)
+.verbunden: ('127.0.0.1', 55621)
+verbunden: ('127.0.0.1', 55622)
+  <- [('127.0.0.1', 55621)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55622)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55621)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55622)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55621)] type=shoot
+  -> [A] type=result
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55621)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55622)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55621)
+getrennt: ('127.0.0.1', 55622)
+.verbunden: ('127.0.0.1', 55624)
+verbunden: ('127.0.0.1', 55625)
+  <- [('127.0.0.1', 55624)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55625)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+verbunden: ('127.0.0.1', 55626)
+  <- [('127.0.0.1', 55626)] type=join
+  -> [('127.0.0.1', 55626)] type=error code=GAME_FULL
+  <- [('127.0.0.1', 55626)] type=getState
+  -> [('127.0.0.1', 55626)] type=error code=NOT_JOINED
+  <- [('127.0.0.1', 55624)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55625)] type=getState
+  -> [B] type=state
+getrennt: ('127.0.0.1', 55626)
+  -> [A] type=opponentLeft
+getrennt: ('127.0.0.1', 55624)
+getrennt: ('127.0.0.1', 55625)
+.verbunden: ('127.0.0.1', 55628)
+verbunden: ('127.0.0.1', 55629)
+  <- [('127.0.0.1', 55628)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55629)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55628)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55629)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55628)] type=unknown
+  -> [A] type=error code=UNKNOWN_TYPE
+  <- [('127.0.0.1', 55628)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55629)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55628)
+getrennt: ('127.0.0.1', 55629)
+.verbunden: ('127.0.0.1', 55631)
+verbunden: ('127.0.0.1', 55632)
+  <- [('127.0.0.1', 55631)] type=join
+  -> [A] type=welcome
+  -> [A] type=waiting
+  -> [A] type=state
+  <- [('127.0.0.1', 55632)] type=join
+  -> [B] type=welcome
+  -> [A] type=gameStart
+  -> [B] type=gameStart
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55631)] type=place
+  -> [A] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55632)] type=place
+  -> [B] type=placeAck
+  -> [A] type=state
+  -> [B] type=state
+  <- [('127.0.0.1', 55631)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55631)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55632)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55631)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55631)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55632)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55631)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55631)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55632)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55631)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55631)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55632)] type=getState
+  -> [B] type=state
+  <- [('127.0.0.1', 55631)] type=shoot
+  -> [A] type=error code=CELL_OUT_OF_BOUNDS
+  <- [('127.0.0.1', 55631)] type=getState
+  -> [A] type=state
+  <- [('127.0.0.1', 55632)] type=getState
+  -> [B] type=state
+  -> [A] type=opponentLeft
+  -> [A] type=state
+getrennt: ('127.0.0.1', 55631)
+getrennt: ('127.0.0.1', 55632)
+..............................................................................................................................
+----------------------------------------------------------------------
+Ran 190 tests in 12.186s
+
+OK

@@ -7,16 +7,42 @@ Im Projektordner mit aktivierter Umgebung. Die Bash-Beispiele verwenden
 verwenden (siehe [Setup](../guides/setup.md)):
 
 ```bash
+python3 tools/run_tests.py --core
 python3 tools/run_tests.py
 python3 tools/run_tests.py --milestone 00
 python3 tools/run_tests.py --milestone 02
 python3 tools/run_tests.py --milestone 03
 python3 tools/run_tests.py --milestone 04
+python3 tools/run_tests.py --milestone 05
 python3 tools/run_tests.py --milestone 06 --require-gui
-python3 tools/run_tests.py --milestone 07
-python3 tools/run_tests.py --milestone 08
 python3 tools/run_tests.py --require-gui --report-json "<neuer_testbericht.json>"
 ```
+
+**Lernweg:** Starte nach einer Änderung am Spielkern zuerst `--core`.
+Dieses Profil lädt nur Brett- und Spielregeltests, einschließlich der
+eigenständigen Kurstests aus `src/test_spiel.py`. Es bindet keinen TCP-Port,
+öffnet kein Tk-Fenster und startet keinen fremden Prozess. Prüfe danach mit
+`--milestone <Nummer>` den betroffenen Bereich; die Testgruppen 02 und 03
+enthalten zusätzlich lokale Konsolenpartien beziehungsweise Netzwerkfälle,
+die Testgruppen 04 und 06 echte GUI-Fälle. Vor einer
+Übergabe führe die gesamte Suite mit `--require-gui` aus und spiele bei
+GUI-/Netzänderungen zusätzlich die unten beschriebene lokale Demo durch.
+`--core` und `--milestone` sind alternative Auswahlen.
+
+Der aktuelle Kurs endet mit M6; dessen Umsetzung ist lokal abgeschlossen und
+geprüft (`src/test_netz.py`, siehe
+[M6-Anforderungsabgleich](../status/06_requirements.md)). Der vorhandene
+Ordner `meilenstein_06/` bewahrt frühere Grafikprüfungen als technische
+Testgruppe und ist von der M6-Netztestsuite unter `src/` zu unterscheiden.
+Nachrichtenlog und Abgabepaket sind Zusatzfunktionen:
+Ihre Tests liegen unter `tests/additional/` und werden im Gesamtlauf immer
+mitgesammelt. Die Paketprüfung kann zusätzlich einzeln gestartet werden:
+
+```bash
+python3 -m unittest -v tests.additional.test_packaging
+```
+
+Der Teststarter bietet die vorhandenen Gruppen 00, 02, 03, 04, 05 und 06 an.
 
 Der Starter setzt Quell-/Projektpfade, sammelt alle `unittest`-Tests ein und
 liefert bei einem Fehler Exitcode 1. Der absolute Skriptpfad funktioniert
@@ -47,17 +73,22 @@ strengen Bedingungen.
 | Ordner | Schwerpunkt und Prüfart |
 |---|---|
 | `tests/meilenstein_00/` | Echo-Server/-Client als eigene Prozesse, lange Nachrichten |
-| `tests/meilenstein_02/` | Brett, Kernphasen, ganze Partie, geheime Kopien, lokale CLI |
+| `tests/meilenstein_02/` | Brett, Kernphasen, ganze Partie, geheime Kopien, reine GUI-Vorbereitung, lokale CLI |
 | `tests/meilenstein_03/` | Transport über Socketpaare; echte TCP-/CLI-Prozesse, Lobby, Angriffe, Partie, Wettläufe, Abbruch und Ersatz |
 | `tests/meilenstein_04/` | Serverzustände/Privatheit/Logs; echte Tk-Widgets mit Socketpaaren, Eingaben, Zeichnen, Threadgrenzen und Lebenszyklus |
+| `tests/meilenstein_05/` | Eigenständige Kurstests aus `src/test_spiel.py`, Server-Endfolge, GUI-Ende und Startvarianten |
 | `tests/meilenstein_06/` | PNG-Pixel und PhotoImage-Lebensdauer; SVG-Flotte, Canvas-Drehung, eigene Sprengungseffekte und Tastaturbedienung |
-| `tests/meilenstein_07/` | Sofort persistente Nachrichtenmetadaten, parallele Schreiber, Privatheit, Überschreibschutz, tatsächlicher Handler |
-| `tests/meilenstein_08/` | Echte ZIP-Dateien, Laufzeitabhängigkeiten, Originalquellen, Ausschlüsse, unabhängige SHA256-Prüfung |
+| `tests/additional/test_event_log.py` | Zusatzprüfung: sofort persistente Nachrichtenmetadaten, parallele Schreiber, Privatheit, Überschreibschutz, tatsächlicher Handler |
+| `tests/additional/test_packaging.py` | Zusatzprüfung: echte ZIP-Dateien, Laufzeitabhängigkeiten, Originalquellen, Ausschlüsse, unabhängige SHA256-Prüfung |
 
 Feste Testflotten stehen in `tests/fixtures.py`. Sie sind keine Vorgabe für
 GUI-Flotten. Tests bleiben bei ihrem ursprünglichen Schwerpunkt, auch wenn
 sie spätere Erweiterungen mitprüfen. M1 hat Dokumentations-/Freigabeaufgaben;
 deshalb gibt es dafür keinen leeren Testordner.
+
+Die Flotte in `src/test_spiel.py` steht absichtlich noch einmal in dieser
+Datei: Der Kursbefehl `python3 -m unittest -v test_spiel.py` aus `src/`
+funktioniert damit unabhängig von den gemeinsamen Testdaten.
 
 TCP-Tests brauchen freie lokale Ports. Tk-Tests prüfen zuerst in einem
 Unterprozess, ob tkinter und ein Display funktionieren; andernfalls melden
@@ -65,7 +96,7 @@ sie einen begründeten Skip. **Ein Skip ist kein GUI-Nachweis.** Unter Windows
 ist ein POSIX-Terminaltest nicht verfügbar. Die tatsächlich geprüfte
 Umgebung steht in den Ergebnissen.
 
-Die Grafikprüfungen in M6 sind nach Verhalten getrennt:
+Die vorhandenen Grafikprüfungen unter `tests/meilenstein_06/` sind nach Verhalten getrennt:
 
 - `test_image.py`: erhaltenes transparentes PNG, echte Anzeigepixel und
   Freigabe von `PhotoImage` im Tk-Hauptthread.
@@ -131,8 +162,9 @@ persönliche Bedienung durch den Projektverantwortlichen.
 erzeugt eine neue technische Lieferform mit `.sha256`-Datei. Das innere
 `SHA256SUMS.json` bildet ZIP-Pfade auf SHA256-Digests aller übrigen Dateien
 ab. Projekt und `Dokumente` sind benachbarte Verzeichnisse, damit relative
-Quellenlinks erhalten bleiben. `.git`, Umgebungen, Caches, Secrets und
-Laufzeitlogs bleiben draussen; absichtlich gespeicherte Rohbelege unter
+Quellenlinks erhalten bleiben. `.git`, Umgebungen, Caches, Secrets,
+Laufzeitlogs sowie lokale Entwicklungswerkzeuge unter `.agents/` und
+`.specify/` bleiben draussen; absichtlich gespeicherte Rohbelege unter
 `docs/evidence` werden mitgeliefert. Vorhandene Ausgaben werden abgelehnt.
 Der Entpacktest muss aus einem frischen Ziel starten und darf nicht
 versehentlich die ursprüngliche Arbeitskopie importieren. Persönliche und

@@ -108,8 +108,8 @@ Ein automatisch gespeicherter JSON-Bericht beschreibt genau seinen Lauf.
 Das eigene Schiffsbild liegt in `bilder/`; seine
 [Herkunftsdokumentation](../../bilder/README.md) nennt Werkzeug, Prompt,
 tatsächliche Grösse und Darstellung. Es dekoriert die Oberfläche und enthält
-keine Spielinformationen. Der Server ergänzt für M7 ein dauerhaftes JSONL-
-Metadatenlog mit ISO-Zeit, Richtung, Verbindung/Slot, bekanntem Typ und
+keine Spielinformationen. Als Zusatzfunktion schreibt der Server ein dauerhaftes
+JSONL-Metadatenlog mit ISO-Zeit, Richtung, Verbindung/Slot, bekanntem Typ und
 servereigenem Fehlercode. Ganze Payloads und freie Clienttexte werden nicht
 geschrieben. Neue Logdateien werden exklusiv erzeugt und nicht überschrieben.
 

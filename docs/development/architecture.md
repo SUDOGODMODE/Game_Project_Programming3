@@ -22,12 +22,21 @@ flowchart LR
 | `src/server.py` | Spieler an Verbindungen binden, Sperre, private Antworten, Zustandsverteilung, Reset |
 | `src/event_log.py` | Exklusiv erzeugtes JSONL-Metadatenlog, Schreibsperre, Flush und geschütztes Schliessen |
 | `src/client_gui.py` | Eingaben senden, bestätigte Zustände vollständig anzeigen, GUI-Lebenszyklus |
-| `src/sea_cell.py` | Canvas-Rasterfelder, Schiffsausschnitte, Schussmarkierungen und Tastaturbedienung |
-| `src/ship_art.py` | Fünf SVG-Quellen laden, Grundformen skalieren und auf Canvas zeichnen |
-| `src/ship_effects.py` | Neue eigene Schiffsverluste erkennen und zeitlich begrenzte lokale Sprengungen zeichnen |
+| `src/gui/client_view.py` | Brettzeichen und Schiffsausschnitte rein aus dem bestätigten Zustand berechnen; ohne Tk |
+| `src/fleet_setup.py` | Gültige zufällige Platzierung ohne Tk erzeugen; ein gesetzter Zufallsgenerator macht Tests reproduzierbar |
+| `src/gui/sea_cell.py` | Canvas-Rasterfelder, Schiffsausschnitte, Schussmarkierungen und Tastaturbedienung |
+| `src/gui/ship_art.py` | Fünf SVG-Quellen laden, Grundformen skalieren und auf Canvas zeichnen |
+| `src/gui/ship_effects.py` | Neue eigene Schiffsverluste erkennen und zeitlich begrenzte lokale Sprengungen zeichnen |
 | `src/play.py` / `src/client.py` | Konsolenspiel bzw. Lobbydiagnose |
 | `src/local_game.py` | Spielkern an einer Tastatur bedienen |
 | `src/echo_*.py` | Separater TCP-Grundversuch aus M0 |
+
+`spiel.py`, `netz.py`, `test_spiel.py`, `test_netz.py` und
+`tests/meilenstein_03/test_angriff.py` tragen Name und deutsche
+Testbeschreibungen wörtlich aus der Aufgabenstellung; sie bleiben deshalb
+bewusst unverändert. Alle eigenen Dateien und Bezeichner — auch die
+Funktionen und Klassen innerhalb dieser Vorlagedateien selbst — sind
+durchgehend Englisch benannt.
 
 ## Server
 
@@ -76,7 +85,10 @@ Das Log ist eine Nachrichtenchronik, kein gespeicherter Spielzustand.
 Ein Klick stellt eine Anfrage in die Ausgangsqueue; ein Sendethread führt
 den Socketversand aus. Der Empfangsthread schreibt in die Eingangsqueue.
 `after` ruft deren nicht blockierende Leerung im Tk-Hauptthread auf. Alle
-Widgetzugriffe bleiben dort. `draw_state` zeichnet beide Raster vollständig.
+Widgetzugriffe bleiben dort. `client_view.board_symbols` berechnet die
+Zeichen ohne Widgetzugriff; `draw_state` zeichnet danach beide Raster
+vollständig. `fleet_setup.random_placement` erzeugt nur den Vorschlag, und
+die Tk-Klasse setzt ihn in die Eingabefelder.
 Die Platzierungsfelder sind ein Entwurf, keine verbindliche Brettanzeige.
 
 Die Meerblau-Oberfläche verwendet pro Feld einen `SeaCell`-Canvas. Eigene

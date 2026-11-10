@@ -53,7 +53,7 @@ SVG-Quellen für die Flottenplanung und die eigenen bestätigten Schiffe:
 | [flotte/destroyer.svg](flotte/destroyer.svg) | Zerstörer | 2 / `0 0 80 40` |
 
 Die Draufsichten in Hellblau und Stahlblau zeigen den Bug nach rechts.
-`src/ship_art.py` liest mit `xml.etree.ElementTree` die verwendeten Polygone,
+`src/gui/ship_art.py` liest mit `xml.etree.ElementTree` die verwendeten Polygone,
 Rechtecke, Kreise, Ellipsen und Linien und zeichnet sie als Tk-Canvas-Objekte.
 Skalierung und Drehung um 90 Grad erfolgen beim Zeichnen; bei senkrechter
 Platzierung zeigt der Bug nach unten. Es braucht weder eine SVG-Bibliothek

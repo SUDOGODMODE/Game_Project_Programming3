@@ -23,6 +23,8 @@ def parse_cell(cell: str) -> tuple[int, int] | None:
     row_part = cell[1:]
     if column_letter not in COLUMNS or not row_part.isascii() or not row_part.isdigit():
         return None
+    # A01 und a1 bezeichnen dasselbe Feld. Erst nach Entfernen der Nullen
+    # begrenzen wir die Laenge, bevor wir den Zahlenteil in int umwandeln.
     row_part = row_part.lstrip("0")
     if not row_part or len(row_part) > 2:
         return None
@@ -54,11 +56,11 @@ def ship_cells(start: str, direction: str, size: int) -> list[str] | None:
     column, row = parsed
     cells = []
     for offset in range(size):
-        c = column + offset if direction == "h" else column
-        r = row if direction == "h" else row + offset
-        if not (0 <= c < GRID_SIZE and 0 <= r < GRID_SIZE):
+        cell_column = column + offset if direction == "h" else column
+        cell_row = row if direction == "h" else row + offset
+        if not (0 <= cell_column < GRID_SIZE and 0 <= cell_row < GRID_SIZE):
             return None
-        cells.append(f"{COLUMNS[c]}{r + 1}")
+        cells.append(f"{COLUMNS[cell_column]}{cell_row + 1}")
     return cells
 
 
@@ -118,6 +120,9 @@ def apply_shot(ships: list[dict], field: str) -> tuple[str, str | None]:
     Gibt (result, sunk_type) zurueck: result ist "hit" oder "miss";
     sunk_type ist der Schiffstyp, falls dieser Schuss das Schiff vollstaendig
     versenkt hat, sonst None.
+
+    BattleshipGame prueft zuvor Spielphase, Zug und Wiederholungen. Dieser
+    Helfer veraendert nur die Trefferliste der bereits aufgebauten Schiffe.
     """
     field = canonical_cell(field)
     for ship in ships:
@@ -142,7 +147,12 @@ class RuleError(ValueError):
 
 
 class BattleshipGame:
-    """Fuehrt eine Partie; der Server kuemmert sich um Verbindungen und Sperren."""
+    """Fuehrt eine Partie; der Server kuemmert sich um Verbindungen und Sperren.
+
+    players enthaelt je Slot die Flotte und Schuesse, keine Sockets oder Namen.
+    Die Phasen sind waiting -> placing -> shooting -> finished; reset setzt
+    beide Spieler und die Partie auf waiting zurueck.
+    """
 
     def __init__(self):
         self.reset()
@@ -184,7 +194,10 @@ class BattleshipGame:
         return {"phase": self.phase}
 
     def check_shot(self, slot: str, field: str) -> tuple[str, str] | None:
-        """None bei einem erlaubten Schuss, sonst Fehlercode und Grund."""
+        """None bei einem erlaubten Schuss, sonst Fehlercode und Grund.
+
+        Ein unbekannter Spieler loest stattdessen RuleError aus.
+        """
         player = self._player(slot)
         if self.phase != "shooting":
             return "WRONG_PHASE", f"aktuelle Phase ist {self.phase}, nicht shooting"

@@ -1,5 +1,11 @@
 # Anforderungsabgleich bis Meilenstein 3
 
+**Einordnung vom 10.11.2026:** Die hier zitierte ältere Projektfolge bis M8
+ist keine aktuelle Kursplanung. Der aktuelle Kurs endet mit M6; dessen
+Auftrag ist inzwischen lokal umgesetzt und geprüft, siehe
+[M6-Anforderungsabgleich](06_requirements.md). Der Paketnachweis aus
+einem fremden Arbeitsverzeichnis steht noch aus.
+
 Historischer Abgleich vom 13.10.2026. Technische Aussagen zu damals fehlenden
 Zustandsmeldungen und GUI beschreiben diesen Zeitpunkt. Der aktuelle Stand
 und die zusätzlichen Kursanforderungen stehen im [M4-Abgleich](04_requirements.md).

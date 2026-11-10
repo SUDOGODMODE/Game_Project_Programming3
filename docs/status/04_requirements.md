@@ -1,5 +1,10 @@
 # Anforderungsabgleich — Kursmeilenstein 4
 
+**Einordnung vom 10.11.2026:** Die unten verlinkte Gesamtplanung M0–M8 ist
+historisch. Der aktuelle Kurs endet mit M6; dessen Auftrag ist inzwischen
+lokal umgesetzt und geprüft, siehe
+[M6-Anforderungsabgleich](06_requirements.md).
+
 Stand: 27.10.2026. Die abschliessenden tatsächlichen Prüfergebnisse stehen
 in [04_local_output.md](../evidence/04_local_output.md). Fremdrechner- und
 Personenversuche werden nur nach Durchführung als erfüllt geführt.

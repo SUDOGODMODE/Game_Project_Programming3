@@ -1,0 +1,12 @@
+--- src/server.py
++++ isolated/c_counter.py
+@@ -92,7 +92,8 @@
+         if not isinstance(name, str) or not name.strip():
+             return {"type": "error", "code": "MISSING_PLAYER", "message": "Name fehlt"}
+ 
+-        slot = next(s for s in SLOTS if s not in game["taken"])
++        slot = chr(ord("A") + game.setdefault("join_count", 0))
++        game["join_count"] += 1
+         game["taken"].append(slot)
+         connection["slot"] = slot
+         game["players"][slot].update(sock=sock, name=name)

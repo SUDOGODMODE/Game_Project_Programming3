@@ -12,16 +12,18 @@ import threading
 try:
     import tkinter as tk
     from tkinter import ttk
-    from sea_cell import SeaCell, SEA
+    from gui.sea_cell import SeaCell, SEA
 except ImportError:
     tk = None
     ttk = None
     SEA = "#143c50"
 
-from spiel import COLUMNS, FLEET, ship_cells
+from spiel import COLUMNS, FLEET
 from netz import read_messages, send
-from ship_art import draw_svg, SHIP_NAMES
-from ship_effects import ShipEffects
+from gui.ship_art import draw_svg, SHIP_NAMES
+from gui.ship_effects import ShipEffects
+from gui.client_view import board_symbols
+from fleet_setup import random_placement
 
 SHIP_IMAGE_PATH = Path(__file__).resolve().parents[1] / "bilder" / "schiff.png"
 NAVY = "#0b2333"
@@ -86,6 +88,16 @@ class BattleshipWindow:
         self._after_id = root.after(25, self._poll_messages)
 
     def _build_interface(self):
+        """Die sichtbaren Bereiche in ihrer bisherigen Reihenfolge aufbauen."""
+        self._configure_style()
+        self._build_header()
+        self._build_grid("Deine Flotte", 0, self.own_buttons, own=True)
+        self._build_grid("Zielraster", 1, self.target_buttons, own=False)
+        self._build_legend()
+        self._build_placement_form()
+        self._build_actions()
+
+    def _configure_style(self):
         root = self.root
         # Ein einheitliches ttk-Theme zeigt die Farben auch unter macOS an.
         style = ttk.Style(root)
@@ -110,10 +122,12 @@ class BattleshipWindow:
         style.configure("Naval.TCheckbutton", background=NAVY, foreground=MUTED, font=(self.font, 9))
         style.map("Naval.TCheckbutton", background=[("active", NAVY)], foreground=[("active", TEXT)])
 
+    def _build_header(self):
+        root = self.root
         header = tk.Frame(root, background=NAVY)
         header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
-        # Both creation and disposal belong to this Tk thread. Workers never
-        # receive a Window/PhotoImage reference. Asset is independent of cwd.
+        # Bild und Fenster bleiben im Tk-Thread; Worker erhalten keine Referenz.
+        # Der Bildpfad ist unabhaengig vom aktuellen Arbeitsverzeichnis.
         self.ship_image = tk.PhotoImage(master=root, file=str(SHIP_IMAGE_PATH)).subsample(4)
         self.ship_image_label = tk.Label(
             header, image=self.ship_image, background=NAVY,
@@ -132,8 +146,9 @@ class BattleshipWindow:
                  background="#174156", foreground=TEXT, font=(self.font, 11), padx=14, pady=10).grid(
             row=1, column=0, columnspan=2, sticky="ew", pady=(0, 12),
         )
-        self._build_grid("Deine Flotte", 0, self.own_buttons, own=True)
-        self._build_grid("Zielraster", 1, self.target_buttons, own=False)
+
+    def _build_legend(self):
+        root = self.root
         legend = tk.Frame(root, background=NAVY)
         legend.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(9, 12))
         for label, color in (("●  Wasser", "#9cbac9"), ("×  Treffer", "#ffb39a"),
@@ -141,6 +156,8 @@ class BattleshipWindow:
             tk.Label(legend, text=label, background=NAVY, foreground=color,
                      font=(self.font, 9)).pack(side="left", padx=(0, 20))
 
+    def _build_placement_form(self):
+        root = self.root
         placement = tk.Frame(root, background=PANEL, padx=12, pady=10)
         placement.grid(row=4, column=0, columnspan=2, sticky="ew")
         tk.Label(placement, text="Flotte planen", background=PANEL, foreground=TEXT,
@@ -174,6 +191,8 @@ class BattleshipWindow:
         self.place_button.grid(row=4, column=4, rowspan=2, padx=(20, 0), pady=3, sticky="ew")
         placement.columnconfigure(4, weight=1)
 
+    def _build_actions(self):
+        root = self.root
         actions = tk.Frame(root, background=NAVY)
         actions.grid(row=5, column=0, columnspan=2, sticky="ew", pady=(12, 0))
         self.refresh_button = ttk.Button(actions, text="Zustand abfragen", style="Naval.TButton",
@@ -232,21 +251,10 @@ class BattleshipWindow:
 
     def randomize_fleet(self):
         """Eine gueltige, nicht vorhersehbar feste Vorlage nur in die Eingaben setzen."""
-        occupied = set()
-        for ship in FLEET:
-            candidates = []
-            for letter in COLUMNS:
-                for row in range(1, 11):
-                    for direction in ("h", "v"):
-                        start = f"{letter}{row}"
-                        cells = ship_cells(start, direction, ship["size"])
-                        if cells is not None and not occupied.intersection(cells):
-                            candidates.append((start, direction, cells))
-            start, direction, cells = random.choice(candidates)
-            occupied.update(cells)
-            variables = self.placement_vars[ship["type"]]
-            variables[0].set(start)
-            variables[1].set(direction)
+        for ship in random_placement(random):
+            start_var, direction_var = self.placement_vars[ship["type"]]
+            start_var.set(ship["start"])
+            direction_var.set(ship["direction"])
 
     @staticmethod
     def _receive(sock, incoming, stopped):
@@ -291,36 +299,38 @@ class BattleshipWindow:
     def draw_state(self, state):
         """Die gesamte erlaubte Sicht neu zeichnen; einzige Brett-Zeichenfunktion."""
         self.last_state = deepcopy(state)
-        ships = set()
-        hits = set()
-        segments = {}
-        for ship in state.get("ownShips", []):
-            cells = ship.get("cells", [])
-            ships.update(cells)
-            hits.update(ship.get("hits", []))
-            vertical = len(cells) > 1 and cells[0][0] == cells[1][0]
-            for index, field in enumerate(cells):
-                segments[field] = (ship["type"], index, len(cells), vertical)
-        symbols = {"miss": "·", "hit": "X", "sunk": "#"}
+        own_symbols, target_symbols, segments = board_symbols(state)
+        hits = {field for ship in state.get("ownShips", []) for field in ship.get("hits", [])}
         colors = {"": SEA, "S": SEA, "·": "#18394b", "X": "#493a3c", "#": "#573d3c"}
         phase = state.get("phase", "waiting")
         for field, button in self.own_buttons.items():
-            symbol = "X" if field in hits else "S" if field in ships else ""
-            symbol = symbols.get(state.get("shotsAtSelf", {}).get(field), symbol)
+            symbol = own_symbols.get(field, "")
             button.set_content(symbol, ship=segments.get(field), background=colors[symbol], state="disabled")
         for field, button in self.target_buttons.items():
-            symbol = symbols.get(state.get("shotsAtOpponent", {}).get(field), "")
+            symbol = target_symbols.get(field, "")
             button.set_content(
                 symbol, background=colors[symbol],
                 state="normal" if self.connected and phase in ("shooting", "finished") else "disabled",
             )
-        total = len(ships)
-        self.own_summary.configure(text=f"{total - len(hits)} von {total} Schiffsfeldern intakt" if total else "Deine Schiffe erscheinen nach der Bestätigung.")
+        total = len(segments)
+        if total:
+            own_summary = f"{total - len(hits)} von {total} Schiffsfeldern intakt"
+        else:
+            own_summary = "Deine Schiffe erscheinen nach der Bestätigung."
+        self.own_summary.configure(text=own_summary)
         shots = state.get("shotsAtOpponent", {})
         hit_count = sum(result in ("hit", "sunk") for result in shots.values())
-        self.target_summary.configure(text=f"{hit_count} Treffer bei {len(shots)} Schüssen" if shots else "Wähle ein Feld für deinen nächsten Schuss.")
-        phase_text = {"waiting": "Warte auf Gegner", "placing": "Flotte planen", "shooting": "Dein Zug" if state.get("turn") == self.slot else "Gegner am Zug",
-                      "finished": "Sieg" if state.get("winner") == self.slot else "Partie beendet"}
+        if shots:
+            target_summary = f"{hit_count} Treffer bei {len(shots)} Schüssen"
+        else:
+            target_summary = "Wähle ein Feld für deinen nächsten Schuss."
+        self.target_summary.configure(text=target_summary)
+        phase_text = {
+            "waiting": "Warte auf Gegner",
+            "placing": "Flotte planen",
+            "shooting": "Dein Zug" if state.get("turn") == self.slot else "Gegner am Zug",
+            "finished": "Sieg" if state.get("winner") == self.slot else "Partie beendet",
+        }
         self.phase_label.configure(text=phase_text.get(phase, phase))
         if self.connected:
             self.effects.observe(state.get("ownShips", []))
@@ -328,7 +338,13 @@ class BattleshipWindow:
             self.effects.reset()
         can_place = self.connected and phase == "placing" and not state.get("ownShips")
         for widget in self._placement_widgets:
-            widget.configure(state=("readonly" if isinstance(widget, ttk.Combobox) else "normal") if can_place else "disabled")
+            if not can_place:
+                widget_state = "disabled"
+            elif isinstance(widget, ttk.Combobox):
+                widget_state = "readonly"
+            else:
+                widget_state = "normal"
+            widget.configure(state=widget_state)
         self.place_button.configure(state="normal" if can_place else "disabled")
         self.randomize_button.configure(state="normal" if can_place else "disabled")
         self.refresh_button.configure(state="normal" if self.connected else "disabled")

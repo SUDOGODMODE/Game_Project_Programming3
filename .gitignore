@@ -43,6 +43,11 @@ logs/
 *.swo
 *~
 
+# Lokales Agent-/Spec-Kit-Tooling (Codex-/Claude-Skills, Spec-Kit-Vorlagen)
+.specify/
+.agents/
+.claude/
+
 # Editoren / IDEs
 .vscode/
 .idea/

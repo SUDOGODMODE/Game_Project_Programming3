@@ -11,7 +11,7 @@ VARIANTS = ("localhost", "zwei_rechner")
 EXCLUDED_DIRS = {
     ".git", ".venv", "venv", "env", "ENV", "__pycache__", ".pytest_cache",
     ".mypy_cache", ".ruff_cache", ".tox", ".nox", ".idea", ".vscode",
-    "dist", "build", "node_modules", ".aws", ".ssh", ".codex", ".agents",
+    "dist", "build", "node_modules", ".aws", ".ssh", ".codex", ".agents", ".specify",
 }
 
 
@@ -35,9 +35,40 @@ def _files(root):
     # Never follow symlinks out of the selected source tree.
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root)
-        if path.is_file() and not path.is_symlink() and not any(parent.is_symlink() for parent in path.parents if parent != root.parent):
-            if _included(relative):
-                yield path, relative
+        if not path.is_file() or path.is_symlink():
+            continue
+        has_symlink_parent = any(
+            parent.is_symlink() for parent in path.parents if parent != root.parent
+        )
+        if not has_symlink_parent and _included(relative):
+            yield path, relative
+
+
+def _submission_status():
+    """Kennzeichnet technische Paketdateien und weiterhin offene Personenaufgaben."""
+    return (
+        "# Abgabestatus\n\n"
+        "Technisches Paket aus tatsächlich vorhandenen Dateien.\n"
+        "Erstellt: " + datetime.now(timezone.utc).isoformat() + "\n\n"
+        "Offen: persönliche Reflexion durch den Projektverantwortlichen; "
+        "eigene Prüfung/Überarbeitung und Erklärung des technischen Berichts; "
+        "menschliches Regel-/Protokoll-Gegenlesen, Lesepartnerschaft, reale "
+        "Zweipersonenpartie, Echo/Handshake-Fremdtests mit Rollenwechsel, "
+        "Dreirechnerpartie mit fremden IPs und gemeinsamem Bild, "
+        "Zweirechnerlauf mit Server-Terminalausgabe aus Kursmeilenstein 5, gegenseitiger "
+        "Fremdclienttest und Livevorführung. Keine vollständige Abgabeerfüllung "
+        "oder Punktezahl wird behauptet.\n\n"
+        "Aktuelle M6-Ergebnisse siehe docs/status/06_requirements.md und docs/evidence; "
+        "frühere M5-Ergebnisse stehen in docs/status/05_requirements.md. "
+        "Ältere Testurteile unter docs/status/final_test_verdict.md behalten ihren ursprünglichen Stand. "
+        "Das Vorhandensein einer Datei ist keine Behauptung über einen neuen Testlauf.\n"
+    ).encode("utf-8")
+
+
+def _write_member(archive, manifest, member, data):
+    """Schreibt dieselben Bytes ins ZIP und in dessen Hashverzeichnis."""
+    archive.writestr(member, data)
+    manifest[member] = hashlib.sha256(data).hexdigest()
 
 
 def build_submission(repo_root, output, *, variant=None):
@@ -88,37 +119,18 @@ def build_submission(repo_root, output, *, variant=None):
                                 continue
                             member = f"{prefix}/{relative.as_posix()}"
                             data = path.read_bytes()
-                            archive.writestr(member, data)
-                            manifest[member] = hashlib.sha256(data).hexdigest()
+                            _write_member(archive, manifest, member, data)
                     if variant is not None:
                         for source, destination in selected_files:
                             member = f"{project_prefix}/{destination}"
                             data = source.read_bytes()
-                            archive.writestr(member, data)
-                            manifest[member] = hashlib.sha256(data).hexdigest()
+                            _write_member(archive, manifest, member, data)
                         member = f"{project_prefix}/PROFIL.txt"
                         data = (variant + "\n").encode("utf-8")
-                        archive.writestr(member, data)
-                        manifest[member] = hashlib.sha256(data).hexdigest()
-                    status = (
-                        "# Abgabestatus\n\n"
-                        "Technisches Paket aus tatsächlich vorhandenen Dateien.\n"
-                        "Erstellt: " + datetime.now(timezone.utc).isoformat() + "\n\n"
-                        "Offen: persönliche Reflexion durch den Projektverantwortlichen; "
-                        "eigene Prüfung/Überarbeitung und Erklärung des technischen Berichts; "
-                        "menschliches Regel-/Protokoll-Gegenlesen, Lesepartnerschaft, reale "
-                        "Zweipersonenpartie, Echo/Handshake-Fremdtests mit Rollenwechsel, "
-                        "Dreirechnerpartie mit fremden IPs und gemeinsamem Bild, "
-                        "Zweirechnerlauf mit Server-Terminalausgabe aus Kursmeilenstein 5, gegenseitiger "
-                        "Fremdclienttest und Livevorführung. Keine vollständige Abgabeerfüllung "
-                        "oder Punktezahl wird behauptet.\n\n"
-                        "Aktuelle M5-Ergebnisse siehe docs/status/05_requirements.md und docs/evidence; "
-                        "ältere Testurteile unter docs/status/final_test_verdict.md behalten ihren ursprünglichen Stand. "
-                        "Das Vorhandensein einer Datei ist keine Behauptung über einen neuen Testlauf.\n"
-                    ).encode("utf-8")
+                        _write_member(archive, manifest, member, data)
+                    status = _submission_status()
                     member = f"{project_prefix}/ABGABESTATUS.md"
-                    archive.writestr(member, status)
-                    manifest[member] = hashlib.sha256(status).hexdigest()
+                    _write_member(archive, manifest, member, status)
                     archive.writestr("SHA256SUMS.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
                 stream.flush()
                 with output.open("rb") as archive_stream:

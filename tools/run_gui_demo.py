@@ -150,6 +150,85 @@ def save_evidence(output, report, messages, *, completed):
     (output / "result.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def place_individual_fleets(alice, bob, until, report):
+    """Bedient die echten Platzierungsfelder fuer zwei unterschiedliche Flotten."""
+    bob_fleet = [{**ship, "start": "A" + str(i + 6)} for i, ship in enumerate(FLEET)]
+    for app, fleet in ((alice, FLEET), (bob, bob_fleet)):
+        for ship in fleet:
+            start, direction = app.placement_vars[ship["type"]]
+            start.set(ship["start"])
+            direction.set(ship["direction"])
+        app.place_button.invoke()
+        until(lambda app=app: len(app.last_state["ownShips"]) == 5)
+    until(lambda: all(a.last_state["phase"] == "shooting" for a in (alice, bob)))
+    assert alice.last_state["ownShips"] != bob.last_state["ownShips"]
+    report["checks"].append("Individuelle Flotten und serverbestaetigte Platzierung")
+
+
+
+def verify_private_rejections(alice, bob, until, report):
+    """Ungueltige Klicks bleiben privat und veraendern keinen bestaetigten Zustand."""
+    states_before = [deepcopy(a.last_state) for a in (alice, bob)]
+    bob_notice = bob.status_var.get()
+    alice.target_buttons["J10"].invoke()
+    until(lambda: "NOT_YOUR_TURN" in alice.status_var.get())
+    assert [a.last_state for a in (alice, bob)] == states_before
+    assert bob.status_var.get() == bob_notice
+    report["out_of_turn"] = alice.status_var.get()
+    bob.target_buttons["J10"].invoke()
+    until(lambda: alice.last_state["shotsAtSelf"].get("J10") == "miss"
+          and bob.last_state["shotsAtOpponent"].get("J10") == "miss")
+    assert alice.own_buttons["J10"].cget("text") == bob.target_buttons["J10"].cget("text") == "·"
+    states_before = [deepcopy(a.last_state) for a in (alice, bob)]
+    alice.target_buttons["B6"].invoke()
+    until(lambda: "DUPLICATE_SHOT" in alice.status_var.get())
+    assert [a.last_state for a in (alice, bob)] == states_before
+    report["duplicate_shot"] = alice.status_var.get()
+    report["checks"].append("Beide Ablehnungen privat; beide Zustaende unveraendert")
+
+
+
+def finish_match(alice, bob, until, process, report):
+    """Spielt die restlichen bestaetigten Zuege und prueft das gemeinsame Ende."""
+    # Restliche Flotte mit abwechselnden echten Button-Klicks versenken.
+    targets = [field[0] + str(int(field[1:]) + 5) for field in FLEET_CELLS]
+    targets.remove("B6")
+    misses = [f for f in MISSES if f != "J10"]
+    for index, target in enumerate(targets):
+        alice.target_buttons[target].invoke()
+        until(lambda target=target: target in alice.last_state["shotsAtOpponent"]
+              and target in bob.last_state["shotsAtSelf"])
+        if index < len(targets) - 1:
+            miss = misses[index]
+            bob.target_buttons[miss].invoke()
+            until(lambda miss=miss: miss in bob.last_state["shotsAtOpponent"]
+                  and miss in alice.last_state["shotsAtSelf"])
+    assert all(a.last_state["phase"] == "finished" and a.last_state["winner"] == "A"
+               and a.last_state["turn"] is None for a in (alice, bob))
+    assert len(alice.last_state["shotsAtOpponent"]) + len(bob.last_state["shotsAtOpponent"]) == 33
+    until(lambda: "Gewonnen" in alice.status_var.get() and "Verloren" in bob.status_var.get())
+    assert process.poll() is None, "Server hat die beendete Partie nicht ueberlebt"
+    report["end_status"] = {"Alice": alice.status_var.get(), "Bob": bob.status_var.get()}
+    report["checks"].append("Vollstaendige 33-Schuss-Partie, Sieg und Niederlage in beiden Fenstern")
+    report["checks"].append("Server laeuft nach dem Spielende weiter")
+
+
+def verify_private_states(messages, report):
+    """Jede aufgezeichnete Sicht darf nur die Flotte ihres Empfaengers enthalten."""
+    for entry in messages:
+        message = entry["message"]
+        if message.get("type") != "state":
+            continue
+        assert set(message) == {"type", "phase", "turn", "ownShips", "shotsAtOpponent", "shotsAtSelf", "winner"}
+        assert not any(key in message for key in ("opponentShips", "players", "ships"))
+        own_cells = {c for ship in message["ownShips"] for c in ship["cells"]}
+        if entry["recipient"] == "Alice" and own_cells:
+            assert own_cells == set(FLEET_CELLS)
+        if entry["recipient"] == "Bob" and own_cells:
+            assert own_cells == set([c[0] + str(int(c[1:]) + 5) for c in FLEET_CELLS])
+    report["checks"].append("Alle echten Zustandsnachrichten enthalten ausschliesslich die jeweilige eigene Flotte")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     default_output = ROOT / "docs/evidence" / ("04_run_" + datetime.now().strftime("%Y%m%d_%H%M%S_%f"))
@@ -232,17 +311,7 @@ def main():
             bob = new_window("Bob")
             until(lambda: bob.slot == "B" and all(a.last_state["phase"] == "placing" for a in (alice, bob)))
             report["checks"].append("Beitritt, Warten und ungefragter Spielstart")
-            bob_fleet = [{**ship, "start": "A" + str(i + 6)} for i, ship in enumerate(FLEET)]
-            for app, fleet in ((alice, FLEET), (bob, bob_fleet)):
-                for ship in fleet:
-                    start, direction = app.placement_vars[ship["type"]]
-                    start.set(ship["start"])
-                    direction.set(ship["direction"])
-                app.place_button.invoke()
-                until(lambda app=app: len(app.last_state["ownShips"]) == 5)
-            until(lambda: all(a.last_state["phase"] == "shooting" for a in (alice, bob)))
-            assert alice.last_state["ownShips"] != bob.last_state["ownShips"]
-            report["checks"].append("Individuelle Flotten und serverbestaetigte Platzierung")
+            place_individual_fleets(alice, bob, until, report)
 
             alice.target_buttons["B6"].invoke()
             until(lambda: alice.last_state["shotsAtOpponent"].get("B6") == "hit"
@@ -281,45 +350,10 @@ def main():
                     root.update()
                     time.sleep(0.01)
 
-            states_before = [deepcopy(a.last_state) for a in (alice, bob)]
-            bob_notice = bob.status_var.get()
-            alice.target_buttons["J10"].invoke()
-            until(lambda: "NOT_YOUR_TURN" in alice.status_var.get())
-            assert [a.last_state for a in (alice, bob)] == states_before
-            assert bob.status_var.get() == bob_notice
-            report["out_of_turn"] = alice.status_var.get()
-            bob.target_buttons["J10"].invoke()
-            until(lambda: alice.last_state["shotsAtSelf"].get("J10") == "miss"
-                  and bob.last_state["shotsAtOpponent"].get("J10") == "miss")
-            assert alice.own_buttons["J10"].cget("text") == bob.target_buttons["J10"].cget("text") == "·"
-            states_before = [deepcopy(a.last_state) for a in (alice, bob)]
-            alice.target_buttons["B6"].invoke()
-            until(lambda: "DUPLICATE_SHOT" in alice.status_var.get())
-            assert [a.last_state for a in (alice, bob)] == states_before
-            report["duplicate_shot"] = alice.status_var.get()
-            report["checks"].append("Beide Ablehnungen privat; beide Zustaende unveraendert")
+            verify_private_rejections(alice, bob, until, report)
 
-            # Restliche Flotte mit abwechselnden echten Button-Klicks versenken.
-            targets = [field[0] + str(int(field[1:]) + 5) for field in FLEET_CELLS]
-            targets.remove("B6")
-            misses = [f for f in MISSES if f != "J10"]
-            for index, target in enumerate(targets):
-                alice.target_buttons[target].invoke()
-                until(lambda target=target: target in alice.last_state["shotsAtOpponent"]
-                      and target in bob.last_state["shotsAtSelf"])
-                if index < len(targets) - 1:
-                    miss = misses[index]
-                    bob.target_buttons[miss].invoke()
-                    until(lambda miss=miss: miss in bob.last_state["shotsAtOpponent"]
-                          and miss in alice.last_state["shotsAtSelf"])
-            assert all(a.last_state["phase"] == "finished" and a.last_state["winner"] == "A"
-                       and a.last_state["turn"] is None for a in (alice, bob))
-            assert len(alice.last_state["shotsAtOpponent"]) + len(bob.last_state["shotsAtOpponent"]) == 33
-            until(lambda: "Gewonnen" in alice.status_var.get() and "Verloren" in bob.status_var.get())
-            assert process.poll() is None, "Server hat die beendete Partie nicht ueberlebt"
-            report["end_status"] = {"Alice": alice.status_var.get(), "Bob": bob.status_var.get()}
-            report["checks"].append("Vollstaendige 33-Schuss-Partie, Sieg und Niederlage in beiden Fenstern")
-            report["checks"].append("Server laeuft nach dem Spielende weiter")
+            finish_match(alice, bob, until, process, report)
+
             if args.final_screenshot:
                 until(lambda: all(a.root.winfo_viewable() for a in (alice, bob)))
                 until(lambda: not any(a.effects.active for a in (alice, bob)))
@@ -356,18 +390,8 @@ def main():
             assert all(not a.last_state["ownShips"] for a in (alice, carol))
             report["checks"].append("Fensterkreuz, Abbruchanzeige, leerer Reset und Ersatzbeitritt")
 
-            for entry in messages:
-                message = entry["message"]
-                if message.get("type") != "state":
-                    continue
-                assert set(message) == {"type", "phase", "turn", "ownShips", "shotsAtOpponent", "shotsAtSelf", "winner"}
-                assert not any(key in message for key in ("opponentShips", "players", "ships"))
-                own_cells = {c for ship in message["ownShips"] for c in ship["cells"]}
-                if entry["recipient"] == "Alice" and own_cells:
-                    assert own_cells == set(FLEET_CELLS)
-                if entry["recipient"] == "Bob" and own_cells:
-                    assert own_cells == set([c[0] + str(int(c[1:]) + 5) for c in FLEET_CELLS])
-            report["checks"].append("Alle echten Zustandsnachrichten enthalten ausschliesslich die jeweilige eigene Flotte")
+            verify_private_states(messages, report)
+
             completed = True
         except Exception as exc:
             report["error"] = f"{type(exc).__name__}: {exc}"

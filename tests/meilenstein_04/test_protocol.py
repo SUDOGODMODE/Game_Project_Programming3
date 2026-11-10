@@ -8,6 +8,7 @@ import io
 import json
 from pathlib import Path
 import re
+import tempfile
 import unittest
 
 import server
@@ -147,7 +148,10 @@ class ProtocolTests(unittest.TestCase):
         outgoing = []
         sockets = {slot: RecordingSocket(slot, outgoing) for slot in ("A", "B")}
         connections = {slot: {"slot": None, "leaving": False} for slot in ("A", "B")}
-        game = server.new_game()
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        game = server.new_game(log_file=Path(temp.name) / "protocol.jsonl")
+        self.addCleanup(game["event_log"].close)
         shots_played = 0
 
         def handle(slot, message):

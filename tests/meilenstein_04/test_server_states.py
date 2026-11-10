@@ -3,8 +3,10 @@ import copy
 import io
 import json
 import socket
+import tempfile
 import unittest
 from contextlib import redirect_stdout
+from pathlib import Path
 
 import server
 from tests.fixtures import FLEET
@@ -26,7 +28,10 @@ class Wire:
 
 class StateTests(unittest.TestCase):
     def setUp(self):
-        self.game = server.new_game()
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.game = server.new_game(log_file=Path(temp.name) / "states.jsonl")
+        self.addCleanup(self.game["event_log"].close)
         self.alice, self.bob = Wire(), Wire()
         self.a = {"slot": None, "leaving": False}
         self.b = {"slot": None, "leaving": False}

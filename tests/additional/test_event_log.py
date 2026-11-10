@@ -1,7 +1,7 @@
 """Persistent metadata for actual messages; no untrusted text or private payloads."""
 from collections import Counter
 from datetime import datetime
-import importlib
+from event_log import EventLog
 import json
 from pathlib import Path
 import socket
@@ -11,14 +11,12 @@ import unittest
 
 import server
 from netz import send
-from tests.meilenstein_04.test_gui import Peer
+from tests.gui_helpers import Peer
 
 
 class EventLogTests(unittest.TestCase):
     def event_log(self, path):
-        spec = importlib.util.find_spec('event_log')
-        self.assertIsNotNone(spec, 'Persistent EventLog is missing')
-        return importlib.import_module('event_log').EventLog(path)
+        return EventLog(path)
 
     def entries(self, path):
         lines = path.read_text().splitlines()
@@ -55,11 +53,15 @@ class EventLogTests(unittest.TestCase):
             errors = []
             def write(peer):
                 try:
-                    for _ in range(40): log.record('<-', peer, {'type': 'getState'})
-                except Exception as exc: errors.append(exc)
+                    for _ in range(40):
+                        log.record('<-', peer, {'type': 'getState'})
+                except Exception as exc:
+                    errors.append(exc)
             threads = [threading.Thread(target=write, args=(f'peer-{i}',)) for i in range(6)]
-            for thread in threads: thread.start()
-            for thread in threads: thread.join(3)
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(3)
             self.assertFalse(any(t.is_alive() for t in threads))
             self.assertEqual(errors, [])
             rows = self.entries(path)
@@ -69,26 +71,29 @@ class EventLogTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'old.jsonl'
             path.write_bytes(b'old immutable evidence\n')
-            with self.assertRaises(FileExistsError): self.event_log(path)
+            with self.assertRaises(FileExistsError):
+                self.event_log(path)
             self.assertEqual(path.read_bytes(), b'old immutable evidence\n')
 
     def test_actual_handler_logs_each_received_and_sent_message_through_abort(self):
-        self.assertIn('log_file', __import__('inspect').signature(server.new_game).parameters, 'new_game must own a persistent log')
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'wire.jsonl'
             game = server.new_game(log_file=path)
             errors = []
             local, remote = socket.socketpair()
             def serve():
-                try: server.handle_connection(local, ('127.0.0.1', 12345), game)
-                except Exception as exc: errors.append(exc)
+                try:
+                    server.handle_connection(local, ('127.0.0.1', 12345), game)
+                except Exception as exc:
+                    errors.append(exc)
             worker = threading.Thread(target=serve)
             worker.start()
             peer = Peer(remote)
             received = []
             try:
                 send(remote, {'type': 'join', 'player': 'PRIVATE_NAME'})
-                for _ in range(3): received.append(peer.read())
+                for _ in range(3):
+                    received.append(peer.read())
                 remote.sendall(b'{not JSON}\n')
                 received.append(peer.read())
                 send(remote, {'type': 'getState'})

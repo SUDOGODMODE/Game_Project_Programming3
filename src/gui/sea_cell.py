@@ -1,7 +1,7 @@
 """Ein Vektorfeld im Seeraster, mit Maus- und Tastaturbedienung."""
 import tkinter as tk
 
-from ship_art import draw_svg
+from .ship_art import draw_svg
 
 
 SEA = "#143c50"
@@ -81,9 +81,11 @@ class SeaCell(tk.Canvas):
         self.create_line(0, n - 1, n, n - 1, fill=GRID, tags="art")
         if ship:
             ship_type, index, count, vertical = ship
+            # Das ganze Schiff versetzen; Canvas zeigt nur diesen Feldeinschnitt.
+            ship_x = 0 if vertical else -index * n
+            ship_y = -index * n if vertical else 0
             draw_svg(
-                self, ship_type, 0 if vertical else -index * n,
-                -index * n if vertical else 0, count * n, n,
+                self, ship_type, ship_x, ship_y, count * n, n,
                 vertical=vertical, tags=("art", "ship"),
             )
         if symbol == "·":

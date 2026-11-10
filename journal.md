@@ -350,3 +350,153 @@ bestanden (155/155). Die Ursache des einmaligen zusätzlichen Aufrufs ist
 unbekannt. `full.json` und `full_retry.json` im zugehörigen
 `.verification/`-Ordner bleiben erhalten; die Vergleichsliste nennt dies
 als Beobachtung zur Testrobustheit.
+
+## 07.11.2026 — Testbarkeit und verständlicherer Code
+
+Der Projektverantwortliche beauftragte die lokale Überarbeitung im
+Feature-Branch. Branch `feature/testability-junior-clarity` entstand von
+`main` bei `f6c2f79`, mit sauberem Ausgangsstand. Vor Änderungen bestand
+die strenge Suite außerhalb der Sandbox mit 155/155 Tests. Der erste
+Sandbox-Versuch scheiterte an verbotenen TCP-Portbindungen und war kein
+Codefehler.
+
+Requirements- und Codeprüfrollen untersuchten unabhängig Tests, GUI und
+Server. Der Umsetzungsumfang steht in der neuen Spezifikation und im Plan
+unter `docs/superpowers/`. Testgetrieben ergänzt: ein schneller `--core`-Lauf,
+reine Berechnung der Brettzeichen und eine ohne Tk reproduzierbare
+Zufallsflotte. Drei Server-Testmodule legen Logs nun temporär ab und schließen
+sie. Der Runner weist übersprungene GUI-Subtests bereits ehrlich als
+`partial_skip` aus; ein genauerer Test sichert dies jetzt ab. README,
+Architektur und Testanleitung erklären den Lernweg.
+
+Die fünf neuen reinen Tests scheiterten zunächst erwartungsgemäß wegen der
+noch fehlenden Helfer und bestanden nach der Implementierung. Danach bestanden
+`--core` mit 41/41, die eigenständige Kursprüfung mit 19/19 und die
+[strenge Gesamtsuite](docs/evidence/refactor_2026-11-07/full_suite.json)
+mit 162/162 Tests, darunter 29/29 echten GUI-Prüfungen, ohne Fehler/Skips.
+Die [lokale vollständige GUI/TCP-Demo](docs/evidence/refactor_2026-11-07/gui_demo/result.json)
+bestand mit zwei echten Tk-Fenstern und 33 Schüssen bis Sieg/Niederlage,
+privaten Ablehnungen, Reset und Ersatzbeitritt.
+
+Ein gezielter GUI-Teillauf zeigte einmal erneut den oben dokumentierten
+Tastaturtest-Ausreißer (drei statt zwei Aufrufe auf dem Tk-Hauptthread).
+Der einzeln wiederholte Test und der spätere strenge Gesamtlauf bestanden.
+Die Ursache wurde nicht nachgewiesen und kein Fix behauptet. Keine Commits,
+Pushes oder GitHub-Änderungen; echter Zweirechnerlauf und persönliche
+Kursleistungen bleiben offen.
+
+## 10.11.2026 — Fortsetzung der Samstagsarbeit
+
+Der zunächst eingeschränkte Gesamtlauf scheiterte an der Sandbox-Sperre für
+lokale TCP-Portbindungen; sein JSON-Bericht bleibt als fehlgeschlagener
+Umgebungsversuch erhalten. Mit TCP-/Tk-Zugriff bestand derselbe Stand mit
+162/162 Tests und 29/29 echten GUI-Prüfungen. Ein unabhängiger Gesamtreview
+fand genau einen konkreten Befund: `--core` startete bei der Plattformangabe
+indirekt `uname` und `file`. Ein Regressionstest für einen frischen
+Interpreter mit/ohne JSON-Bericht war zuerst rot; prozessfreie Systemdaten
+behoben den Befund. Der fokussierte Re-Review meldete keine weiteren Befunde.
+Der anschließende strenge Lauf bestand 163/163 Tests, davon 29/29 GUI, ohne
+Fehler oder Skips; Bericht:
+`docs/evidence/refactor_2026-11-07/full_suite_after_fix_2026-11-10.json`.
+
+Die unterbrochene offizielle Spec-Kit-Recherche wurde lesend abgeschlossen:
+`docs/development/spec_kit_research.md`. Keine Installation, Commits, Pushes
+oder GitHub-Änderungen. Die Entscheidung über eine spätere Einführung ist
+offen. Der neue Auftrag zur projektweiten Lesbarkeitsbereinigung wird unter
+`docs/superpowers/` geplant; sein Ergebnis steht im folgenden Abschnitt.
+
+## 10.11.2026 — Projektweite Lesbarkeit
+
+Drei getrennte Arbeitsbereiche prüften und bereinigten Spielkern/Netzwerk,
+GUI/Grafik sowie Werkzeuge/Tests. Ziel waren sprechende Namen, kürzere
+fachliche Abläufe und klare Zuständigkeiten; kleine bereits verständliche
+Module blieben weitgehend bestehen. Eine neue Lesereihenfolge steht unter
+`docs/development/code_lesen.md`.
+
+Im ersten gemeinsamen Gesamtlauf trat der bekannte sporadische
+Tastaturtest-Ausreißer erneut auf. Eine gezielte Trace-Reproduktion zeigte
+einen zusätzlichen Return-Callback während `root.update()`. Drei für die
+synthetischen Tastaturereignisse unnötige Zwischenaufrufe wurden im Test
+entfernt. Ein kontrolliert eingereihtes Return führte zuvor exakt zum
+Fehler und danach nicht mehr. Die genaue Herkunft des ursprünglichen
+zusätzlichen Ereignisses ist offen.
+
+Danach bestand die strenge Gesamtsuite mit 166/166 Tests und 29/29 echten
+GUI-Prüfungen, ohne Fehler oder Skips:
+`docs/evidence/refactor_2026-11-07/full_suite_readability_final_2026-11-10.json`.
+Die vollständige lokale Tk/TCP-Demo mit zwei echten Fenstern bestand bis
+Sieg/Niederlage, einschließlich privater Ablehnungen, Reset und
+Ersatzbeitritt:
+`docs/evidence/refactor_2026-11-07/gui_demo_readability_2026-11-10/result.json`.
+Ein unabhängiger Gesamtreview fand keine weiteren konkreten
+Regressionsbefunde. Keine Commits, Pushes oder GitHub-Änderungen.
+
+## 10.11.2026 — Spec Kit lokal eingeführt
+
+Nach Klarstellung des Projektverantwortlichen wurde Spec Kit aus dem
+offiziellen Tag v1.3.3 mit `uv tool install` installiert und das bestehende
+Repository für Codex und Shell-Skripte initialisiert. `specify --version`
+meldete 1.3.3 und `specify check` erkannte Codex CLI. Die Projektgrundsätze
+stehen nun in `.specify/memory/constitution.md`; ältere Unterlagen unter
+`docs/superpowers/` blieben erhalten. Die Git- und Agent-Kontext-Erweiterungen
+wurden nicht installiert. Alle Änderungen sind lokal und uncommittet.
+
+## 10.11.2026 — Struktur und aktuelle Kursnummerierung
+
+Der Projektverantwortliche stellte klar, dass der aktuelle Kurs mit M6 endet
+und M6 erst später beginnt. Die alte Planung bis M8 bleibt als historische
+Quelle erhalten, bestimmt aber keine aktuelle Aufgabe. Vorhandene Log- und
+Pakettests wurden als Zusatzprüfungen nach `tests/additional/` verschoben;
+der Teststarter bietet nur technische Meilensteingruppen bis 06 an.
+Vier interne GUI-Helfer wurden unter `src/gui/` gruppiert. Die bekannten
+Kursdateien, Startprofile, Bilddateien, Originalaufträge und Rohbelege
+blieben an ihren bisherigen Pfaden. Eine neue Spec-Kit-Spezifikation mit
+Plan und Prüfschritten steht unter `specs/001-project-structure/`.
+
+Nach der Umordnung bestanden 41/41 Kerntests, 19/19 eigenständige
+Kursregeltests und 167/167 Tests der strengen Gesamtsuite, darunter 29/29
+echte GUI-Prüfungen; Bericht:
+`docs/evidence/refactor_2026-11-07/full_suite_structure_2026-11-10.json`.
+Die vollständige lokale Tk/TCP-Demo bestand:
+`docs/evidence/refactor_2026-11-07/gui_demo_structure_2026-11-10/result.json`.
+Ein temporäres echtes Spiel-ZIP bestand Manifest-, Hash-, Inhalts-,
+entpackte Kern- und Client-Starthilfeprüfung. Der unabhängige Review fand
+einen veralteten aktiven Bildmodulpfad; er wurde korrigiert. Zehn aktive
+Markdown-Dateien wurden auf lokale Linkziele geprüft, ohne fehlenden Pfad.
+Keine Commits oder Pushes; GitHub bleibt beim Projektverantwortlichen.
+
+## 10.11.2026 — M6-Übergabe abgeschlossen
+
+Die bei der letzten Pause offene Übergabe wurde fortgeführt. Fünf Statusdoku-
+mente (`docs/status/03_requirements.md`, `04_requirements.md`,
+`04_rubric_requirements.md`, `final_rubric_review.md`,
+`docs/development/testing.md`) enthielten noch die vor M6 geschriebene
+Einordnung „M6 beginnt erst später/noch nicht begonnen“; sie wurden auf den
+tatsächlichen Stand korrigiert und verweisen jetzt auf den abgeschlossenen
+[M6-Anforderungsabgleich](docs/status/06_requirements.md). Der `--core`-Lauf
+bestand danach unverändert 41/41.
+
+Die bereits vorhandene vollständige lokale GUI/TCP-Demo für M6
+(`docs/evidence/06_final_2026-11-10/gui_demo_m6/result.json`, PASS,
+33 Schüsse bis Sieg/Niederlage) war bisher nirgends verlinkt; sie ist jetzt
+im README und im M6-Anforderungsabgleich referenziert.
+
+Ein neues Abgabearchiv `dist/Schiffe_versenken_Meilenstein_6_2026-11-10.zip`
+wurde mit `tools/build_submission.py` gebaut und bestand die eigene
+SHA256-Prüfung. Entpackt in einem frischen fremden Zielordner außerhalb
+dieses Repositories bestand die innere `SHA256SUMS.json` (336/336 Hashes),
+die `--help`-Einstiege von `server.py`, `client_gui.py` und
+`tools/run_tests.py` sowie die volle Suite mit `--require-gui`: **190/190
+Tests, 29/29 echte GUI-Prüfungen, 0 Skips** unter einer frisch erzeugten
+Venv mit Python 3.14.10 (Tk 9.1). Die erste automatisch erzeugte Venv nutzte
+versehentlich Python 3.15, das lokal ohne `_tkinter` installiert ist; nach
+Neuerstellung mit 3.14 liefen auch die echten GUI-Tests. Beleg unter
+`dist/Schiffe_versenken_Meilenstein_6_2026-11-10.verification/`
+(`result.json`, `discover.txt`, `full_strict.json`, `help.txt`). Dies ist
+kein echter Fremdrechnernachweis, nur ein frisches lokales Zielverzeichnis
+und eine frische Venv.
+
+README und M6-Anforderungsabgleich wurden mit diesen tatsächlichen
+Endergebnissen ergänzt. Weiterhin offen bleiben persönliche Reflexion,
+menschliches Gegenlesen, echte Fremdrechner-/Fremdclientversuche und
+Livevorführung. Keine Commits, Pushes oder GitHub-Änderungen.

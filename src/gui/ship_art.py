@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     import tkinter as tk
 
 
-ASSET_DIRECTORY = Path(__file__).resolve().parents[1] / "bilder" / "flotte"
+ASSET_DIRECTORY = Path(__file__).resolve().parents[2] / "bilder" / "flotte"
 SHIP_NAMES = {
     "Carrier": "Flugzeugträger",
     "Battleship": "Schlachtschiff",
@@ -82,24 +82,27 @@ def load_svg(ship_type: str) -> SvgArtwork:
         if kind in ("title", "desc"):
             continue
         attributes = element.attrib
-        number = lambda key, default="0": float(attributes.get(key, default))
+
+        def read_number(key, default="0"):
+            return float(attributes.get(key, default))
+
         if kind == "polygon":
             coordinates = _numbers(attributes["points"])
             if len(coordinates) < 6 or len(coordinates) % 2:
                 raise ValueError(f"Ungueltiges SVG-Polygon: {source.name}")
         elif kind == "line":
-            coordinates = tuple(number(key) for key in ("x1", "y1", "x2", "y2"))
+            coordinates = tuple(read_number(key) for key in ("x1", "y1", "x2", "y2"))
         elif kind == "rect":
-            x, y, width, height = (number(key) for key in ("x", "y", "width", "height"))
+            x, y, width, height = (read_number(key) for key in ("x", "y", "width", "height"))
             coordinates = (x, y, x + width, y + height)
         elif kind in ("circle", "ellipse"):
-            x, y = number("cx"), number("cy")
-            rx = number("r") if kind == "circle" else number("rx")
-            ry = number("r") if kind == "circle" else number("ry")
+            x, y = read_number("cx"), read_number("cy")
+            rx = read_number("r") if kind == "circle" else read_number("rx")
+            ry = read_number("r") if kind == "circle" else read_number("ry")
             coordinates = (x - rx, y - ry, x + rx, y + ry)
         else:
             raise ValueError(f"Nicht unterstuetzte SVG-Form: {kind}")
-        stroke_width = number("stroke-width", "1")
+        stroke_width = read_number("stroke-width", "1")
         if not all(isfinite(value) for value in (*coordinates, stroke_width)):
             raise ValueError(f"Ungueltige SVG-Koordinaten: {source.name}")
         shapes.append(SvgShape(kind, coordinates,
@@ -123,19 +126,23 @@ def draw_svg(canvas: tk.Canvas, ship_type: str, x: float, y: float,
     if not all(isfinite(value) for value in (x, y, length, thickness)) or min(length, thickness) <= 0:
         raise ValueError("Schiffsgroesse muss positiv und Koordinaten muessen endlich sein")
     artwork = load_svg(ship_type)
-    along, across = length / artwork.width, thickness / artwork.height
-    stroke_scale = min(along, across)
+    length_scale = length / artwork.width
+    thickness_scale = thickness / artwork.height
+    stroke_scale = min(length_scale, thickness_scale)
 
     def point(source_x: float, source_y: float) -> tuple[float, float]:
         if vertical:
-            return x + thickness - source_y * across, y + source_x * along
-        return x + source_x * along, y + source_y * across
+            return x + thickness - source_y * thickness_scale, y + source_x * length_scale
+        return x + source_x * length_scale, y + source_y * thickness_scale
 
     items = []
     for shape in artwork.shapes:
-        pairs = [point(shape.coordinates[index], shape.coordinates[index + 1])
-                 for index in range(0, len(shape.coordinates), 2)]
-        coordinates = tuple(value for pair in pairs for value in pair)
+        transformed_points = [
+            point(shape.coordinates[index], shape.coordinates[index + 1])
+            for index in range(0, len(shape.coordinates), 2)
+        ]
+        # Canvas erwartet x1, y1, x2, y2 ... statt einzelner Punktpaare.
+        coordinates = tuple(value for pair in transformed_points for value in pair)
         width = max(0.5, shape.stroke_width * stroke_scale)
         if shape.kind == "line":
             item = canvas.create_line(*coordinates, fill=shape.stroke, width=width,
@@ -145,7 +152,7 @@ def draw_svg(canvas: tk.Canvas, ship_type: str, x: float, y: float,
             if shape.kind == "polygon":
                 item = canvas.create_polygon(*coordinates, joinstyle="round", **options)
             else:
-                xs, ys = zip(*pairs)
+                xs, ys = zip(*transformed_points)
                 box = (min(xs), min(ys), max(xs), max(ys))
                 if shape.kind == "rect":
                     item = canvas.create_rectangle(*box, **options)

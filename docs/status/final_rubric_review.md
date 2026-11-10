@@ -1,5 +1,11 @@
 # Unabhängiger Bewertungsabgleich des Endstands
 
+**Historische Einordnung vom 10.11.2026:** Dieser Review bewertet den
+damaligen technischen Stand anhand der älteren Planung bis M8. Er ist kein
+Nachweis für den aktuellen Kursmeilenstein 6, der inzwischen separat lokal
+umgesetzt und geprüft wurde, siehe
+[M6-Anforderungsabgleich](06_requirements.md).
+
 27.10.2026. Rolle 1 prüfte den eingefrorenen Stand nach der Umsetzung erneut
 gegen die zuerst gelesenen Originalquellen, die
 [Anforderungs-IDs](04_rubric_requirements.md) und die

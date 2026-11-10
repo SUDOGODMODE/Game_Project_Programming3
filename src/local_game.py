@@ -3,6 +3,8 @@ import sys
 
 import board
 
+CLEAR_TERMINAL = "\033[2J\033[3J\033[H"  # Anzeige und Scrollback leeren, Cursor nach oben.
+
 
 def read_input(prompt):
     value = input(prompt).strip()
@@ -14,9 +16,9 @@ def read_input(prompt):
 def hand_over(slot):
     """Verdeckt die bisherige Anzeige vor der Tastaturuebergabe im Terminal."""
     if sys.stdin.isatty():
-        print("\033[2J\033[3J\033[H", end="", flush=True)
+        print(CLEAR_TERMINAL, end="", flush=True)
         read_input(f"Tastatur an Spieler {slot}; Enter zum Fortfahren (q beendet): ")
-        print("\033[2J\033[3J\033[H", end="", flush=True)
+        print(CLEAR_TERMINAL, end="", flush=True)
 
 
 def show_boards(state):
@@ -35,6 +37,7 @@ def show_boards(state):
 
 
 def place_fleet(game, slot):
+    """Wiederholt Formatfehler je Schiff, Regelverletzungen fuer die ganze Flotte."""
     while True:
         print(f"Spieler {slot} platziert seine Flotte.")
         placement = []

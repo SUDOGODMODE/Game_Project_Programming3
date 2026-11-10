@@ -1,5 +1,12 @@
 # Bewertungsabgleich — Kursmeilenstein 4 und Gesamtprojekt bis Endabgabe
 
+**Historische Einordnung vom 10.11.2026:** Dieser Bericht folgt einer älteren
+Projektplanung bis M8. Für die aktuelle Arbeit gilt die Klarstellung des
+Projektverantwortlichen: M6 ist der letzte Kursmeilenstein; sein gesonderter
+Auftrag ist inzwischen lokal umgesetzt und geprüft, siehe
+[M6-Anforderungsabgleich](06_requirements.md). Frühere M7/M8-Nummern sind
+keine aktuelle Beauftragung.
+
 Stand: 27.10.2026. Rolle 1: Anforderungen aus der Bewertung ableiten.
 Dieser Abgleich wurde **vor einer neuen Umsetzung** erstellt. Er trennt
 nachprüfbaren vorhandenen Code, frühere tatsächliche Testnachweise und

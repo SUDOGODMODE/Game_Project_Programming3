@@ -1,5 +1,192 @@
 # Projektstand für die nächste Arbeitseinheit
 
+## Pause während Kursmeilenstein 6, 10.11.2026
+
+Der Projektverantwortliche hat M6 begonnen und bestätigt, die Tic-Tac-Toe-
+Lehrschritte auf das bestehende Schiffe versenken zu übertragen. Auf Wunsch
+bei 14 % verbleibender Ladung wird nach diesem geprüften Arbeitsblock
+pausiert. Die unten stehenden älteren Abschnitte beschreiben frühere Stände;
+damalige Aussagen „M6 beginnt später“ sind inzwischen überholt.
+
+**Abgeschlossen und lokal geprüft:** Originalauftrag
+`../Dokumente/Auftrag_Meilenstein6.docx` gelesen; Spec-Kit-Plan unter
+`specs/002-milestone-6/`; `PORT`-Umgebungsvariable in `src/server.py`
+ergänzt (CLI-`--port` hat Vorrang), zuerst roter, danach 2/2 grüner Porttest.
+Fensterloser `src/testclient.py` und `src/test_netz.py` mit **21 echten
+Prozess-/TCP-Tests**: alle elf Protokoll-Fehlercodes, private Antworten,
+gefilterte Zustände, 33-Schuss-Partie, harter Abbruch und Ersatzbeitritt.
+Der Kurslauf steht in
+`docs/evidence/06_final_2026-11-10/test_netz_green.txt` (21/21).
+`python3 -m unittest discover` aus dem Projektordner bestand **190/190**;
+Rohausgabe `docs/evidence/06_final_2026-11-10/discover_green.txt`.
+Der strenge Gesamtlauf bestand **190/190, 29/29 echte GUI-Prüfungen,
+0 Skips**; `full_strict.json` und `full_strict.txt` liegen daneben.
+
+Vorhergesagte isolierte Servermutationen A/B/C lieferten genau **3/1/1
+rote Netztests**; die 19 Kernregeltests blieben bei A grün und die originale
+Netzsuite danach wieder 21/21. Diffs, Rohlogs und Erklärung stehen unter
+`docs/evidence/06_mutations_2026-11-10/`. Der Zählerfehler der Lehrvorlage
+war im echten Server bereits behoben; C ist ausdrücklich Simulation. Der
+tatsächlich vor M6 vorhandene Portfehler wurde korrigiert.
+
+**Nach der Pause erledigt, 10.11.2026:**
+
+1. ✓ Fünf Statusdokumente, die noch „M6 beginnt später/noch nicht begonnen“
+   sagten, auf den tatsächlichen Abschluss korrigiert (siehe Journal
+   10.11.2026 „M6-Übergabe abgeschlossen“). `--core` dabei unverändert 41/41.
+2. ✓ Die bereits vorhandene vollständige lokale GUI/TCP-Demo für M6
+   (`docs/evidence/06_final_2026-11-10/gui_demo_m6/result.json`, PASS) war
+   unverlinkt und ist jetzt im README und M6-Abgleich referenziert. Keine
+   zusätzliche Demo nötig.
+3. ✓ Neues `dist/Schiffe_versenken_Meilenstein_6_2026-11-10.zip` gebaut;
+   SHA256- und innere Manifestprüfung (336/336), in frischem fremdem
+   Zielordner entpackt, dort `--require-gui`-Gesamtlauf **190/190 Tests,
+   29/29 echte GUI-Prüfungen, 0 Skips** unter frischer Venv mit Python
+   3.14.10. Beleg unter
+   `dist/Schiffe_versenken_Meilenstein_6_2026-11-10.verification/`.
+4. ✓ README und `docs/status/06_requirements.md` mit den tatsächlichen
+   Endergebnissen ergänzt; Journal fortgeschrieben.
+
+**Noch offen:**
+
+- Unabhängigen Diff-Review und `git diff --check` über den gesamten
+  aktuellen Arbeitsstand ausführen; abschliessenden Git-Status prüfen.
+- Persönliche Reflexion, menschliches Gegenlesen, echte Fremdrechner- und
+  Fremdclientversuche sowie Livevorführung bleiben offen und sind durch
+  keinen der obigen Schritte ersetzt.
+
+**Grenze:** Persönliche Reflexion, menschliche Gegenlesung, Fremdrechner-
+und Fremdclientversuche sowie Livevorführung bleiben offen. Nur der
+Projektverantwortliche committet und pusht; bisher keine Commits/Pushes.
+
+## Verzeichnisordnung und aktueller Nachweis, 10.11.2026
+
+Die festen Kurseinstiege unter `src/`, die Startprofile und `bilder/` bleiben
+an ihren bisherigen Pfaden. Vier interne GUI-Helfer liegen nun unter
+`src/gui/`. Vorhandene Log- und Pakettests wurden ohne Verlust nach
+`tests/additional/` verschoben; `--milestone` bietet nur technische Gruppen
+bis 06. Die [Spec-Kit-Spezifikation](specs/001-project-structure/spec.md)
+und [Dokumentübersicht](docs/README.md) erklären die Entscheidung.
+
+Nach der Umordnung bestanden der Kernlauf **41/41**, der eigenständige
+Kurstest **19/19** und die [strenge Gesamtsuite](docs/evidence/refactor_2026-11-07/full_suite_structure_2026-11-10.json)
+**167/167 Tests mit 29/29 echten GUI-Prüfungen**, ohne Fehler oder Skips.
+Die [lokale vollständige Tk/TCP-Partie](docs/evidence/refactor_2026-11-07/gui_demo_structure_2026-11-10/result.json)
+bestand. Ein neu gebautes temporäres Spiel-ZIP enthielt die verschobenen
+Module und Zusatztests, schloss `.specify/` und `.agents/` aus und bestand
+Manifest-/Hashprüfung, den entpackten Kernlauf und die Client-Starthilfe
+aus fremdem Arbeitsverzeichnis. Der unabhängige Review meldete einen
+veralteten Pfad in `bilder/README.md`; er wurde korrigiert. Dies belegt
+keinen echten Fremdrechnerlauf und keine Umsetzung des späteren M6-Auftrags.
+Nur der Projektverantwortliche pusht; es wurden keine Commits oder Pushes
+ausgeführt.
+
+## Aktueller Kursumfang und Testordnung, 10.11.2026
+
+Der Projektverantwortliche hat klargestellt: Der aktuelle Kurs endet mit
+Meilenstein 6, dessen Umsetzung erst mit einem späteren Auftrag beginnt.
+Vorhandene Nachrichtenlogs und Paketwerkzeuge sind Zusatzfunktionen.
+Ihre Tests liegen unter `tests/additional/`; `tools/run_tests.py` sammelt sie
+im Gesamtlauf und bietet als Meilensteinauswahl nur die vorhandenen Gruppen
+00, 02, 03, 04, 05 und 06 an. Der ältere Grafik-Testordner
+`tests/meilenstein_06/` bleibt als technische Gruppierung erhalten und
+belegt keine Umsetzung des späteren Kursauftrags.
+
+Die untenstehenden datierten Arbeitsstände und Originalunterlagen bleiben
+historische Belege. Ihre früheren M7/M8-Bezeichnungen sind keine aktuelle
+Kursplanung. Lokale Entwicklungswerkzeuge unter `.agents/` und `.specify/`
+werden aus neu erstellten Spiel-ZIPs ausgeschlossen.
+
+## Fortsetzung am 10.11.2026
+
+Der am 07.11. pausierte Testbarkeitsstand wurde weiter geprüft. Der erste
+Gesamtlauf in der eingeschränkten Sandbox scheiterte an gesperrten lokalen
+TCP-Portbindungen; sein Bericht ist
+`docs/evidence/refactor_2026-11-07/full_suite_resume_2026-11-10.json` und
+kein Code- oder GUI-Nachweis. Mit TCP-/Tk-Zugriff bestanden zunächst 162/162
+Tests und 29/29 GUI-Prüfungen. Ein unabhängiger Review fand danach, dass
+`platform.platform()` im Teststarter selbst für `--core` fremde Prozesse
+starten konnte. Ein zuerst fehlschlagender Regressionstest sichert den
+CLI-Einstieg mit und ohne JSON-Bericht ab; die Plattformangabe nutzt jetzt
+prozessfreie Systemdaten. Nach dem Fix bestanden
+`docs/evidence/refactor_2026-11-07/full_suite_after_fix_2026-11-10.json`
+mit **163/163 Tests, 29/29 GUI-Prüfungen, ohne Fehler oder Skips**. Der
+fokussierte Re-Review meldete keine weiteren Befunde.
+
+Die lesende [Spec-Kit-Recherche](docs/development/spec_kit_research.md) ist
+abgeschlossen. Danach wurde Spec Kit 1.3.3 auf ausdrücklichen Auftrag des
+Projektverantwortlichen lokal installiert und im bestehenden Repository für
+Codex initialisiert. Die Projektgrundsätze stehen in
+`.specify/memory/constitution.md`; die Skills unter `.agents/skills/`.
+Alle Änderungen bleiben lokal und uncommittet.
+
+## Projektweite Lesbarkeitsbereinigung, 10.11.2026
+
+Alle Python-Bereiche wurden auf Verständlichkeit geprüft. Konkrete lange
+Abläufe in Konsolenclient, GUI, Grafik und Werkzeugen wurden in benannte
+Schritte gegliedert; Server- und Spielkernzuständigkeiten sind erklärt.
+Gemeinsame GUI-Testfixturen liegen nun in `tests/gui_helpers.py`.
+Die [Lesereihenfolge](docs/development/code_lesen.md) führt vom Spielkern
+über Server und Clients zu Tests und Nachweisen. Spezifikation und Plan
+liegen unter `docs/superpowers/`.
+
+Ein sporadischer Tastaturtest-Ausreißer wurde auf zusätzliche wartende
+Tastaturereignisse während dreier unnötiger `root.update()`-Aufrufe im Test
+eingegrenzt. Die Aufrufe wurden entfernt; ein kontrolliert eingereihtes
+Return reproduzierte vorher den Fehler und bestand danach. Die genaue
+Herkunft des ursprünglich eingereihten Return bleibt unbekannt.
+
+Die abschließende [strenge Gesamtsuite](docs/evidence/refactor_2026-11-07/full_suite_readability_final_2026-11-10.json)
+bestand mit **166/166 Tests, 29/29 echten GUI-Prüfungen, ohne Fehler oder
+Skips**. Die [vollständige lokale Tk/TCP-Demo](docs/evidence/refactor_2026-11-07/gui_demo_readability_2026-11-10/result.json)
+bestand mit 33 Schüssen, privaten Ablehnungen, Sieg/Niederlage und
+Ersatzbeitritt. Ein unabhängiger Gesamtreview meldete keine weiteren
+konkreten Regressionsbefunde. Dies ist kein echter Zweirechnernachweis.
+
+## Pause auf Wunsch des Projektverantwortlichen, 07.11.2026
+
+Arbeit auf `feature/testability-junior-clarity` angehalten. Sämtliche
+Änderungen sind lokal und uncommittet; nichts zurücksetzen oder überschreiben.
+Die unten genannte strenge Suite mit 162/162 und die GUI-Demo bestanden vor
+einer letzten kleinen Vereinfachung der Imports in zwei neuen Testdateien.
+Danach bestanden diese fünf gezielten Tests erneut; die volle Suite wurde
+seit dieser letzten Änderung noch nicht wiederholt. Der unabhängige
+Gesamtreview und die lesende Spec-Kit-Recherche wurden wegen der gewünschten
+Pause unterbrochen. Es gibt noch keinen Reviewabschluss.
+
+Beim Fortsetzen: zuerst Git-Status prüfen, den strengen Gesamtlauf erneut
+ausführen, dann den gesamten Diff unabhängig reviewen und Befunde bearbeiten.
+Die früher bestätigten Entscheidungen gelten weiterhin: Der Projektpfad ist
+dieses Repository und Spezifikationen sollen dauerhaft darin bleiben. Offen
+ist nur, ob die eigentliche Spec-Kit-Installation Teil dieses Feature-Branches
+oder eine getrennte Arbeit sein soll; die Rückfrage wurde gestellt, aber bis
+zur Pause nicht beantwortet. Keine Commits, Pushes oder GitHub-Änderungen.
+
+## Aktuelle Ergänzung: Testbarkeit und Junior-Einstieg, 07.11.2026
+
+Lokaler Branch: `feature/testability-junior-clarity`; keine Commits oder
+Pushes. Die [Spezifikation](docs/superpowers/specs/2026-11-07-testability-junior-clarity-design.md)
+und der [Arbeitsplan](docs/superpowers/plans/2026-11-07-testability-junior-clarity.md)
+bleiben wie vom Projektverantwortlichen gewünscht im Repository.
+
+`python3 tools/run_tests.py --core` prüft 41 Spielkern- und Kurstests ohne
+Netzwerk oder Tk. Tk-freie Helfer berechnen Brettzeichen und eine gültige
+Zufallsflotte; `client_gui.py` bleibt für die Widgetdarstellung zuständig.
+Server-Integrationstests nutzen temporäre Logpfade und schließen ihren
+Logwriter. README und Testanleitung erklären einen Lern- und Testweg.
+Regeln und Drahtprotokoll wurden nicht geändert.
+
+Frische Prüfungen: [strenge Gesamtsuite](docs/evidence/refactor_2026-11-07/full_suite.json)
+mit **162/162 Tests, 29/29 echten GUI-Prüfungen, ohne Fehler oder Skips**;
+eigenständiger Kursbefehl in `src/` mit 19/19 Tests; [vollständige lokale
+Tk/TCP-Demo](docs/evidence/refactor_2026-11-07/gui_demo/result.json) mit
+33 Schüssen, privaten Ablehnungen, Sieg/Niederlage und Ersatzbeitritt: PASS.
+Bei einem gezielten GUI-Teillauf trat einmal der bereits historisch
+dokumentierte Tastaturtest-Ausreißer mit drei statt zwei Aufrufen auf. Der
+einzelne Test und der frische strenge Gesamtlauf bestanden danach; seine
+Ursache bleibt offen. Dies ist kein Fremdrechnernachweis. Persönliche und
+reale Zweirechner-Aufgaben bleiben offen.
+
 ## Aktuelle Ergänzung: zwei Startvarianten, 03.11.2026
 
 Der neue Auftrag ergänzt getrennte Einstiege und Anleitungen für

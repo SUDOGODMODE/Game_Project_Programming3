@@ -5,8 +5,8 @@ import tempfile
 import unittest
 
 from board import FLEET
-import ship_art
-from tests.meilenstein_04 import test_gui as gui_helpers
+from gui import ship_art
+from tests import gui_helpers
 
 
 class ShipAssetTests(unittest.TestCase):
@@ -26,10 +26,9 @@ class ShipAssetTests(unittest.TestCase):
                 os.chdir(original)
 
 
-class ShipCanvasTests(unittest.TestCase):
+class ShipCanvasTests(gui_helpers.TkDisplayTestCase):
     requires_gui = True
     tk = gui_helpers.tk
-    setUpClass = classmethod(gui_helpers.GuiTests.setUpClass.__func__)
 
     def setUp(self):
         self.root = self.tk.Tk()

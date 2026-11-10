@@ -2,8 +2,8 @@
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
-import platform
 import sys
 import time
 import unittest
@@ -11,10 +11,21 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _cases(suite):
+def load_core_suite(loader):
+    """Load only rule tests that need neither Tk nor network access."""
+    return unittest.TestSuite(
+        loader.loadTestsFromName(name) for name in (
+            "tests.meilenstein_02.test_board",
+            "tests.meilenstein_02.test_game",
+            "tests.meilenstein_05.test_spiel",
+        )
+    )
+
+
+def _test_cases(suite):
     for test in suite:
         if isinstance(test, unittest.TestSuite):
-            yield from _cases(test)
+            yield from _test_cases(test)
         else:
             yield test
 
@@ -44,7 +55,8 @@ class RecordedResult(unittest.TextTestResult):
         if active is None:
             self.events.append({"kind": "fixture", "id": test.id(), "status": status, "reason": reason})
         else:
-            active[0].update(status=status, reason=reason)
+            record, _started_at = active
+            record.update(status=status, reason=reason)
 
     def addSuccess(self, test):
         super().addSuccess(test)
@@ -64,8 +76,10 @@ class RecordedResult(unittest.TextTestResult):
             self.events.append({"kind": "subtest", "id": test.id(), "parent_id": test.test_case.id(),
                                 "status": "skipped", "reason": reason})
             active = self._running.get(id(test.test_case))
-            if active and active[0]["status"] in ("running", "passed", "partial_skip"):
-                self._outcome(test.test_case, "partial_skip", reason)
+            if active is not None:
+                record, _started_at = active
+                if record["status"] in ("running", "passed", "partial_skip"):
+                    self._outcome(test.test_case, "partial_skip", reason)
             return
         self._outcome(test, "skipped", reason)
 
@@ -79,58 +93,79 @@ class RecordedResult(unittest.TextTestResult):
 
     def addSubTest(self, test, subtest, err):
         super().addSubTest(test, subtest, err)
-        status = "passed" if err is None else "failed" if issubclass(err[0], test.failureException) else "error"
+        if err is None:
+            status = "passed"
+        elif issubclass(err[0], test.failureException):
+            status = "failed"
+        else:
+            status = "error"
         reason = "" if err is None else self._exc_info_to_string(err, subtest)
         self.events.append({"kind": "subtest", "id": subtest.id(), "parent_id": test.id(), "status": status, "reason": reason})
         if err is not None:
             self._outcome(test, status, reason)
 
 
+def _gui_summary(result, gui_ids, require_gui):
+    """Trennt entdeckte Tests, echte Ausfuehrungen und uebersprungene Subtests."""
+    gui_rows = [record for record in result.records if record["id"] in gui_ids]
+    executed = sum(record["status"] != "skipped" for record in gui_rows)
+    subtest_skips = {event["parent_id"] for event in result.events
+                     if event["kind"] == "subtest" and event["status"] == "skipped" and event["parent_id"] in gui_ids}
+    skipped = len(gui_ids) - executed + len(subtest_skips)
+    issues = []
+    if require_gui:
+        if not gui_ids:
+            issues.append("Keine mit requires_gui markierten GUI-Tests gefunden.")
+        if executed != len(gui_ids):
+            issues.append("Nicht alle gefundenen GUI-Tests wurden ausgeführt; Skip/Setup-Fehler prüfen.")
+        if subtest_skips:
+            issues.append("Mindestens ein erforderlicher GUI-Subtest wurde übersprungen.")
+        if any(record["status"] != "passed" for record in gui_rows):
+            issues.append("Nicht alle erforderlichen GUI-Tests haben bestanden (auch expectedFailure genügt nicht).")
+    return {"required": require_gui, "discovered": len(gui_ids), "executed": executed,
+            "skipped": skipped, "issues": issues}
+
+
+def _environment():
+    """Erfasst die Laufzeitumgebung, ohne dafuer Fremdprozesse zu starten."""
+    try:
+        import tkinter
+        tk_version = str(tkinter.TkVersion)
+    except ImportError:
+        tk_version = None
+    # os.uname is a system call; platform.platform may launch uname/file.
+    platform_name = sys.platform
+    if hasattr(os, "uname"):
+        system = os.uname()
+        platform_name = "-".join((system.sysname, system.release, system.machine))
+    return {"python": sys.version, "platform": platform_name, "tk": tk_version}
+
+
 def run_suite(suite, *, require_gui=False, report_json=None, selection=None):
     # Reserve output before executing anything. Never overwrite earlier evidence.
     report_stream = Path(report_json).open("x", encoding="utf-8") if report_json is not None else None
     try:
-        gui_ids = {test.id() for test in _cases(suite) if getattr(test, "requires_gui", False)}
+        gui_ids = {test.id() for test in _test_cases(suite) if getattr(test, "requires_gui", False)}
         started_at = datetime.now(timezone.utc).isoformat()
         start = time.perf_counter()
         result = unittest.TextTestRunner(verbosity=2, resultclass=RecordedResult).run(suite)
         duration = time.perf_counter() - start
-        gui_rows = [r for r in result.records if r["id"] in gui_ids]
-        executed = sum(r["status"] != "skipped" for r in gui_rows)
-        subtest_skips = {e["parent_id"] for e in result.events
-                         if e["kind"] == "subtest" and e["status"] == "skipped" and e["parent_id"] in gui_ids}
-        skipped = len(gui_ids) - executed + len(subtest_skips)
-        issues = []
-        if require_gui:
-            if not gui_ids:
-                issues.append("Keine mit requires_gui markierten GUI-Tests gefunden.")
-            if executed != len(gui_ids):
-                issues.append("Nicht alle gefundenen GUI-Tests wurden ausgeführt; Skip/Setup-Fehler prüfen.")
-            if subtest_skips:
-                issues.append("Mindestens ein erforderlicher GUI-Subtest wurde übersprungen.")
-            if any(r["status"] != "passed" for r in gui_rows):
-                issues.append("Nicht alle erforderlichen GUI-Tests haben bestanden (auch expectedFailure genügt nicht).")
-        success = result.wasSuccessful() and not issues
-        try:
-            import tkinter
-            tk_version = str(tkinter.TkVersion)
-        except ImportError:
-            tk_version = None
+        gui = _gui_summary(result, gui_ids, require_gui)
+        success = result.wasSuccessful() and not gui["issues"]
         report = {
-            "environment": {"python": sys.version, "platform": platform.platform(), "tk": tk_version},
+            "environment": _environment(),
             "selection": selection, "started_at": started_at, "duration_seconds": duration,
             "tests": result.records, "events": result.events,
             "summary": {"tests_run": result.testsRun,
-                        "passed": sum(r["status"] == "passed" for r in result.records),
+                        "passed": sum(record["status"] == "passed" for record in result.records),
                         "failures": len(result.failures), "errors": len(result.errors), "skipped": len(result.skipped)},
-            "gui": {"required": require_gui, "discovered": len(gui_ids), "executed": executed,
-                    "skipped": skipped, "issues": issues},
+            "gui": gui,
             "success": success,
         }
         if report_stream is not None:
             json.dump(report, report_stream, ensure_ascii=False, indent=2)
             report_stream.write("\n")
-        for issue in issues:
+        for issue in gui["issues"]:
             print("GUI-Abnahme fehlgeschlagen:", issue, file=sys.stderr)
         return 0 if success else 1
     finally:
@@ -140,18 +175,24 @@ def run_suite(suite, *, require_gui=False, report_json=None, selection=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--milestone", choices=("00", "02", "03", "04", "05", "06", "07", "08"))
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--milestone", choices=("00", "02", "03", "04", "05", "06"))
+    selection.add_argument("--core", action="store_true", help="Nur netz- und GUI-freie Spielregeln prüfen")
     parser.add_argument("--require-gui", action="store_true", help="Alle gefundenen GUI-Tests müssen tatsächlich laufen")
     parser.add_argument("--report-json", type=Path, help="Neue JSON-Berichtsdatei (kein Überschreiben)")
     args = parser.parse_args()
     sys.path.insert(0, str(ROOT))
     sys.path.insert(0, str(ROOT / "src"))
-    start = ROOT / "tests"
-    if args.milestone:
-        start /= f"meilenstein_{args.milestone}"
-    suite = unittest.defaultTestLoader.discover(str(start), top_level_dir=str(ROOT))
+    if args.core:
+        suite = load_core_suite(unittest.defaultTestLoader)
+    else:
+        start = ROOT / "tests"
+        if args.milestone:
+            start /= f"meilenstein_{args.milestone}"
+        suite = unittest.defaultTestLoader.discover(str(start), top_level_dir=str(ROOT))
     try:
-        return run_suite(suite, require_gui=args.require_gui, report_json=args.report_json, selection=args.milestone or "all")
+        return run_suite(suite, require_gui=args.require_gui, report_json=args.report_json,
+                         selection="core" if args.core else args.milestone or "all")
     except OSError as exc:
         parser.error(f"Bericht konnte nicht neu angelegt werden: {exc}")
 

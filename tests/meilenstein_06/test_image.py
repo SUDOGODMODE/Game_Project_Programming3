@@ -8,16 +8,43 @@ import threading
 import unittest
 import weakref
 
-from tests.meilenstein_04 import test_gui as gui_helpers
+from tests import gui_helpers
 
 tk, client_gui = gui_helpers.tk, gui_helpers.client_gui
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-class ImageTests(unittest.TestCase):
+class ImageTests(gui_helpers.TkDisplayTestCase):
     requires_gui = True
-    setUpClass = classmethod(gui_helpers.GuiTests.setUpClass.__func__)
+
+    def assert_matches_delivered_png(self, root, image):
+        """Vergleicht echte Pixel und Transparenz mit den gelieferten PNG-Dateien."""
+        pngs = list((ROOT / 'bilder').glob('*.png'))
+        self.assertTrue(pngs, 'No original PNG delivered in bilder/')
+        matched = False
+        for path in pngs:
+            original = tk.PhotoImage(master=root, file=str(path))
+            if original.width() != original.height() or original.width() not in (64, 128, 256):
+                continue
+            factor = original.width() // image.width()
+            if factor < 1 or original.width() % image.width():
+                continue
+            candidate = original.subsample(factor)
+            coords = [(x, y) for x in range(0, image.width(), 7) for y in range(0, image.height(), 7)]
+            pixels_match = all(
+                candidate.get(x, y) == image.get(x, y)
+                and candidate.transparency_get(x, y) == image.transparency_get(x, y)
+                for x, y in coords
+            )
+            if pixels_match:
+                matched = True
+                last_x = original.width() - 1
+                last_y = original.height() - 1
+                corners = ((0, 0), (0, last_y), (last_x, 0), (last_x, last_y))
+                self.assertTrue(any(original.transparency_get(x, y) for x, y in corners))
+                self.assertTrue(any(not image.transparency_get(x, y) for x, y in coords), 'Image must contain visible artwork')
+        self.assertTrue(matched, 'Displayed pixels must come from the actual delivered PNG')
 
     def test_real_asset_is_visible_from_foreign_cwd_and_released_on_tk_thread(self):
         root = tk.Tk()
@@ -25,8 +52,10 @@ class ImageTests(unittest.TestCase):
         local, remote = socket.socketpair()
         self.addCleanup(remote.close)
         def destroy_root():
-            try: root.destroy()
-            except tk.TclError: pass
+            try:
+                root.destroy()
+            except tk.TclError:
+                pass
         self.addCleanup(destroy_root)
         original_cwd = Path.cwd()
         with tempfile.TemporaryDirectory() as directory:
@@ -44,23 +73,7 @@ class ImageTests(unittest.TestCase):
         self.assertEqual(str(window.ship_image_label.cget('image')), str(image))
         root.update_idletasks()
         self.assertTrue(window.ship_image_label.winfo_manager())
-        pngs = list((ROOT / 'bilder').glob('*.png'))
-        self.assertTrue(pngs, 'No original PNG delivered in bilder/')
-        matched = False
-        for path in pngs:
-            original = tk.PhotoImage(master=root, file=str(path))
-            if original.width() != original.height() or original.width() not in (64, 128, 256):
-                continue
-            factor = original.width() // image.width()
-            if factor < 1 or original.width() % image.width():
-                continue
-            candidate = original.subsample(factor)
-            coords = [(x, y) for x in range(0, image.width(), 7) for y in range(0, image.height(), 7)]
-            if all(candidate.get(x, y) == image.get(x, y) and candidate.transparency_get(x, y) == image.transparency_get(x, y) for x, y in coords):
-                matched = True
-                self.assertTrue(any(original.transparency_get(x, y) for x, y in ((0, 0), (0, original.height()-1), (original.width()-1, 0), (original.width()-1, original.height()-1))))
-                self.assertTrue(any(not image.transparency_get(x, y) for x, y in coords), 'Image must contain visible artwork')
-        self.assertTrue(matched, 'Displayed pixels must come from the actual delivered PNG')
+        self.assert_matches_delivered_png(root, image)
         finalizers = []
         reference = weakref.ref(image, lambda ref: finalizers.append(threading.get_ident()))
         del image

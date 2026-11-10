@@ -1,0 +1,168 @@
+{"timestamp": "2026-11-10T12:51:04.261304+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": null, "type": "join"}
+{"timestamp": "2026-11-10T12:51:04.261530+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "welcome"}
+{"timestamp": "2026-11-10T12:51:04.261570+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "waiting"}
+{"timestamp": "2026-11-10T12:51:04.261607+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.454486+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": null, "type": "join"}
+{"timestamp": "2026-11-10T12:51:04.454573+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "welcome"}
+{"timestamp": "2026-11-10T12:51:04.454608+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "gameStart"}
+{"timestamp": "2026-11-10T12:51:04.454632+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "gameStart"}
+{"timestamp": "2026-11-10T12:51:04.454668+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.454706+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.613837+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "place"}
+{"timestamp": "2026-11-10T12:51:04.613992+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "placeAck"}
+{"timestamp": "2026-11-10T12:51:04.614046+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.614072+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.664424+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "place"}
+{"timestamp": "2026-11-10T12:51:04.664514+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "placeAck"}
+{"timestamp": "2026-11-10T12:51:04.664569+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.664606+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.716161+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:04.716232+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:04.716283+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.716319+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.785489+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:04.785549+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "error", "code": "NOT_YOUR_TURN"}
+{"timestamp": "2026-11-10T12:51:04.809374+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:04.809437+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:04.809489+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.809529+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.880969+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:04.881052+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "error", "code": "DUPLICATE_SHOT"}
+{"timestamp": "2026-11-10T12:51:04.910802+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:04.910861+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:04.910915+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.910956+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.973230+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:04.973303+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:04.973358+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:04.973398+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.034844+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.034899+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.034947+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.034982+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.095360+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.095420+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.095474+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.095512+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.135987+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.136042+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.136087+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.136126+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.183245+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.183312+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.183364+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.183403+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.223435+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.223489+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.223534+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.223572+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.270673+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.270726+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.270767+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.270811+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.311377+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.311424+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.311458+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.311489+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.362617+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.362673+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.362733+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.362765+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.407664+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.407748+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.407817+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.407857+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.450360+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.450421+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.450489+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.450531+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.492802+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.492868+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.492921+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.492960+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.553470+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.553520+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.553563+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.553602+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.609293+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.609337+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.609372+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.609405+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.666375+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.666427+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.666467+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.666502+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.710355+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.710406+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.710454+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.710489+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.769991+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.770044+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.770087+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.770121+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.840207+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.840262+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.840315+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.840375+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.904504+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.904548+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.904587+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.904626+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.968588+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:05.968638+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:05.968682+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:05.968714+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.032590+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.032634+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.032676+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.032714+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.097589+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.097651+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.097712+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.097759+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.162425+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.162480+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.162528+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.162566+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.228591+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.228640+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.228677+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.228712+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.293304+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.293359+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.293406+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.293444+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.356867+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.356919+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.356960+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.356995+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.420932+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.420988+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.421046+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.421084+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.484818+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.484872+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.484913+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.484947+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.549108+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.549164+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.549219+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.549258+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.613194+00:00", "direction": "<-", "peer": "('127.0.0.1', 56656)", "slot": "A", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.613245+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "result"}
+{"timestamp": "2026-11-10T12:51:06.613288+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.613326+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.613347+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "gameOver"}
+{"timestamp": "2026-11-10T12:51:06.613361+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "gameOver"}
+{"timestamp": "2026-11-10T12:51:06.678248+00:00", "direction": "<-", "peer": "('127.0.0.1', 56657)", "slot": "B", "type": "shoot"}
+{"timestamp": "2026-11-10T12:51:06.678294+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "error", "code": "WRONG_PHASE"}
+{"timestamp": "2026-11-10T12:51:06.706398+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "opponentLeft"}
+{"timestamp": "2026-11-10T12:51:06.706443+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.770287+00:00", "direction": "<-", "peer": "('127.0.0.1', 56658)", "slot": null, "type": "join"}
+{"timestamp": "2026-11-10T12:51:06.770343+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "welcome"}
+{"timestamp": "2026-11-10T12:51:06.770372+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "gameStart"}
+{"timestamp": "2026-11-10T12:51:06.770391+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "gameStart"}
+{"timestamp": "2026-11-10T12:51:06.770419+00:00", "direction": "->", "peer": "A", "slot": "A", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.770443+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}
+{"timestamp": "2026-11-10T12:51:06.920017+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "opponentLeft"}
+{"timestamp": "2026-11-10T12:51:06.920078+00:00", "direction": "->", "peer": "B", "slot": "B", "type": "state"}

@@ -1,0 +1,41 @@
+test_ablehnung_ist_privat_und_aendert_keinen_zustand (test_netz.NetzTest.test_ablehnung_ist_privat_und_aendert_keinen_zustand) ... ok
+test_aktionen_vor_join_bekommen_not_joined (test_netz.NetzTest.test_aktionen_vor_join_bekommen_not_joined) ... ok
+test_anfangszustand_kommt_ohne_get_state (test_netz.NetzTest.test_anfangszustand_kommt_ohne_get_state) ... ok
+test_doppelbeschuss_bekommt_duplicate_shot (test_netz.NetzTest.test_doppelbeschuss_bekommt_duplicate_shot) ... ok
+test_dritter_spieler_bekommt_game_full (test_netz.NetzTest.test_dritter_spieler_bekommt_game_full) ... ok
+test_ein_schuss_erreicht_beide_spieler (test_netz.NetzTest.test_ein_schuss_erreicht_beide_spieler) ... ok
+test_erster_spieler_bekommt_welcome_waiting_und_state (test_netz.NetzTest.test_erster_spieler_bekommt_welcome_waiting_und_state) ... ok
+test_falscher_spieler_bekommt_not_your_turn (test_netz.NetzTest.test_falscher_spieler_bekommt_not_your_turn) ... ok
+test_feld_ausserhalb_bekommt_cell_out_of_bounds (test_netz.NetzTest.test_feld_ausserhalb_bekommt_cell_out_of_bounds) ... ok
+test_ganze_partie_mit_33_schuessen_bis_zum_sieg (test_netz.NetzTest.test_ganze_partie_mit_33_schuessen_bis_zum_sieg) ... ok
+test_harter_abbruch_meldet_opponent_left (test_netz.NetzTest.test_harter_abbruch_meldet_opponent_left) ... ok
+test_jeder_sieht_nur_seine_eigene_flotte (test_netz.NetzTest.test_jeder_sieht_nur_seine_eigene_flotte) ... ok
+test_join_ohne_namen_bekommt_missing_player (test_netz.NetzTest.test_join_ohne_namen_bekommt_missing_player) ... ok
+test_kaputtes_json_bekommt_invalid_json (test_netz.NetzTest.test_kaputtes_json_bekommt_invalid_json) ... ok
+test_platzierung_ohne_gegner_bekommt_wrong_phase (test_netz.NetzTest.test_platzierung_ohne_gegner_bekommt_wrong_phase) ... ok
+test_schuss_vor_beiden_flotten_wird_abgelehnt (test_netz.NetzTest.test_schuss_vor_beiden_flotten_wird_abgelehnt) ... ok
+test_server_lebt_nach_hartem_abbruch_und_vergibt_slot_erneut (test_netz.NetzTest.test_server_lebt_nach_hartem_abbruch_und_vergibt_slot_erneut) ... FAIL
+test_unbekannter_typ_bekommt_unknown_type (test_netz.NetzTest.test_unbekannter_typ_bekommt_unknown_type) ... ok
+test_ungueltige_flotte_bekommt_invalid_placement (test_netz.NetzTest.test_ungueltige_flotte_bekommt_invalid_placement) ... ok
+test_zweiter_spieler_startet_die_partie_fuer_beide (test_netz.NetzTest.test_zweiter_spieler_startet_die_partie_fuer_beide) ... ok
+test_zweites_join_bekommt_already_joined (test_netz.NetzTest.test_zweites_join_bekommt_already_joined) ... ok
+
+======================================================================
+FAIL: test_server_lebt_nach_hartem_abbruch_und_vergibt_slot_erneut (test_netz.NetzTest.test_server_lebt_nach_hartem_abbruch_und_vergibt_slot_erneut)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/test_netz.py", line 294, in test_server_lebt_nach_hartem_abbruch_und_vergibt_slot_erneut
+    self.meldung(carla, "welcome", slot="B", player="Carla")
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/test_netz.py", line 85, in meldung
+    nachricht = client.erwarte(typ)
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/testclient.py", line 51, in erwarte
+    nachricht = self.empfange(sekunden)
+  File "/Users/max/Desktop/Shared_Folder_Desktop/Fachstudium/Programming3/Projekt/Game_Project_Programming3/src/testclient.py", line 43, in empfange
+    raise AssertionError(f"keine Nachricht nach {sekunden}s; bisher: {typen}") from None
+AssertionError: keine Nachricht nach 2.0s; bisher: []
+
+----------------------------------------------------------------------
+Ran 21 tests in 3.921s
+
+FAILED (failures=1)

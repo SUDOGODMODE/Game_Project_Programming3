@@ -3,14 +3,11 @@ import select
 import threading
 import unittest
 
-from tests.meilenstein_04 import test_gui as gui_helpers
+from tests import gui_helpers
 
 
-class GraphicsIntegrationTests(unittest.TestCase):
+class GraphicsIntegrationTests(gui_helpers.GuiTestCase):
     requires_gui = True
-    setUpClass = classmethod(gui_helpers.GuiTests.setUpClass.__func__)
-    setUp = gui_helpers.GuiTests.setUp
-    tearDown = gui_helpers.GuiTests.tearDown
 
     def own_ship(self, hits=()):
         return {"type": "Destroyer", "cells": ["A1", "B1"], "hits": list(hits)}
@@ -83,14 +80,13 @@ class GraphicsIntegrationTests(unittest.TestCase):
             original(field)
 
         self.window.shoot = record_shot
+        # event_generate verarbeitet die Bindings synchron. update() wuerde
+        # hier auch weitere wartende Tastatureingaben im sichtbaren Fenster ausfuehren.
         target.event_generate("<Return>")
-        self.root.update()
         self.assertEqual(self.peer.read(), {"type": "shoot", "field": "A1"})
         target.event_generate("<Right>")
-        self.root.update()
         self.assertEqual(self.root.focus_get(), self.window.target_buttons["B1"])
         self.window.target_buttons["B1"].event_generate("<space>")
-        self.root.update()
         self.assertEqual(self.peer.read(), {"type": "shoot", "field": "B1"})
         self.assertEqual(thread_ids, [threading.get_ident()] * 2)
         self.assertEqual(target.cget("text"), "")

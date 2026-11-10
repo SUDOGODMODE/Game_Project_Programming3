@@ -5,12 +5,11 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
-from tests.meilenstein_04 import test_gui as hilfen
+from tests import gui_helpers as hilfen
 
 
-class EndklickTests(unittest.TestCase):
+class EndklickTests(hilfen.GuiTestCase):
     requires_gui = True
-    setUpClass = classmethod(hilfen.GuiTests.setUpClass.__func__)
 
     def setUp(self):
         self.root = hilfen.tk.Tk()
@@ -33,15 +32,15 @@ class EndklickTests(unittest.TestCase):
         ende = hilfen.state(phase="finished", turn=None, winner="A",
                            shotsAtOpponent={"A1": "sunk"})
         self.window.draw_state(ende)
-        vorher = hilfen.GuiTests.board_snapshot(self)
+        vorher = self.board_snapshot()
         self.assertEqual(str(self.window.target_buttons["H10"].cget("state")), "normal")
         self.window.target_buttons["H10"].invoke()
         self.assertEqual(self.peer.read(), {"type": "shoot", "field": "H10"})
-        self.assertEqual(hilfen.GuiTests.board_snapshot(self), vorher)
+        self.assertEqual(self.board_snapshot(), vorher)
         self.window.process_message({"type": "error", "code": "WRONG_PHASE",
                                      "message": "aktuelle Phase ist finished, nicht shooting"})
         self.assertIn("finished", self.window.status_var.get())
-        self.assertEqual(hilfen.GuiTests.board_snapshot(self), vorher)
+        self.assertEqual(self.board_snapshot(), vorher)
 
 
 if __name__ == "__main__":
