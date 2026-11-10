@@ -51,16 +51,11 @@ def _submission_status():
         "Technisches Paket aus tatsächlich vorhandenen Dateien.\n"
         "Erstellt: " + datetime.now(timezone.utc).isoformat() + "\n\n"
         "Offen: persönliche Reflexion durch den Projektverantwortlichen; "
-        "eigene Prüfung/Überarbeitung und Erklärung des technischen Berichts; "
         "menschliches Regel-/Protokoll-Gegenlesen, Lesepartnerschaft, reale "
-        "Zweipersonenpartie, Echo/Handshake-Fremdtests mit Rollenwechsel, "
-        "Dreirechnerpartie mit fremden IPs und gemeinsamem Bild, "
-        "Zweirechnerlauf mit Server-Terminalausgabe aus Kursmeilenstein 5, gegenseitiger "
+        "Zweipersonenpartie, ein echter Zweirechnerlauf mit "
+        "Server-Terminalausgabe und gemeinsamem Bild, gegenseitiger "
         "Fremdclienttest und Livevorführung. Keine vollständige Abgabeerfüllung "
         "oder Punktezahl wird behauptet.\n\n"
-        "Aktuelle M6-Ergebnisse siehe docs/status/06_requirements.md und docs/evidence; "
-        "frühere M5-Ergebnisse stehen in docs/status/05_requirements.md. "
-        "Ältere Testurteile unter docs/status/final_test_verdict.md behalten ihren ursprünglichen Stand. "
         "Das Vorhandensein einer Datei ist keine Behauptung über einen neuen Testlauf.\n"
     ).encode("utf-8")
 

@@ -21,14 +21,13 @@ class PackagingTests(unittest.TestCase):
             'src/test_spiel.py': 'CORE_TESTS = True\n', 'src/netz.py': 'TRANSPORT = True\n',
             'src/server.py': 'SERVER = True\n', 'src/client_gui.py': 'GUI = True\n',
             'src/testclient.py': 'TEST_CLIENT = True\n', 'src/test_netz.py': 'NETWORK_TESTS = True\n',
-            'tests/meilenstein_02/test_core.py': 'test fixture', 'tools/run_tests.py': 'runner',
-            'tests/meilenstein_06/test_netz.py': 'course test wrapper',
-            'tests/meilenstein_06/test_server_port.py': 'port tests',
+            'tests/core/test_core.py': 'test fixture', 'tools/run_tests.py': 'runner',
+            'tests/graphics/test_netz.py': 'course test wrapper',
+            'tests/graphics/test_server_port.py': 'port tests',
             'bilder/ship.png': 'image bytes fixture', 'docs/status/open.md': 'External tests pending',
-            'docs/status/05_requirements.md': 'M5 results',
-            'docs/status/06_requirements.md': 'M6 results',
-            'docs/evidence/06_final_2026-11-10/discover_green.txt': '190 tests passed',
-            'docs/evidence/05_end.png': 'image evidence fixture',
+            'docs/status/overview.md': 'status results',
+            'docs/evidence/final/discover_green.txt': '190 tests passed',
+            'docs/evidence/final/end.png': 'image evidence fixture',
             '.git/config': 'git secret', '.venv/bin/python': 'venv', 'src/__pycache__/board.pyc': 'cache',
             '.env': 'SECRET=x', 'docs/.env.local': 'SECRET=y', '.pytest_cache/cache': 'cache',
             'logs/local.jsonl': 'runtime', 'docs/evidence/original.txt': 'immutable original',
@@ -40,7 +39,7 @@ class PackagingTests(unittest.TestCase):
         originals = base / 'Dokumente'
         originals.mkdir()
         (originals / 'source.txt').write_text('original source')
-        (originals / 'Auftrag_Meilenstein6.docx').write_bytes(b'original M6 source fixture')
+        (originals / 'Auftrag_original.docx').write_bytes(b'original source fixture')
         return repo
 
     def test_archive_contains_dependencies_assets_tests_sources_and_verified_manifest(self):
@@ -56,21 +55,19 @@ class PackagingTests(unittest.TestCase):
                 for name in ('README.md', 'src/board.py', 'src/spiel.py', 'src/test_spiel.py',
                              'src/netz.py', 'src/server.py', 'src/client_gui.py',
                              'src/testclient.py', 'src/test_netz.py',
-                             'tests/meilenstein_02/test_core.py',
-                             'tests/meilenstein_06/test_netz.py',
-                             'tests/meilenstein_06/test_server_port.py',
+                             'tests/core/test_core.py',
+                             'tests/graphics/test_netz.py',
+                             'tests/graphics/test_server_port.py',
                              'bilder/ship.png', 'docs/evidence/original.txt',
-                             'docs/status/05_requirements.md',
-                             'docs/status/06_requirements.md',
-                             'docs/evidence/06_final_2026-11-10/discover_green.txt',
-                             'docs/evidence/05_end.png'):
+                             'docs/status/overview.md',
+                             'docs/evidence/final/discover_green.txt',
+                             'docs/evidence/final/end.png'):
                     self.assertIn(prefix + name, names)
                 self.assertIn('Dokumente/source.txt', names)
-                self.assertIn('Dokumente/Auftrag_Meilenstein6.docx', names)
+                self.assertIn('Dokumente/Auftrag_original.docx', names)
                 self.assertEqual(archive.read('Dokumente/source.txt'), b'original source')
                 self.assertEqual(archive.read(prefix + 'src/spiel.py'), b'CORE = True\n')
                 status = archive.read(prefix + 'ABGABESTATUS.md').decode('utf-8')
-                self.assertIn('docs/status/06_requirements.md', status)
                 self.assertIn('Zweirechnerlauf', status)
                 for name in names:
                     parts = Path(name).parts

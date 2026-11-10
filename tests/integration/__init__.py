@@ -1,0 +1,1 @@
+"""Spielende, Startvarianten und Abgabepakete."""

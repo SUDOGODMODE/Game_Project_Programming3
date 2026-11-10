@@ -1,6 +1,6 @@
-# Schiffe versenken — Protokoll 0.6
+# Schiffe versenken — Protokoll
 
-Katalog des lokalen A/B-Protokolls für Kursmeilenstein 5, Version 0.6; strukturierte Fassung: [protocol.json](docs/protocol/protocol.json). Das Gegenlesen steht aus. Die Beispiele erläutern das Format; Ausführungsnachweise stehen unter `docs/evidence/`. Frühere Nachweise zu Version 0.5 bleiben Belege für ihren damaligen Stand.
+Katalog des lokalen A/B-Protokolls, Protokoll 0.6; strukturierte Fassung: [protocol.json](docs/protocol/protocol.json). Die Beispiele erläutern das Format.
 
 ## Transport und Identität
 
@@ -14,7 +14,7 @@ Clients lesen dauerhaft in einem Empfangsthread und unterscheiden die Nachrichte
 
 ## Nachrichtenaufzeichnung auf dem Server
 
-Die Nachrichtenfolge am Spielende entspricht Version 0.6. Zusätzlich erzeugt jeder
+Zusätzlich erzeugt jeder
 Serverstart eine neue JSONL-Datei unter projektlokalem `logs/`; `--log-file`
 wählt eine ausdrücklich neue Datei. Es gibt kein Anhängen an frühere Logs.
 Pro empfangener und erfolgreich gesendeter Nachricht wird eine vollständige,

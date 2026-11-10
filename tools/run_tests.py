@@ -15,9 +15,9 @@ def load_core_suite(loader):
     """Load only rule tests that need neither Tk nor network access."""
     return unittest.TestSuite(
         loader.loadTestsFromName(name) for name in (
-            "tests.meilenstein_02.test_board",
-            "tests.meilenstein_02.test_game",
-            "tests.meilenstein_05.test_spiel",
+            "tests.core.test_board",
+            "tests.core.test_game",
+            "tests.integration.test_spiel",
         )
     )
 
@@ -176,7 +176,7 @@ def run_suite(suite, *, require_gui=False, report_json=None, selection=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     selection = parser.add_mutually_exclusive_group()
-    selection.add_argument("--milestone", choices=("00", "02", "03", "04", "05", "06"))
+    selection.add_argument("--group", choices=("core", "network", "gui", "integration", "graphics"))
     selection.add_argument("--core", action="store_true", help="Nur netz- und GUI-freie Spielregeln prüfen")
     parser.add_argument("--require-gui", action="store_true", help="Alle gefundenen GUI-Tests müssen tatsächlich laufen")
     parser.add_argument("--report-json", type=Path, help="Neue JSON-Berichtsdatei (kein Überschreiben)")
@@ -187,12 +187,12 @@ def main():
         suite = load_core_suite(unittest.defaultTestLoader)
     else:
         start = ROOT / "tests"
-        if args.milestone:
-            start /= f"meilenstein_{args.milestone}"
+        if args.group:
+            start /= args.group
         suite = unittest.defaultTestLoader.discover(str(start), top_level_dir=str(ROOT))
     try:
         return run_suite(suite, require_gui=args.require_gui, report_json=args.report_json,
-                         selection="core" if args.core else args.milestone or "all")
+                         selection="core" if args.core else args.group or "all")
     except OSError as exc:
         parser.error(f"Bericht konnte nicht neu angelegt werden: {exc}")
 

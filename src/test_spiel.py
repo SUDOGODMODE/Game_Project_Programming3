@@ -1,4 +1,4 @@
-"""Eigenstaendige Regeltests fuer den Schiffe-versenken-Kern (Kurs-M5)."""
+"""Eigenstaendige Regeltests fuer den Schiffe-versenken-Kern."""
 import copy
 import unittest
 

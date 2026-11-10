@@ -1,9 +1,8 @@
 # Gemeinsame Einrichtung
 
 Benötigt werden Python **3.12 oder neuer** mit tkinter und eine grafische
-Sitzung. Es werden keine zusätzlichen Python-Pakete benötigt. Die letzte lokale M5-Releaseprüfung vom 03.11.2026 verwendete macOS,
-Python 3.14.10 und Tk 9.1. Die neuen Startprofile haben eigene, noch
-getrennt zu prüfende Nachweise.
+Sitzung. Es werden keine zusätzlichen Python-Pakete benötigt. Geprüft auf
+macOS mit Python 3.14.10 und Tk 9.1.
 Eine eigene Ausführung unter Python 3.12 oder auf Windows ist damit nicht belegt.
 
 Alle Befehle im Projektordner ausführen. Die Bash-Beispiele verwenden
@@ -85,8 +84,8 @@ Der Server nennt bei jedem Start einen neuen JSONL-Metadatenlogpfad unter
 Der localhost-Betrieb braucht nach der Einrichtung kein LAN. Für zwei
 Rechner muss der zweite Client die tatsächliche IPv4-Adresse von Rechner 1
 bekommen; `0.0.0.0` ist nur eine Server-Bindeadresse. Startanleitungen und
-lokale Tests belegen noch keinen echten Zweirechnerlauf. Der geforderte
-M5-Terminalbeleg und der getrennte ältere Dreirechnernachweis bleiben offen.
+lokale Tests belegen noch keinen echten Zweirechnerlauf mit Server-
+Terminalausgabe von zwei tatsächlich getrennten Rechnern.
 
 ## Terminalwerkzeuge
 

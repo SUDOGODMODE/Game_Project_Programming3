@@ -1,4 +1,4 @@
-"""M6: Das Spiel über echte TCP-Verbindungen und einen Serverprozess prüfen.
+"""Das Spiel über echte TCP-Verbindungen und einen Serverprozess prüfen.
 
 Jeder Test erhält einen frischen Prozess und einen freien Port. Weder ein
 Fenster noch ein von Hand gestarteter Server ist für diesen Lauf nötig.

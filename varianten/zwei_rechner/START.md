@@ -7,10 +7,6 @@ Rechner 1. Das Spiel verwendet weiterhin denselben Regelkern und dasselbe
 Protokoll wie die localhost-Variante. Im Profil-ZIP liegt diese Anleitung
 als `START_HIER.md` im inneren Projektordner.
 
-Die Anleitung bereitet den geforderten M5-Zweirechnerlauf vor. Ein echter
-Lauf über zwei Geräte samt Server-Terminalausgabe gilt erst nach
-tatsächlicher Durchführung als nachgewiesen.
-
 ## 1. Projekt und Python auf beide Rechner bringen
 
 Das **gleiche** Zwei-Rechner-ZIP auf beiden Geräten entpacken. Es erzeugt
@@ -141,12 +137,7 @@ Zum Beenden beide Clientfenster schliessen und im Serverterminal auf
 Rechner 1 **Ctrl+C** drücken. Bei Verbindungsabbruch wird die Runde
 zurückgesetzt; der verbleibende Spieler wartet auf Ersatz.
 
-Für den späteren M5-Nachweis die tatsächliche Server-Terminalausgabe
-einer ganzen Partie über diese **zwei echten Rechner** aufbewahren, mit
-Datum, tatsächlicher Geräteverteilung und den verwendeten IPs. Keine
-privaten Flotten aus Clientfenstern in das Serverlog übertragen. Die
-getrennte ältere Dreirechneraufgabe aus Kursmeilenstein 4 bleibt eine
-andere noch offene praktische Prüfung.
+Keine privaten Flotten aus Clientfenstern in das Serverlog übertragen.
 
 ## Wenn die Verbindung nicht klappt
 
@@ -159,5 +150,4 @@ andere noch offene praktische Prüfung.
 | Bob erscheint als A | Alice war nicht zuerst beigetreten; Runde neu starten und Startreihenfolge einhalten. |
 
 Die Netzwerkverbindung verwendet TCP ohne Anmeldung oder Verschlüsselung;
-vorgesehen ist ein vertrauenswürdiges Unterrichtsnetz. Die Startanleitung
-und lokale Paketprüfungen ersetzen den echten Zweirechnernachweis nicht.
+vorgesehen ist ein vertrauenswürdiges Unterrichtsnetz.

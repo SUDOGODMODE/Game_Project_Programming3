@@ -1,4 +1,4 @@
-"""M2: Zwei Personen spielen ohne Netzwerk abwechselnd an einer Tastatur."""
+"""Zwei Personen spielen ohne Netzwerk abwechselnd an einer Tastatur."""
 import sys
 
 import board

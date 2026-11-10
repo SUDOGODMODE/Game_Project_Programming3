@@ -9,7 +9,7 @@ Diese Reihenfolge beginnt beim einfachen Spiel ohne Netzwerk. Lies zuerst
 Koordinaten und Flotten; `BattleshipGame` hält Phase, Spieler, Schiffe und
 Schüsse. `place_fleet()` und `shoot()` prüfen eine Anfrage, bevor sie den
 Zustand ändern. `state(slot)` baut eine neue, gefilterte Sicht für genau
-einen Spieler. Beginne mit den Tests in `tests/meilenstein_02/test_game.py`.
+einen Spieler. Beginne mit den Tests in `tests/core/test_game.py`.
 `src/board.py` ist nur ein alter Importname für denselben Kern.
 
 ## 2. Von der Nachricht zur Spielaktion
@@ -19,7 +19,7 @@ in `src/server.py` ordnet eine Verbindung dem Platz A oder B zu. Unter der
 Spielsperre übersetzt `process()` eine Nachricht in eine Spielaktion;
 `handle()` schickt die direkte Antwort und anschließend die erlaubten
 Zustände. Beim Sieg folgt nach beiden Endzuständen `gameOver`. Die Tests in
-`tests/meilenstein_03/` und `tests/meilenstein_04/test_server_states.py`
+`tests/network/` und `tests/gui/test_server_states.py`
 zeigen diese Reihenfolge mit echten beziehungsweise kontrollierten Sockets.
 
 ## 3. Was die beiden Clients sehen
@@ -46,12 +46,10 @@ passenden Adressen und Prozesse für ein oder zwei Geräte.
 ## 5. Eine Änderung prüfen
 
 1. Nach Regeländerungen: `python3 tools/run_tests.py --core`.
-2. Danach: `python3 tools/run_tests.py --milestone <Nummer>` für den Bereich.
+2. Danach: `python3 tools/run_tests.py --group <name>` für den Bereich.
 3. Vor der Übergabe: `python3 tools/run_tests.py --require-gui` in einer
    grafischen Sitzung mit lokalen TCP-Ports.
 4. Nach GUI- oder Netzwerkänderungen zusätzlich eine neue vollständige
    lokale Partie gemäß `docs/development/testing.md` ausführen.
 
 Ein lokaler Test belegt keinen echten Versuch mit zwei fremden Rechnern.
-Historische Berichte und offene persönliche Aufgaben stehen in
-`WEITERARBEITEN.md`.

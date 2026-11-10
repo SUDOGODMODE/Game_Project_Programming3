@@ -29,10 +29,10 @@ flowchart LR
 | `src/gui/ship_effects.py` | Neue eigene Schiffsverluste erkennen und zeitlich begrenzte lokale Sprengungen zeichnen |
 | `src/play.py` / `src/client.py` | Konsolenspiel bzw. Lobbydiagnose |
 | `src/local_game.py` | Spielkern an einer Tastatur bedienen |
-| `src/echo_*.py` | Separater TCP-Grundversuch aus M0 |
+| `src/echo_*.py` | Separater einfacher TCP-Grundversuch |
 
 `spiel.py`, `netz.py`, `test_spiel.py`, `test_netz.py` und
-`tests/meilenstein_03/test_angriff.py` tragen Name und deutsche
+`tests/network/test_angriff.py` tragen Name und deutsche
 Testbeschreibungen wörtlich aus der Aufgabenstellung; sie bleiben deshalb
 bewusst unverändert. Alle eigenen Dateien und Bezeichner — auch die
 Funktionen und Klassen innerhalb dieser Vorlagedateien selbst — sind
@@ -128,5 +128,5 @@ wartet; ein Ersatzspieler startet eine frische Platzierung. Kein Reconnect
 und keine Wiederherstellung einer abgebrochenen Partie.
 
 Vorgesehen ist ein Zweipersonenspiel im Unterrichtsnetz. Authentifizierung,
-Verschlüsselung, mehrere Tische und persistente Partien gehören nicht zu
-diesem Meilenstein.
+Verschlüsselung, mehrere Tische und persistente Partien sind nicht
+Bestandteil des Projekts.

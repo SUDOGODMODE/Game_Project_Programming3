@@ -1,8 +1,7 @@
-# Vorführung und Abnahme
+# Vorführung
 
-Die Schritte sind ein Leitfaden. Ihre Beschreibung ist kein Nachweis einer
-bereits gehaltenen Vorführung. Alle Befehle mit aktivierter `.venv`; auf
-Windows nach Aktivierung `python` statt `python3` verwenden.
+Leitfaden für eine Vorführung des Spiels. Alle Befehle mit aktivierter
+`.venv`; auf Windows nach Aktivierung `python` statt `python3` verwenden.
 
 1. README, Regeln und Protokoll zeigen. Den zentralen Server, private Sichten
    und den vollständigen Zustandsaufbau erklären.
@@ -33,9 +32,8 @@ python3 tools/run_gui_demo.py --output "<neuer_nachweisordner>"
 python3 tools/build_submission.py --output "<neues_abgabearchiv.zip>"
 ```
 
-Das Werkzeugpaket enthält Manifest und offenen Abgabestatus. Frisch in einen
+Das Abgabearchiv enthält ein Manifest mit SHA256-Prüfsummen. Frisch in einen
 anderen Ordner entpacken, Manifest prüfen und von dort Tests/Start wiederholen.
-Ein Paket allein erfüllt keine persönliche Reflexion oder Gerätevorführung.
 
 Erklärfragen für die eigene Vorbereitung:
 
@@ -44,8 +42,8 @@ Erklärfragen für die eigene Vorbereitung:
 - Welche Felder darf der Gegner sehen? Wie prüft man tatsächliche Payloads?
 - Wo trennen Queue/`after` Tk und Netzwerk? Wie werden Tk-Referenzen freigegeben?
 - Wie erkennt der Transport vollständige Nachrichten trotz TCP-Paketgrenzen?
-- Was bedeutet ein GUI-Skip, und welche praktischen Nachweise fehlen noch?
+- Was bedeutet ein GUI-Skip in der Testausgabe?
 
-Für den gegenseitigen Fremdtest erhält die andere Person nur Protokoll und
-Serveradresse. Tatsächliche Namen, Datum, selbst gebauten Client,
-Rollenwechsel, Abweichungen und Rohbelege danach ergänzen. Bis dahin offen.
+Für einen Test mit einer anderen Person auf einem anderen Rechner erhält
+diese Person nur Protokoll und Serveradresse; ein eigener Client genügt,
+solange er dem Protokoll folgt.

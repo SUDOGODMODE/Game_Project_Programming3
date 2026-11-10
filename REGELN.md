@@ -59,17 +59,17 @@ Es gibt kein Unentschieden. Bei einem gültigen Schuss wird immer zuerst genau e
 
 Geht im Netzwerk ein Spieler, wird sein Platz sofort frei. Beide Flotten, Treffer, Schüsse und das bisherige Ergebnis werden verworfen. Der verbleibende Spieler wartet auf einen neuen Gegner; der nächste Beitritt beginnt eine neue Partie. Ein Abbruch vergibt keinen Gewinner. Im lokalen Spiel beendet q oder EOF die laufende Partie ohne Gewinner.
 
-**Änderung zum Vorschlag:** Das ursprüngliche Spielwahlformular nennt noch eine mögliche Wartefrist von 30 Sekunden mit anschliessender Aufgabe. Für den aktuellen Kursmeilenstein gilt stattdessen der sofortige Reset mit Ersatzbeitritt. Das entspricht den geforderten Abbruch- und Wiederbeitrittsfällen. Eine Wiederverbindung zur alten Partie ist nicht Teil dieses Stands.
+Ein verlassener Platz wird sofort frei; der nächste Beitritt startet eine neue Partie mit Ersatzbeitritt. Eine Wiederverbindung zur alten Partie ist nicht vorgesehen.
 
 ## Bedienung und Prüfungen
 
 Eine Partie ohne Server startet mit `python3 src/local_game.py`. Jeder Spieler setzt seine Flotte und schiesst danach abwechselnd. Für eine Netzwerkpartie wird der Server mit zwei Instanzen von `client_gui.py` gestartet; `play.py` bleibt als Konsolendiagnose erhalten; Startbefehle stehen im [README](README.md).
 
-`tests/meilenstein_02/test_board.py` prüft Brett und Platzierung. `tests/meilenstein_02/test_game.py` prüft Phasen, Zugfolge, Sieg, ungültige Aktionen, Reset und den im Vorschlag benannten schwierigen Fall: getrennte Spielersichten, die keine gegnerischen Schiffe enthalten und keine internen Daten verändern können. `src/test_spiel.py` ergänzt die für Kursmeilenstein 5 geforderten Regeltests mit dem Originalbefehl im Ordner `src`; der gemeinsame Teststarter findet sie unter `tests/meilenstein_05/`. `tests/meilenstein_03/test_network.py` prüft die Sichtzuordnung zusätzlich über TCP-Verbindungen.
+`tests/core/test_board.py` prüft Brett und Platzierung. `tests/core/test_game.py` prüft Phasen, Zugfolge, Sieg, ungültige Aktionen, Reset und den schwierigen Sonderfall: getrennte Spielersichten, die keine gegnerischen Schiffe enthalten und keine internen Daten verändern können. `src/test_spiel.py` ergänzt die Regeltests mit dem Originalbefehl im Ordner `src`; der gemeinsame Teststarter findet sie unter `tests/integration/`. `tests/network/test_network.py` prüft die Sichtzuordnung zusätzlich über TCP-Verbindungen.
 
 ## Oberflächenskizze für die Spielwahl
 
-Ursprüngliche Skizze; seit Kursmeilenstein 4 ist die GUI umgesetzt.
+Ursprüngliche Entwurfsskizze; die GUI ist inzwischen vollständig umgesetzt.
 Host und Name werden beim Start als Argumente übergeben; die Platzierung
 erfolgt über einzelne Start-/Richtungsfelder, der Schuss durch Klick im Zielraster:
 
@@ -90,4 +90,4 @@ Schuss: <feld> [Schiessen]        Letzte Antwort / Fehler
 [Verlassen]
 ```
 
-Die beiden Raster zeigen nur die erlaubte Sicht. Eine ungültige Aktion und ein Verbindungsabbruch erscheinen in der Statuszeile. Die Skizze ergänzt das ursprüngliche Formular; Der aktuelle GUI-Stand gehört zur einzelnen Kursaufgabe 4 (im alten Projektablauf M6). Start und Bedienung stehen in `docs/guides/`.
+Die beiden Raster zeigen nur die erlaubte Sicht. Eine ungültige Aktion und ein Verbindungsabbruch erscheinen in der Statuszeile. Start und Bedienung stehen in `docs/guides/`.

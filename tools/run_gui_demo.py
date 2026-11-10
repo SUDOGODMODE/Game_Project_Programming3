@@ -1,4 +1,4 @@
-"""Reproduzierbarer lokaler M4-Nachweis mit zwei echten Tk-Fenstern und TCP.
+"""Reproduzierbarer lokaler Nachweis mit zwei echten Tk-Fenstern und TCP.
 
 Die absichtlich bekannten Testflotten und Mitschnitte beider Testsichten
 sind kein Fremdrechnernachweis und kein öffentlicher Spielmitschnitt.
@@ -231,7 +231,7 @@ def verify_private_states(messages, report):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    default_output = ROOT / "docs/evidence" / ("04_run_" + datetime.now().strftime("%Y%m%d_%H%M%S_%f"))
+    default_output = ROOT / "docs/evidence" / ("run_" + datetime.now().strftime("%Y%m%d_%H%M%S_%f"))
     parser.add_argument("--output", type=Path, default=default_output,
                         help="Neuer Ausgabeordner; Standard: eigener zeitgestempelter Ordner")
     parser.add_argument("--server-profile", choices=("localhost",),

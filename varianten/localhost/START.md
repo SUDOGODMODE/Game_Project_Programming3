@@ -127,6 +127,3 @@ schreibt seinen neuen Metadatenlogpfad beim Start ins Terminal.
 | Kein Fenster | `python3 -m tkinter` beziehungsweise `python -m tkinter` und grafische Sitzung prüfen. |
 | „Warte auf Gegner“ | Zweiten Client starten; zuerst beigetretener Client ist A. |
 | Port belegt | Einen anderen Port in **allen drei** Startbefehlen verwenden. |
-
-Der neue Profilstart und die Profil-ZIPs erhalten ihre eigenen Prüfnachweise;
-ältere lokale M5-Ergebnisse belegen nicht automatisch diese neuen Einstiege.

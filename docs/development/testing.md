@@ -9,12 +9,11 @@ verwenden (siehe [Setup](../guides/setup.md)):
 ```bash
 python3 tools/run_tests.py --core
 python3 tools/run_tests.py
-python3 tools/run_tests.py --milestone 00
-python3 tools/run_tests.py --milestone 02
-python3 tools/run_tests.py --milestone 03
-python3 tools/run_tests.py --milestone 04
-python3 tools/run_tests.py --milestone 05
-python3 tools/run_tests.py --milestone 06 --require-gui
+python3 tools/run_tests.py --group core
+python3 tools/run_tests.py --group network
+python3 tools/run_tests.py --group gui
+python3 tools/run_tests.py --group integration
+python3 tools/run_tests.py --group graphics --require-gui
 python3 tools/run_tests.py --require-gui --report-json "<neuer_testbericht.json>"
 ```
 
@@ -22,18 +21,15 @@ python3 tools/run_tests.py --require-gui --report-json "<neuer_testbericht.json>
 Dieses Profil lädt nur Brett- und Spielregeltests, einschließlich der
 eigenständigen Kurstests aus `src/test_spiel.py`. Es bindet keinen TCP-Port,
 öffnet kein Tk-Fenster und startet keinen fremden Prozess. Prüfe danach mit
-`--milestone <Nummer>` den betroffenen Bereich; die Testgruppen 02 und 03
+`--group <name>` den betroffenen Bereich; `network` und `integration`
 enthalten zusätzlich lokale Konsolenpartien beziehungsweise Netzwerkfälle,
-die Testgruppen 04 und 06 echte GUI-Fälle. Vor einer
+`gui` und `graphics` echte GUI-Fälle. Vor einer
 Übergabe führe die gesamte Suite mit `--require-gui` aus und spiele bei
 GUI-/Netzänderungen zusätzlich die unten beschriebene lokale Demo durch.
-`--core` und `--milestone` sind alternative Auswahlen.
+`--core` und `--group` sind alternative Auswahlen.
 
-Der aktuelle Kurs endet mit M6; dessen Umsetzung ist lokal abgeschlossen und
-geprüft (`src/test_netz.py`, siehe
-[M6-Anforderungsabgleich](../status/06_requirements.md)). Der vorhandene
-Ordner `meilenstein_06/` bewahrt frühere Grafikprüfungen als technische
-Testgruppe und ist von der M6-Netztestsuite unter `src/` zu unterscheiden.
+Die Netzwerktestsuite liegt unter `src/test_netz.py`; der Ordner
+`tests/graphics/` enthält die Grafikprüfungen als eigene Testgruppe.
 Nachrichtenlog und Abgabepaket sind Zusatzfunktionen:
 Ihre Tests liegen unter `tests/additional/` und werden im Gesamtlauf immer
 mitgesammelt. Die Paketprüfung kann zusätzlich einzeln gestartet werden:
@@ -42,7 +38,8 @@ mitgesammelt. Die Paketprüfung kann zusätzlich einzeln gestartet werden:
 python3 -m unittest -v tests.additional.test_packaging
 ```
 
-Der Teststarter bietet die vorhandenen Gruppen 00, 02, 03, 04, 05 und 06 an.
+Der Teststarter bietet die Gruppen `core`, `network`, `gui`, `integration`
+und `graphics` an.
 
 Der Starter setzt Quell-/Projektpfade, sammelt alle `unittest`-Tests ein und
 liefert bei einem Fehler Exitcode 1. Der absolute Skriptpfad funktioniert
@@ -72,19 +69,16 @@ strengen Bedingungen.
 
 | Ordner | Schwerpunkt und Prüfart |
 |---|---|
-| `tests/meilenstein_00/` | Echo-Server/-Client als eigene Prozesse, lange Nachrichten |
-| `tests/meilenstein_02/` | Brett, Kernphasen, ganze Partie, geheime Kopien, reine GUI-Vorbereitung, lokale CLI |
-| `tests/meilenstein_03/` | Transport über Socketpaare; echte TCP-/CLI-Prozesse, Lobby, Angriffe, Partie, Wettläufe, Abbruch und Ersatz |
-| `tests/meilenstein_04/` | Serverzustände/Privatheit/Logs; echte Tk-Widgets mit Socketpaaren, Eingaben, Zeichnen, Threadgrenzen und Lebenszyklus |
-| `tests/meilenstein_05/` | Eigenständige Kurstests aus `src/test_spiel.py`, Server-Endfolge, GUI-Ende und Startvarianten |
-| `tests/meilenstein_06/` | PNG-Pixel und PhotoImage-Lebensdauer; SVG-Flotte, Canvas-Drehung, eigene Sprengungseffekte und Tastaturbedienung |
+| `tests/core/` | Brett, Kernphasen, ganze Partie, geheime Kopien, reine GUI-Vorbereitung, lokale CLI |
+| `tests/network/` | Transport über Socketpaare; echte TCP-/CLI-Prozesse, Lobby, Angriffe, Partie, Wettläufe, Abbruch und Ersatz |
+| `tests/gui/` | Serverzustände/Privatheit/Logs; echte Tk-Widgets mit Socketpaaren, Eingaben, Zeichnen, Threadgrenzen und Lebenszyklus |
+| `tests/integration/` | Eigenständige Kurstests aus `src/test_spiel.py`, Server-Endfolge, GUI-Ende und Startvarianten |
+| `tests/graphics/` | Netz-/Porttests; PNG-Pixel und PhotoImage-Lebensdauer; SVG-Flotte, Canvas-Drehung, eigene Sprengungseffekte und Tastaturbedienung |
 | `tests/additional/test_event_log.py` | Zusatzprüfung: sofort persistente Nachrichtenmetadaten, parallele Schreiber, Privatheit, Überschreibschutz, tatsächlicher Handler |
 | `tests/additional/test_packaging.py` | Zusatzprüfung: echte ZIP-Dateien, Laufzeitabhängigkeiten, Originalquellen, Ausschlüsse, unabhängige SHA256-Prüfung |
 
 Feste Testflotten stehen in `tests/fixtures.py`. Sie sind keine Vorgabe für
-GUI-Flotten. Tests bleiben bei ihrem ursprünglichen Schwerpunkt, auch wenn
-sie spätere Erweiterungen mitprüfen. M1 hat Dokumentations-/Freigabeaufgaben;
-deshalb gibt es dafür keinen leeren Testordner.
+GUI-Flotten.
 
 Die Flotte in `src/test_spiel.py` steht absichtlich noch einmal in dieser
 Datei: Der Kursbefehl `python3 -m unittest -v test_spiel.py` aus `src/`
@@ -96,7 +90,7 @@ sie einen begründeten Skip. **Ein Skip ist kein GUI-Nachweis.** Unter Windows
 ist ein POSIX-Terminaltest nicht verfügbar. Die tatsächlich geprüfte
 Umgebung steht in den Ergebnissen.
 
-Die vorhandenen Grafikprüfungen unter `tests/meilenstein_06/` sind nach Verhalten getrennt:
+Die vorhandenen Grafikprüfungen unter `tests/graphics/` sind nach Verhalten getrennt:
 
 - `test_image.py`: erhaltenes transparentes PNG, echte Anzeigepixel und
   Freigabe von `PhotoImage` im Tk-Hauptthread.
@@ -110,9 +104,7 @@ Die vorhandenen Grafikprüfungen unter `tests/meilenstein_06/` sind nach Verhalt
   eigene statt gegnerische Effekte, Verbindungsende, Effektschalter und
   Zielrasterbedienung mit Pfeiltasten sowie Enter/Leertaste.
 
-Diese Liste beschreibt den Prüfumfang. Frühere Ergebniszahlen belegen
-ihren jeweiligen Stand; die grafische Überarbeitung benötigt einen neuen
-Gesamtlauf mit `--require-gui` und einem neuen Berichts- oder Nachweisziel.
+Diese Liste beschreibt den Prüfumfang.
 
 ## Handshake-Angriffe
 
@@ -129,7 +121,7 @@ TCP-Suite prüft diesen echten Skriptaufruf ebenfalls automatisch.
 ## Zwei Fenster und vollständige TCP-Partie
 
 ```bash
-python3 tools/run_gui_demo.py --output docs/evidence/04_new_run
+python3 tools/run_gui_demo.py --output "<ausgabeordner>"
 ```
 
 Startet einen echten Serverprozess, zwei echte Tk-Fenster und zwei TCP-Clients.
@@ -145,46 +137,32 @@ Personen noch fremde Rechner. Ohne `--output` wird ein eigener zeitgestempelter 
 vorhandene Ausgabeordner werden vor jedem Dateizugriff abgelehnt. FAIL wird
 auch nach einer durchgespielten Partie gespeichert, falls die abschliessende
 Serverlogprüfung fehlschlägt. Für neue Läufe einen neuen Ausgabeordner
-verwenden und alte Rohlogs erhalten. Der Klassenversuch steht in der
-[Schulnetz-Checkliste](../evidence/04_school_network_checklist.md).
+verwenden und alte Rohlogs erhalten.
 
-## Endprüfung und Paket
-
-Die unabhängige Testrolle hält frische Prüfungen unter
-`docs/evidence/final_assessment_tests/` fest. Sieben Angriffe und eine ganze
-Partie mit zwei tatsächlichen Konsolenclientprozessen sind eigenständige
-Nachweise; sie werden nicht aus dem GUI-Lauf abgeleitet. Massgebend für
-aktuelle Zahlen und Grenzen ist das [Testurteil](../status/final_test_verdict.md).
-Ausführende Rolle ist bei den automatischen Läufen Codex, keine erfundene
-persönliche Bedienung durch den Projektverantwortlichen.
+## Paket
 
 `python3 tools/build_submission.py --output "<neues_abgabearchiv.zip>"`
-erzeugt eine neue technische Lieferform mit `.sha256`-Datei. Das innere
+erzeugt eine technische Lieferform mit `.sha256`-Datei. Das innere
 `SHA256SUMS.json` bildet ZIP-Pfade auf SHA256-Digests aller übrigen Dateien
 ab. Projekt und `Dokumente` sind benachbarte Verzeichnisse, damit relative
 Quellenlinks erhalten bleiben. `.git`, Umgebungen, Caches, Secrets,
 Laufzeitlogs sowie lokale Entwicklungswerkzeuge unter `.agents/` und
-`.specify/` bleiben draussen; absichtlich gespeicherte Rohbelege unter
-`docs/evidence` werden mitgeliefert. Vorhandene Ausgaben werden abgelehnt.
+`.specify/` bleiben draussen. Vorhandene Ausgaben werden abgelehnt.
 Der Entpacktest muss aus einem frischen Ziel starten und darf nicht
-versehentlich die ursprüngliche Arbeitskopie importieren. Persönliche und
-externe Aufgaben stehen weiter im Paketstatus; ein grüner lokaler Testlauf
-erfüllt sie nicht.
+versehentlich die ursprüngliche Arbeitskopie importieren.
 
 ## Änderungen durchführen
 
-1. `AGENTS.md`, Übergabe, README und aktuellen Abgleich lesen; Git-Status
-   prüfen und vorhandene Änderungen erhalten.
+1. `AGENTS.md` und README lesen; Git-Status prüfen und vorhandene
+   Änderungen erhalten.
 2. Erwartetes Verhalten festhalten. Bei funktionalen Änderungen zuerst einen
    aussagekräftigen fehlschlagenden Test ergänzen.
 3. Kleinste passende Änderung umsetzen. Protokolländerungen gemeinsam in
    Server, Clients, JSON-Katalog und lesbarem Katalog nachführen.
 4. Betroffene Tests, dann die gemeinsame Suite ausführen. Für GUI und
    Netzwerk den tatsächlichen Bedienweg und Datenfluss prüfen.
-5. Befehl, Umgebung, Datum und Grenzen dokumentieren; README, Journal,
-   Übergabe und Anforderungsabgleich aktualisieren.
-6. Diff unabhängig prüfen lassen, Fehler korrigieren und gezielt erneut testen.
+5. Befehl, Umgebung und Grenzen dokumentieren; README aktualisieren.
+6. Diff prüfen lassen, Mängel korrigieren und gezielt erneut testen.
 
 Keine Commits/Pushes ohne neuen Auftrag. Keine erfundene Lizenz oder
-Personenangaben ergänzen. Eine KI-Codeprüfung ersetzt nicht das im Kurs
-geforderte Gegenlesen durch eine andere Person.
+Personenangaben ergänzen.

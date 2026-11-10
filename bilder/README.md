@@ -1,36 +1,17 @@
 # GUI-Bilder und SVG-Flotte
 
-## Erhaltenes ImageGen-PNG
+## Schiffsbild
 
-Am 27.10.2026 für dieses Projekt mit dem eingebauten **ImageGen**-Werkzeug
-erzeugt, ohne Bildvorlage. Keine Aussage über eigenhändisches Zeichnen.
-
-- `schiff_imagegen_original.png`: unverändertes generiertes Original,
-  tatsächlich **1254×1254 Pixel**, PNG mit Alpha. Der gewünschte 1024-Pixel-
-  Wert im Prompt wurde vom Werkzeug nicht übernommen.
-- `schiff.png`: **256×256 Pixel**, PNG mit Alpha. Aus dem Original mit
-  `sips -z 256 256 ... --out ...` skaliert. Der Benutzer hat die Skalierung
-  mit sips ausdrücklich freigegeben. Die Skalierung wurde danach erneut aus
-  dem erhaltenen Original ausgeführt; das Original bleibt zur Herkunft erhalten.
+- `schiff_imagegen_original.png`: Originaldatei, **1254×1254 Pixel**, PNG
+  mit Alpha.
+- `schiff.png`: **256×256 Pixel**, PNG mit Alpha, mit `sips -z 256 256 ... --out ...`
+  aus dem Original skaliert. Das Original bleibt zur Herkunft erhalten.
 - Anzeige: Tk `PhotoImage(...).subsample(4)`, **64×64 Pixel**. Die Referenz
   `ship_image` lebt am Fenster; Laden, Anzeigen und Freigeben geschehen im
   Tk-Hauptthread. Der Dateipfad wird relativ zu `__file__` aufgelöst.
 
 Das Bild ist ausschliesslich Dekoration im Fenstertitelbereich. Es hat keine
-Funktion für Regeln, Flottenpositionen oder Schussergebnisse. Seine
-Darstellung und Lebensdauer werden an echten Tk-Pixeln geprüft; tatsächliche
-Testergebnisse stehen im unabhängigen Endprüfbericht.
-
-Prompt:
-
-> Use case: stylized-concept. Asset type: small decorative PNG for an
-> educational Battleship desktop game. Generate one original compact
-> illustration of a single friendly navy-blue patrol ship viewed three-quarter
-> from above, clean readable silhouette and a few soft blue highlights,
-> centered with generous transparent padding. Genuine transparent background,
-> square 1024 by 1024 pixels (fixed power-of-two size), no sea rectangle, no
-> text, no logos, no watermark, no game boards, no UI. It must remain
-> recognisable when displayed at 64 by 64 pixels.
+Funktion für Regeln, Flottenpositionen oder Schussergebnisse.
 
 SHA256:
 

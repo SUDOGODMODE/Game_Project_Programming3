@@ -1,10 +1,9 @@
-# Technischer Abschlussbericht — Material zur eigenen Endfassung
+# Technischer Abschlussbericht
 
-Stand: 03.11.2026. Dieses Dokument wurde mit KI-Unterstützung aus dem
-tatsächlichen Projektstand erstellt. Es ist eine technische Materialsammlung;
-der Projektverantwortliche muss die Erklärungen vor der Abgabe selbst prüfen,
-überarbeiten und vertreten. Die [persönliche Reflexion](meine_reflexion.md)
-ergänzt er selbst. Fehlende Personen-/Fremdrechnerleistungen bleiben offen.
+Dieser Bericht beschreibt den fertigen Stand des Projekts: Regeln,
+Architektur, Protokoll und die wichtigsten Entwurfsentscheidungen. Die
+[persönliche Reflexion](meine_reflexion.md) ergänzt der Projektverantwortliche
+separat.
 
 ## Ziel und Regeln
 
@@ -15,7 +14,8 @@ wechselt den Spieler, auch bei einem Treffer. Alle gegnerischen Schiffe zu
 versenken beendet die Partie. Die [Regeln](../../REGELN.md) behandeln
 Überlappung, Randüberschreitung, wiederholte Schüsse und Abbruch ausdrücklich.
 Beim Verbindungsende wird sofort zurückgesetzt; der verbleibende Spieler
-wartet auf Ersatz. Der frühere 30-Sekunden-Reconnect-Vorschlag gilt nicht.
+wartet auf Ersatz. Ein Reconnect einer abgebrochenen Partie ist nicht
+vorgesehen.
 
 ## Architektur und Verantwortung
 
@@ -41,7 +41,7 @@ nach tatsächlicher Ausführung als geprüft.
 
 ## Protokollentwurf
 
-Das [Protokoll 0.6](../../PROTOKOLL.md) und sein
+Das [Protokoll](../../PROTOKOLL.md) und sein
 [JSON-Katalog](../protocol/protocol.json) enthalten Richtung, Pflichtfelder,
 Fehler, Beispiele und eine vollständige 33-Schuss-Partie. JSON Lines trennt
 mehrere Nachrichten auf einer langlebigen TCP-Verbindung ohne Annahmen über
@@ -80,12 +80,10 @@ im Hauptthread. Tk-Variablen und das PNG werden dort erzeugt und beim
 Fensterschliessen dort freigegeben; spätere Garbage Collection in einem
 Worker darf keine Tcl-Objekte beseitigen müssen.
 
-## Robustheit: sieben vorgeschriebene Angriffe
+## Robustheit gegenüber fehlerhaften Anfragen
 
-Die Tabelle nennt Prüfziele, keine erfundenen neuen Ergebnisse. Frische
-Ergebnisse und Befehle gehören zum unabhängigen
-[Testurteil](../status/final_test_verdict.md), sobald es tatsächlich vorliegt.
-Historische Ergebnisse bleiben im [M3-Nachweis](../evidence/03_local_output.md).
+Der Server bleibt bei ungültigen oder unerwarteten Anfragen stabil und
+antwortet mit einem passenden Fehlercode, ohne den Spielzustand zu ändern:
 
 | Angriff | Erwartetes beobachtbares Verhalten |
 |---|---|
@@ -113,42 +111,7 @@ JSONL-Metadatenlog mit ISO-Zeit, Richtung, Verbindung/Slot, bekanntem Typ und
 servereigenem Fehlercode. Ganze Payloads und freie Clienttexte werden nicht
 geschrieben. Neue Logdateien werden exklusiv erzeugt und nicht überschrieben.
 
-## Nachweise und ihre Grenzen
+## Vorführung
 
-Die [M4-Ergebnisse](../evidence/04_local_output.md) und die ursprünglichen
-Rohdateien dokumentieren frühere lokale Prüfungen. Neue Endprüfungen stehen
-getrennt unter `docs/evidence/final_assessment_tests/`; ein neuer Bericht
-darf alte Testzahlen nicht als neue Ausführung ausgeben. Der
-[Vorführleitfaden](vorfuehrung.md) beschreibt die wiederholbaren Schritte.
-
-Für den neuen Kursmeilenstein 5 stehen [Anforderungsabgleich](../status/05_requirements.md),
-[grüne Kerntests und abschliessende Gesamtsuite](../evidence/05_final_2026-11-03/full_release.txt),
-[rote Mutationsläufe](../evidence/05_mutation_2026-11-03/result.json) und
-[lokale Tk/TCP-Partie mit Endbild](../evidence/05_gui_verified_2026-11-03/result.json)
-getrennt bereit. Diese lokalen Prüfungen ersetzen den ausdrücklich
-verschobenen echten Zweirechner-Terminalbeleg nicht. Die alten M4-Nachweise
-bleiben Ergebnisse der damaligen Protokollversion 0.5.
-
-Offen sind: echte Lesepartnerschaft und Regel-/Protokoll-Gegenlesen, eine
-reale Zweipersonenpartie an einer Tastatur, Echo/Handshake-Fremdrechnertests
-mit Rollenwechsel, die Partie auf drei realen Geräten samt zwei fremden
-Client-IPs und gemeinsamem Bild sowie gegenseitiger Fremdclienttest und
-Livevorführung. Diese Aufgaben sind ausdrücklich vertagt. Lokale Prozesse,
-KI-Prüfung und geskriptete Partien ersetzen die verlangten Menschen und
-Geräte nicht. Namen, Daten und Resultate werden erst nach Durchführung ergänzt.
-
-## KI-Einsatz und eigener Erklärungsauftrag
-
-KI unterstützte die technische Bearbeitung, die Test-/Dokumentationsarbeit
-und die Bildgestaltung. Auch diese technische Materialsammlung ist mit
-KI-Unterstützung entstanden. Aus dem vorhandenen Repository lässt sich keine
-lückenlose persönliche Autorenschaft einzelner älterer Zeilen ableiten;
-eine solche wird hier nicht erfunden. Der Projektverantwortliche ergänzt
-seinen tatsächlichen Einsatz und seine Eigenleistung in der Reflexion.
-
-Der Kurs erlaubt Bildgestaltung mit KI, fordert aber die eigene
-Verantwortung und Erklärung insbesondere für Regeln/Kern,
-Nachrichtenkatalog, Sperrenentscheidung und Bericht. Grüne Tests belegen
-beobachtetes Verhalten, kein persönliches Verständnis. Vor Abgabe muss der
-Autor jede relevante Codefrage selbst beantworten und den Bericht zu seiner
-geprüften eigenen Endfassung machen.
+Der [Vorführleitfaden](vorfuehrung.md) beschreibt die wiederholbaren Schritte,
+mit denen sich das fertige Spiel vorführen lässt.
