@@ -1,0 +1,42 @@
+{
+  "started": "2026-11-24T11:21:39.272526+01:00",
+  "scope": "Automatisierte lokale TCP-Partie mit zwei Spielern und einem unveraenderten Zuschauerfenster",
+  "server_profile": "direct",
+  "checks": [
+    "Beitritt, Warten und ungefragter Spielstart",
+    "Individuelle Flotten und serverbestaetigte Platzierung",
+    "Klick B6 aktualisiert beide Fenster ohne getState",
+    "Spaeter Zuschauerbeitritt nach B6: spectator ohne Slot, sofort oeffentliche Sicht",
+    "Beide Ablehnungen privat; beide Zustaende unveraendert",
+    "Echter Zuschauerklick privat mit SPECTATOR_ONLY abgelehnt; drei Zustaende unveraendert",
+    "Vollstaendige 33-Schuss-Partie, Sieg und Niederlage in beiden Fenstern",
+    "Server laeuft nach dem Spielende weiter",
+    "Echter Screenshot beider Fenster nach Spielende",
+    "Echter Klick nach Spielende wird privat ohne Zustandsaenderung abgelehnt",
+    "Fensterkreuz, Abbruchanzeige, leerer Reset und Ersatzbeitritt",
+    "Alle oeffentlichen Zustandsfolgen ab B6 einschliesslich Spielende und Reset verglichen",
+    "Alle echten Zustandsnachrichten enthalten ausschliesslich die jeweilige eigene Flotte"
+  ],
+  "result": "PASS",
+  "server_port": 51217,
+  "window_size": [
+    784,
+    899
+  ],
+  "out_of_turn": "Fehler NOT_YOUR_TURN: Spieler A ist nicht am Zug",
+  "duplicate_shot": "Fehler DUPLICATE_SHOT: auf B6 wurde bereits geschossen",
+  "screenshot_layout": "Montage echter Einzelaufnahmen (screencapture), unveraendert nebeneinander",
+  "screenshot": "three_windows.png",
+  "spectator_rejection": "Fehler SPECTATOR_ONLY: Zuschauer duerfen nicht platzieren oder schiessen",
+  "spectator_screenshot": "spectator_rejection.png",
+  "capture_note": "Montage echter Aufnahmen: three_windows.png zeigt links Alice, mittig Bob, rechts Zuschauer nach Bobs J10. Drei TCP-Verbindungen blieben offen; waehrend der Aufnahmen kein Spielzug. Einzeldateien three_windows_*.png stammen aus screencapture; Tk PhotoImage copy kopiert nur ihre Pixel. spectator_rejection.png ist eine echte Einzelaufnahme nach einem Klick. Der unveraenderte Client ignoriert spectator; Rollen-/Siegtexte sind keine Zuschaueranzeige.",
+  "end_status": {
+    "Alice": "Gewonnen!",
+    "Bob": "Verloren. Partie beendet."
+  },
+  "final_screenshot": "three_windows_finished.png",
+  "final_screenshot_layout": "Montage echter Einzelaufnahmen (screencapture), unveraendert nebeneinander",
+  "post_game_rejection": "Fehler WRONG_PHASE: aktuelle Phase ist finished, nicht shooting",
+  "spectator_states_compared": 35,
+  "finished": "2026-11-24T11:21:46.544865+01:00"
+}

@@ -1,4 +1,4 @@
-"""Reproduzierbarer lokaler Nachweis mit zwei echten Tk-Fenstern und TCP.
+"""Reproduzierbarer lokaler Nachweis mit zwei oder drei echten Tk-Fenstern und TCP.
 
 Die absichtlich bekannten Testflotten und Mitschnitte beider Testsichten
 sind kein Fremdrechnernachweis und kein öffentlicher Spielmitschnitt.
@@ -72,12 +72,15 @@ def window_pair_layout(width, height):
     return left, right, region
 
 
-def game_windows_visible(image, left, right):
-    """Prueft sichtbare, gleich gestaltete Kopf-, Status- und Brettbereiche beider Fenster."""
+def game_windows_visible(image, left, right, scale=1):
+    """Prueft sichtbare, gleich gestaltete Kopf-, Status- und Brettbereiche beider Fenster.
+
+    Koordinaten sind Bildschirmpunkte; scale rechnet sie in Bildpixel um (Retina: 2).
+    """
     pairs = []
     try:
         for origin in (left, right):
-            colors = [tuple(image.get(origin + dx, y)) for dx, y in
+            colors = [tuple(image.get((origin + dx) * scale, y * scale)) for dx, y in
                       ((500, 100), (100, 170), (500, 250))]
             if any(len(color) != 3 or not (color[2] >= color[1] + 8 > color[0] + 15)
                    for color in colors):
@@ -90,7 +93,7 @@ def game_windows_visible(image, left, right):
 
 
 def capture_game_pair(root, apps, target, width, height, screen_width):
-    """Speichert nur eine Aufnahme, in der beide eigenen Spielfenster sichtbar sind."""
+    """Speichert eine gepruefte Aufnahme von einem oder zwei echten Spielfenstern."""
     if sys.platform != "darwin":
         return None, "Automatische Aufnahme nur fuer macOS vorbereitet"
     compact_left, compact_right, compact_region = window_pair_layout(width, height)
@@ -98,9 +101,11 @@ def capture_game_pair(root, apps, target, width, height, screen_width):
         ("compact", compact_left, compact_right, compact_region),
         ("wide", 10, screen_width - width - 10, f"0,25,{screen_width},{height + 65}"),
     ]
+    if len(apps) == 1:
+        layouts = [("single", 10, 10, f"0,25,{width + 20},{height + 65}")]
     failures = []
     for label, left, right, region in layouts:
-        if right < left + width + 10 or int(region.split(",")[2]) > screen_width:
+        if (len(apps) == 2 and right < left + width + 10) or int(region.split(",")[2]) > screen_width:
             failures.append(f"{label}: Fenster passen nicht nebeneinander auf den Bildschirm")
             continue
         for x, app in zip((left, right), apps):
@@ -119,24 +124,48 @@ def capture_game_pair(root, apps, target, width, height, screen_width):
                 continue
             try:
                 image = tk.PhotoImage(file=str(candidate))
-                visible = game_windows_visible(image, left, right)
+                scale = round(image.width() / int(region.split(",")[2]))
+                visible = game_windows_visible(image, left, right, scale)
             except tk.TclError as error:
                 failures.append(f"{label}: Bild konnte nicht geprueft werden: {error}")
                 continue
             if not visible:
-                failures.append(f"{label}: Bild enthaelt nicht beide sichtbaren Spielfenster")
+                diagnostic = target.with_name(f"{target.stem}_{label}_diagnostic.png")
+                diagnostic.write_bytes(candidate.read_bytes())
+                failures.append(f"{label}: Spielfenster nicht erkannt; Bild {image.width()}x{image.height()}, "
+                                f"Region {region}; Diagnose: {diagnostic.name}")
                 continue
             target.write_bytes(candidate.read_bytes())
             return label, None
     return None, "; ".join(failures)
 
 
+def capture_game_montage(root, apps, target, width, height, screen_width):
+    """Kopiert echte Einzelaufnahmen unveraendert nebeneinander; keine UI-Zeichnung."""
+    images = []
+    for app in apps:
+        for other in apps:
+            other.root.attributes("-topmost", False)
+        single = target.with_name(f"{target.stem}_{app.name}.png")
+        layout, error = capture_game_pair(root, (app,), single, width, height, screen_width)
+        if not layout:
+            return None, error
+        images.append(tk.PhotoImage(master=root, file=str(single)))
+    montage = tk.PhotoImage(master=root, width=sum(i.width() for i in images),
+                           height=max(i.height() for i in images))
+    x = 0
+    for image in images:
+        root.tk.call(str(montage), "copy", str(image), "-to", x, 0)
+        x += image.width()
+    montage.write(str(target), format="png")
+    return "Montage echter Einzelaufnahmen (screencapture), unveraendert nebeneinander", None
+
+
 def save_evidence(output, report, messages, *, completed):
     """Erst nach allen Pruefungen PASS speichern; Teilversuche bleiben FAIL."""
     log = (output / "server.txt").read_text(encoding="utf-8")
     unsafe = any(value in log for value in ("ownShips", "shotsAtSelf", "Carrier", "Traceback"))
-    missing_capture = any(key in report for key in
-                          ("screenshot_unavailable", "final_screenshot_unavailable"))
+    missing_capture = any(key.endswith("screenshot_unavailable") for key in report)
     report["result"] = "PASS" if completed and not unsafe and not missing_capture else "FAIL"
     if unsafe:
         report["error"] = "Serverlog enthaelt private Payloads oder einen Traceback"
@@ -222,11 +251,43 @@ def verify_private_states(messages, report):
         assert set(message) == {"type", "phase", "turn", "ownShips", "shotsAtOpponent", "shotsAtSelf", "winner"}
         assert not any(key in message for key in ("opponentShips", "players", "ships"))
         own_cells = {c for ship in message["ownShips"] for c in ship["cells"]}
+        if entry["recipient"] == "Zuschauer":
+            assert message["ownShips"] == [], "Zuschauer erhielt eine private Flotte"
         if entry["recipient"] == "Alice" and own_cells:
             assert own_cells == set(FLEET_CELLS)
         if entry["recipient"] == "Bob" and own_cells:
             assert own_cells == set([c[0] + str(int(c[1:]) + 5) for c in FLEET_CELLS])
     report["checks"].append("Alle echten Zustandsnachrichten enthalten ausschliesslich die jeweilige eigene Flotte")
+
+
+def public_state(state, slot="A"):
+    """Oeffentliche Schuesse aus Perspektive A, ohne private Flotte."""
+    view = deepcopy(state)
+    view["ownShips"] = []
+    if slot == "B":
+        view["shotsAtSelf"], view["shotsAtOpponent"] = view["shotsAtOpponent"], view["shotsAtSelf"]
+    return view
+
+
+def verify_spectator_updates(messages, report):
+    """Vergleicht die gesamten Zustandsfolgen ab B6, nicht nur den Endzustand."""
+    views = {name: [] for name in ("Alice", "Bob", "Zuschauer")}
+    for entry in messages:
+        name, state = entry["recipient"], entry["message"]
+        if name not in views or state.get("type") != "state":
+            continue
+        if name == "Zuschauer":
+            assert state["ownShips"] == []
+        view = public_state(state, "B" if name == "Bob" else "A")
+        if not views[name] and view["shotsAtOpponent"].get("B6") != "hit":
+            continue
+        if not views[name] or views[name][-1] != view:
+            views[name].append(view)
+    assert views["Zuschauer"], "Kein Zuschauerzustand nach B6"
+    assert views["Alice"] == views["Zuschauer"], "Zuschauerfolge weicht von Alice ab"
+    assert views["Bob"] and views["Bob"] == views["Zuschauer"][:len(views["Bob"])], "Zuschauerfolge weicht von Bob ab"
+    report["spectator_states_compared"] = len(views["Zuschauer"])
+    report["checks"].append("Alle oeffentlichen Zustandsfolgen ab B6 einschliesslich Spielende und Reset verglichen")
 
 
 def main():
@@ -237,6 +298,8 @@ def main():
     parser.add_argument("--server-profile", choices=("localhost",),
                         help="Server ueber den echten localhost-Starteinstieg starten")
     parser.add_argument("--screenshot", action="store_true", help="Unter macOS beide Fenster aufnehmen")
+    parser.add_argument("--spectator", action="store_true",
+                        help="Drittes unveraendertes Fenster nach B6; mit --screenshot echte Montage und Ablehnung")
     parser.add_argument("--final-screenshot", action="store_true",
                         help="Unter macOS beide Fenster nach Spielende aufnehmen")
     parser.add_argument("--pause-for-capture", action="store_true",
@@ -251,6 +314,8 @@ def main():
     report = {"started": datetime.now().astimezone().isoformat(),
               "scope": "Automatisierte lokale TCP-Partie mit zwei echten Tk-Fenstern",
               "server_profile": args.server_profile or "direct", "checks": [], "result": "FAIL"}
+    if args.spectator:
+        report["scope"] = "Automatisierte lokale TCP-Partie mit zwei Spielern und einem unveraenderten Zuschauerfenster"
     completed = False
 
     class RecordedWindow(BattleshipWindow):
@@ -261,6 +326,7 @@ def main():
     root = None
     apps = []
     process = None
+    spectator = None
     grouped_server = args.server_profile is not None and os.name == "posix"
     with log_path.open("w", encoding="utf-8") as server_log:
         try:
@@ -302,7 +368,11 @@ def main():
                 while time.monotonic() < deadline:
                     root.update()
                     if condition():
-                        return
+                        if spectator is None or all(
+                            public_state(a.last_state, a.slot) == spectator.last_state
+                            for a in apps if not a.closed and a.slot in ("A", "B")
+                        ):
+                            return
                     time.sleep(0.005)
                 raise AssertionError("GUI-Bedingung nicht erreicht: " + str([a.status_var.get() for a in apps if not a.closed]))
 
@@ -320,6 +390,17 @@ def main():
             assert all(a.last_state["turn"] == "B" for a in (alice, bob))
             report["checks"].append("Klick B6 aktualisiert beide Fenster ohne getState")
 
+            if args.spectator:
+                spectator = new_window("Zuschauer")
+                until(lambda: any(e["recipient"] == "Zuschauer" and e["message"].get("type") == "spectator"
+                                  for e in messages))
+                role = next(e["message"] for e in messages
+                            if e["recipient"] == "Zuschauer" and e["message"].get("type") == "spectator")
+                assert "slot" not in role and "symbol" not in role and spectator.slot is None
+                assert spectator.last_state["ownShips"] == []
+                assert spectator.target_buttons["B6"].cget("text") == "X"
+                report["checks"].append("Spaeter Zuschauerbeitritt nach B6: spectator ohne Slot, sofort oeffentliche Sicht")
+
             # Beide echten Fenster nebeneinander; Aufnahme enthält den gleichen Zug.
             root.update()
             width = max(a.root.winfo_reqwidth() for a in (alice, bob))
@@ -331,7 +412,7 @@ def main():
                 app.root.lift()
             root.update()
             report["window_size"] = [width, height]
-            if args.screenshot:
+            if args.screenshot and not args.spectator:
                 until(lambda: all(a.root.winfo_viewable() for a in (alice, bob)))
                 layout, error = capture_game_pair(root, (alice, bob), args.output / "two_windows.png",
                                                   width, height, screen_width)
@@ -352,15 +433,71 @@ def main():
 
             verify_private_rejections(alice, bob, until, report)
 
+            if spectator is not None:
+                trio = (alice, bob, spectator)
+                assert all(a.connected and not a.closed for a in trio)
+                assert spectator.own_buttons["J10"].cget("text") == "·"
+                if args.screenshot:
+                    layout, error = capture_game_montage(root, trio, args.output / "three_windows.png",
+                                                         width, height, screen_width)
+                    if layout:
+                        report["screenshot_layout"] = layout
+                        report["screenshot"] = "three_windows.png"
+                    else:
+                        report["screenshot_unavailable"] = error
+                before = [deepcopy(a.last_state) for a in trio]
+                notices = [a.status_var.get() for a in (alice, bob)]
+                message_start = len(messages)
+                spectator.target_buttons["H10"].invoke()
+                until(lambda: "SPECTATOR_ONLY" in spectator.status_var.get())
+                # Ein nachfolgender getState ist eine TCP-Barriere hinter der Ablehnung.
+                spectator.refresh_button.invoke()
+                until(lambda: any(e["recipient"] == "Zuschauer" and e["message"].get("type") == "state"
+                                  for e in messages[message_start:]))
+                assert [a.last_state for a in trio] == before
+                assert [a.status_var.get() for a in (alice, bob)] == notices
+                assert all(e["recipient"] == "Zuschauer" for e in messages[message_start:])
+                spectator.target_buttons["H10"].invoke()
+                until(lambda: "SPECTATOR_ONLY" in spectator.status_var.get())
+                report["spectator_rejection"] = spectator.status_var.get()
+                report["checks"].append("Echter Zuschauerklick privat mit SPECTATOR_ONLY abgelehnt; drei Zustaende unveraendert")
+                if args.screenshot:
+                    for app in trio:
+                        app.root.attributes("-topmost", False)
+                    layout, error = capture_game_pair(root, (spectator,), args.output / "spectator_rejection.png",
+                                                      width, height, screen_width)
+                    if layout:
+                        report["spectator_screenshot"] = "spectator_rejection.png"
+                    else:
+                        report["spectator_screenshot_unavailable"] = error
+                    report["capture_note"] = (
+                        "Montage echter Aufnahmen: three_windows.png zeigt links Alice, mittig Bob, rechts Zuschauer "
+                        "nach Bobs J10. Drei TCP-Verbindungen blieben offen; waehrend der Aufnahmen kein Spielzug. "
+                        "Einzeldateien three_windows_*.png stammen aus screencapture; Tk PhotoImage copy kopiert "
+                        "nur ihre Pixel. spectator_rejection.png ist eine echte Einzelaufnahme nach einem Klick. "
+                        "Der unveraenderte Client ignoriert spectator; Rollen-/Siegtexte sind keine Zuschaueranzeige."
+                    )
+                    (args.output / "README.md").write_text(
+                        "# Meilenstein 7: lokaler GUI-Nachweis\n\n" + report["capture_note"] +
+                        "\n\nserver.txt und server_messages.jsonl stammen aus derselben Partie. "
+                        "client_messages.jsonl enthaelt die aufgezeichneten Testsichten; result.json die Pruefungen.\n",
+                        encoding="utf-8")
+
             finish_match(alice, bob, until, process, report)
+            if spectator is not None:
+                until(lambda: any(e["recipient"] == "Zuschauer" and e["message"].get("type") == "gameOver"
+                                  for e in messages))
 
             if args.final_screenshot:
                 until(lambda: all(a.root.winfo_viewable() for a in (alice, bob)))
                 until(lambda: not any(a.effects.active for a in (alice, bob)))
                 assert "Gewonnen" in alice.status_var.get() and "Verloren" in bob.status_var.get()
                 final_image = args.output / "two_windows_finished.png"
-                layout, error = capture_game_pair(root, (alice, bob), final_image,
-                                                  width, height, screen_width)
+                final_apps = (alice, bob) if spectator is None else (alice, bob, spectator)
+                capture = capture_game_pair if spectator is None else capture_game_montage
+                if spectator is not None:
+                    final_image = args.output / "three_windows_finished.png"
+                layout, error = capture(root, final_apps, final_image, width, height, screen_width)
                 if layout:
                     report["checks"].append("Echter Screenshot beider Fenster nach Spielende")
                     report["final_screenshot"] = final_image.name
@@ -389,6 +526,12 @@ def main():
             until(lambda: carol.slot == "B" and all(a.last_state["phase"] == "placing" for a in (alice, carol)))
             assert all(not a.last_state["ownShips"] for a in (alice, carol))
             report["checks"].append("Fensterkreuz, Abbruchanzeige, leerer Reset und Ersatzbeitritt")
+
+            if spectator is not None:
+                assert spectator.slot is None and spectator.connected
+                assert any(e["recipient"] == "Zuschauer" and e["message"].get("type") == "opponentLeft"
+                           for e in messages)
+                verify_spectator_updates(messages, report)
 
             verify_private_states(messages, report)
 

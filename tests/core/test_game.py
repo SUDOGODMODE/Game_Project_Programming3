@@ -93,6 +93,23 @@ class TestBattleshipGame(unittest.TestCase):
         self.assertEqual(len(unchanged["ownShips"][0]["cells"]), 5)
         self.assertEqual(unchanged["shotsAtOpponent"], {"F1": "hit"})
 
+    def test_public_state_hides_fleets_and_copies_shots_in_a_b_order(self):
+        game = self.new_game(ready=True)
+        game.shoot("A", "A1")
+        game.shoot("B", "J10")
+        state = game.public_state()
+        self.assertEqual(state, {
+            "phase": "shooting", "turn": "A", "ownShips": [],
+            "shotsAtSelf": {"J10": "miss"}, "shotsAtOpponent": {"A1": "hit"},
+            "winner": None,
+        })
+        state["ownShips"].append({"cells": ["J10"]})
+        state["shotsAtSelf"].clear()
+        state["shotsAtOpponent"].clear()
+        self.assertEqual(game.state("A")["shotsAtOpponent"], {"A1": "hit"})
+        self.assertEqual(game.state("B")["shotsAtOpponent"], {"J10": "miss"})
+        self.assertEqual(game.public_state()["ownShips"], [])
+
     def test_full_match_finishes_only_when_the_whole_fleet_is_sunk(self):
         game = self.new_game(ready=True)
         targets = [

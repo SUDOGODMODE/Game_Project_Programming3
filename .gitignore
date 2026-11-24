@@ -57,3 +57,11 @@ logs/
 ._*
 Thumbs.db
 Desktop.ini
+
+# Lokale Arbeitsdateien (Agent-Übergabe, Planung, verworfene Nachweisläufe)
+docs/development/Übergabe_*.md
+docs/development/Meilenstein7_Plan.md
+docs/evidence/meilenstein7_20261124_01/
+docs/evidence/meilenstein7_20261124_diagnose/
+AGENTS.md
+CLAUDE.md

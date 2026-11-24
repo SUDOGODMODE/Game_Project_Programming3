@@ -359,13 +359,14 @@ class NetworkTests(unittest.TestCase):
         self.assert_lobby(alice, "gameStart", phase="placing", players=players)
         self.assert_lobby(bob, "gameStart", phase="placing", players=players)
 
-    def test_third_player_is_rejected_without_changing_the_two_player_game(self):
+    def test_third_client_is_spectator_without_changing_the_two_player_game(self):
         alice, bob = self.join_pair()
         carol = self.peer()
         carol.send({"type": "join", "player": "Carol"})
-        self.assert_message(carol, "error", code="GAME_FULL")
-        carol.send({"type": "getState"})
-        self.assert_message(carol, "error", code="NOT_JOINED")
+        reply = self.assert_message(carol, "spectator", player="Carol", phase="placing")
+        self.assertEqual(set(reply), {"type", "player", "phase"})
+        self.assert_state(carol, "placing", ownShips=[], shotsAtSelf={}, shotsAtOpponent={})
+        self.fresh_state(carol, "placing")
         self.fresh_state(alice, "placing")
         self.fresh_state(bob, "placing")
 
@@ -391,18 +392,20 @@ class NetworkTests(unittest.TestCase):
             self.assertFalse(thread.is_alive(), "concurrent join sender failed to finish")
         self.assertTrue(failures.empty(), list(failures.queue))
         admitted = []
-        rejected = []
+        spectators = []
         for index, peer in enumerate(peers):
             message = peer.receive()
             if message.get("type") == "welcome":
                 self.assertEqual(message["player"], f"Player{index}")
                 admitted.append((peer, message))
             else:
-                self.assertEqual(message.get("type"), "error", message)
-                self.assertEqual(message.get("code"), "GAME_FULL", message)
-                rejected.append(peer)
+                self.assertEqual(message, {"type": "spectator", "player": f"Player{index}",
+                                           "phase": "placing"})
+                spectators.append(peer)
         self.assertEqual(len(admitted), 2)
-        self.assertEqual(len(rejected), 4)
+        self.assertEqual(len(spectators), 4)
+        for peer in spectators:
+            self.assert_state(peer, "placing", ownShips=[], shotsAtSelf={}, shotsAtOpponent={})
         self.assertEqual({message["slot"] for _, message in admitted}, {"A", "B"})
         players = sorted([{"slot": m["slot"], "player": m["player"]} for _, m in admitted],
                          key=lambda player: player["slot"])
@@ -426,6 +429,153 @@ class NetworkTests(unittest.TestCase):
         self.fresh_state(bob, "placing")
         alice.close()
         self.assert_lobby(bob, "opponentLeft", slot="A", player="Alice")
+
+    def join_spectator(self, phase="shooting", **fields):
+        peer = self.peer()
+        peer.send({"type": "join", "player": "Zuschauer"})
+        self.assertEqual(peer.receive(), {"type": "spectator", "player": "Zuschauer", "phase": phase})
+        self.assert_state(peer, phase, ownShips=[], **fields)
+        return peer
+
+    def test_spectator_sees_only_public_shots_on_join_and_after_each_move(self):
+        alice, bob = self.join_pair()
+        self.place_pair(alice, bob)
+        self.shoot(alice, "A1", result="hit")
+        self.shoot(bob, "J10", result="miss")
+        spectators = [self.join_spectator(turn="A", shotsAtSelf={"J10": "miss"},
+                                         shotsAtOpponent={"A1": "hit"}) for _ in range(2)]
+        self.shoot(alice, "B1", result="hit")
+        for spectator in spectators:
+            pushed = self.assert_state(spectator, "shooting", ownShips=[], turn="B",
+                                      shotsAtSelf={"J10": "miss"},
+                                      shotsAtOpponent={"A1": "hit", "B1": "hit"})
+            self.assertEqual(self.state(spectator, "shooting"), pushed)
+            self.assert_quiet(spectator)
+
+    def test_spectator_actions_are_private_and_cannot_spoof_a_player(self):
+        alice, bob = self.join_pair()
+        spectator = self.join_spectator("placing")
+        observer = self.join_spectator("placing")
+        for message in ({"type": "place", "ships": FLEET},
+                        {"type": "shoot", "field": "A1"}):
+            spectator.send({**message, "slot": "A", "player": "Alice"})
+            self.assert_message(spectator, "error", code="SPECTATOR_ONLY")
+        self.place_pair(alice, bob)
+        for peer in (spectator, observer):
+            self.assert_state(peer, "placing", ownShips=[], shotsAtSelf={}, shotsAtOpponent={})
+            self.assert_state(peer, "shooting", ownShips=[], shotsAtSelf={}, shotsAtOpponent={})
+        before = {peer: self.state(peer, "shooting") for peer in (alice, bob, spectator, observer)}
+        for message in ({"type": "shoot", "field": "A1"}, {"type": "place", "ships": []}):
+            spectator.send({**message, "slot": "A", "player": "Alice"})
+            self.assert_message(spectator, "error", code="SPECTATOR_ONLY")
+            for peer in before:
+                self.assert_quiet(peer)
+                self.assertEqual(self.state(peer, "shooting"), before[peer])
+
+    def test_spectator_receives_final_state_before_game_over_and_late_join_sees_end(self):
+        alice, bob = self.join_pair()
+        self.place_pair(alice, bob)
+        spectator = self.join_spectator()
+        self.finish_game(alice, bob)
+        shots_on_b, shots_on_a = {}, {}
+        for index, field in enumerate(FLEET_CELLS):
+            shots_on_b[field] = "sunk" if field in ("E1", "D2", "C3", "C4", "B5") else "hit"
+            finished = index == len(FLEET_CELLS) - 1
+            self.assert_state(spectator, "finished" if finished else "shooting", ownShips=[],
+                              turn=None if finished else "B", winner="A" if finished else None,
+                              shotsAtSelf=shots_on_a, shotsAtOpponent=shots_on_b)
+            if not finished:
+                shots_on_a[MISSES[index]] = "miss"
+                self.assert_state(spectator, "shooting", ownShips=[], turn="A", winner=None,
+                                  shotsAtSelf=shots_on_a, shotsAtOpponent=shots_on_b)
+        self.assert_message(spectator, "gameOver", winner="A", reason="sunk")
+        late = self.join_spectator("finished", turn=None, winner="A",
+                                   shotsAtSelf=shots_on_a, shotsAtOpponent=shots_on_b)
+        self.assertEqual(self.state(late, "finished"), self.state(spectator, "finished"))
+        spectator.send({"type": "shoot", "field": "J9"})
+        self.assert_message(spectator, "error", code="SPECTATOR_ONLY")
+
+    def test_player_disconnect_resets_spectator_without_promotion_and_new_player_can_join(self):
+        alice, bob = self.join_pair()
+        self.place_pair(alice, bob)
+        self.shoot(alice, "A1")
+        spectator = self.join_spectator()
+        bob.close()
+        for peer in (alice, spectator):
+            self.assert_lobby(peer, "opponentLeft", slot="B", player="Bob")
+        spectator.send({"type": "join", "player": "Ersatz"})
+        self.assert_message(spectator, "error", code="ALREADY_JOINED")
+        spectator.send({"type": "place", "ships": FLEET})
+        self.assert_message(spectator, "error", code="SPECTATOR_ONLY")
+        replacement = self.peer()
+        replacement.send({"type": "join", "player": "Ersatz"})
+        self.assert_message(replacement, "welcome", slot="B")
+        players = [{"slot": "A", "player": "Alice"}, {"slot": "B", "player": "Ersatz"}]
+        for peer in (alice, replacement, spectator):
+            self.assert_lobby(peer, "gameStart", players=players)
+        self.place_pair(alice, replacement)
+        self.assert_state(spectator, "placing", ownShips=[])
+        self.assert_state(spectator, "shooting", ownShips=[])
+        self.shoot(alice, "A1", result="hit")
+        self.assert_state(spectator, "shooting", ownShips=[], shotsAtOpponent={"A1": "hit"})
+
+    def test_spectator_leave_and_hard_disconnect_do_not_reset_or_notify_players(self):
+        alice, bob = self.join_pair()
+        self.place_pair(alice, bob)
+        self.shoot(alice, "A1")
+        for graceful in (True, False):
+            with self.subTest(graceful=graceful):
+                spectator = self.join_spectator()
+                if graceful:
+                    spectator.send({"type": "leave"})
+                    self.assertIs(spectator.messages.get(timeout=TIMEOUT), END)
+                else:
+                    spectator.close()
+                deadline = time.monotonic() + TIMEOUT
+                while True:
+                    with self.server.game["lock"]:
+                        remaining = len(self.server.game["spectators"])
+                    if remaining == 0 or time.monotonic() >= deadline:
+                        break
+                    time.sleep(0.01)
+                self.assertEqual(remaining, 0)
+                for peer in (alice, bob):
+                    self.assert_quiet(peer)
+                self.state(alice, "shooting", turn="B", shotsAtOpponent={"A1": "hit"})
+        self.shoot(bob, "J10", result="miss")
+
+    def test_dead_spectator_during_broadcast_does_not_block_remaining_recipients(self):
+        alice, bob = self.join_pair()
+        self.place_pair(alice, bob)
+        self.join_spectator()
+        observer = self.join_spectator()
+        with self.server.game["lock"]:
+            # Erzwingt einen echten Sendefehler, bevor finally die Liste bereinigen kann.
+            dead = self.server.game["spectators"][0]["sock"]
+            dead.shutdown(socket.SHUT_RDWR)
+            dead.close()
+            server.send_states(self.server.game)
+            server.broadcast(self.server.game, {"type": "gameStart", "phase": "shooting", "players": []})
+        for peer in (alice, bob, observer):
+            self.assert_state(peer, "shooting", turn="A")
+            self.assert_message(peer, "gameStart")
+        self.shoot(alice, "A1", result="hit")
+        self.assert_state(observer, "shooting", ownShips=[], shotsAtOpponent={"A1": "hit"})
+
+    def test_invalid_spectator_name_does_not_join_and_duplicate_join_stays_private(self):
+        alice, bob = self.join_pair()
+        spectator = self.peer()
+        spectator.send({"type": "join", "player": " "})
+        self.assert_message(spectator, "error", code="MISSING_PLAYER")
+        spectator.send({"type": "getState"})
+        self.assert_message(spectator, "error", code="NOT_JOINED")
+        spectator.send({"type": "join", "player": "Zuschauer"})
+        self.assert_message(spectator, "spectator")
+        self.assert_state(spectator, "placing", ownShips=[])
+        spectator.send({"type": "join", "player": "Alice"})
+        self.assert_message(spectator, "error", code="ALREADY_JOINED")
+        for peer in (alice, bob, spectator):
+            self.assert_quiet(peer)
 
     def test_malformed_and_unjoined_requests_keep_connection_usable(self):
         peer = self.peer()

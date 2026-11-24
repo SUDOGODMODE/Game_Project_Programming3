@@ -46,7 +46,7 @@ raise SystemExit(code)
                     self.assertEqual(json.loads(completed.stdout), [])
                     if with_report:
                         report = json.loads(report_path.read_text(encoding='utf-8'))
-                        self.assertEqual(report['summary']['tests_run'], 41)
+                        self.assertEqual(report['summary']['tests_run'], 42)
                         self.assertTrue(report['success'])
                         self.assertTrue(report['environment']['platform'])
 

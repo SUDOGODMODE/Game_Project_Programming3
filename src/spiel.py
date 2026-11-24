@@ -241,3 +241,14 @@ class BattleshipGame:
             "shotsAtSelf": dict(opponent["shots_at_opponent"]),
             "winner": self.winner,
         }
+
+    def public_state(self) -> dict:
+        """Oeffentliche Sicht: links Schuesse auf A, rechts Schuesse auf B."""
+        return {
+            "phase": self.phase,
+            "turn": self.turn,
+            "ownShips": [],
+            "shotsAtOpponent": dict(self.players["A"]["shots_at_opponent"]),
+            "shotsAtSelf": dict(self.players["B"]["shots_at_opponent"]),
+            "winner": self.winner,
+        }

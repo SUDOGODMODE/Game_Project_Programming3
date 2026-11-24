@@ -1,5 +1,6 @@
 """Das Nachweiswerkzeug darf Rohlogs nicht vernichten oder Fehler grün melden."""
 import json
+from copy import deepcopy
 import os
 from pathlib import Path
 import subprocess
@@ -55,6 +56,15 @@ class DemoEvidenceTests(unittest.TestCase):
         samples[right + 100, 170] = (19, 19, 20)  # Discord statt Bobs Statuszeile
         self.assertFalse(run_gui_demo.game_windows_visible(Pixels(samples), left, right))
 
+    def test_screenshot_validation_scales_retina_pixels(self):
+        class Pixels:
+            def get(self, x, y):
+                # Retina: Titelleiste bei Punkt-y 50 grau, Fensterinhalt erst in Pixeln *2 blau.
+                return (40, 40, 40) if y < 120 else (27, 43, 61)
+
+        self.assertFalse(run_gui_demo.game_windows_visible(Pixels(), 10, 10))
+        self.assertTrue(run_gui_demo.game_windows_visible(Pixels(), 10, 10, scale=2))
+
     def test_pair_layout_places_windows_together_and_crops_to_them(self):
         left, right, region = run_gui_demo.window_pair_layout(784, 899)
         self.assertEqual(right - left, 794)
@@ -71,6 +81,44 @@ class DemoEvidenceTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("--final-screenshot", result.stdout)
+        self.assertIn("--spectator", result.stdout)
+
+    def spectator_messages(self):
+        state = {"type": "state", "phase": "shooting", "turn": "B", "ownShips": [],
+                 "shotsAtOpponent": {"B6": "hit"}, "shotsAtSelf": {}, "winner": None}
+        messages = []
+        for step in range(3):
+            if step == 1:
+                state.update(turn="A", shotsAtSelf={"J10": "miss"})
+            elif step == 2:
+                state.update(phase="waiting", turn=None, shotsAtOpponent={}, shotsAtSelf={})
+            for name in ("Alice", "Bob", "Zuschauer"):
+                view = deepcopy(state)
+                if name == "Bob":
+                    view["shotsAtSelf"], view["shotsAtOpponent"] = view["shotsAtOpponent"], view["shotsAtSelf"]
+                messages.append({"recipient": name, "message": view})
+        return messages
+
+    def test_spectator_update_audit_checks_every_public_state_and_reset(self):
+        messages = self.spectator_messages()
+        report = {"checks": []}
+        run_gui_demo.verify_spectator_updates(messages, report)
+        self.assertEqual(report["spectator_states_compared"], 3)
+        for index, field, value in ((5, "shotsAtSelf", {}), (4, "turn", "B"),
+                                    (8, "phase", "finished"), (2, "ownShips", [{"cells": ["A1"]}])):
+            with self.subTest(index=index, field=field):
+                broken = deepcopy(messages)
+                broken[index]["message"][field] = value
+                with self.assertRaises(AssertionError):
+                    run_gui_demo.verify_spectator_updates(broken, {"checks": []})
+        with self.assertRaises(AssertionError):
+            run_gui_demo.verify_spectator_updates(messages[:5] + messages[6:], {"checks": []})
+
+    def test_spectator_fleet_is_rejected_even_when_other_fields_are_valid(self):
+        messages = self.spectator_messages()
+        messages[2]["message"]["ownShips"] = [{"cells": ["A1"]}]
+        with self.assertRaises(AssertionError):
+            run_gui_demo.verify_private_states(messages, {"checks": []})
 
     def test_existing_evidence_directory_is_refused_without_modifying_any_file(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -115,6 +163,10 @@ class DemoEvidenceTests(unittest.TestCase):
         self.assertEqual(report["result"], "FAIL")
         self.assertIn("Bildnachweis", report["error"])
         self.assertIn("final_screenshot_unavailable", report)
+
+    def test_missing_spectator_rejection_capture_makes_report_fail(self):
+        report = self.save_report("type=state\n", spectator_screenshot_unavailable="Keine Aufnahme")
+        self.assertEqual(report["result"], "FAIL")
 
 
 if __name__ == "__main__":

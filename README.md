@@ -3,8 +3,20 @@
 Python-Netzwerkspiel im Modul Programming 3 an der HFTM, Max Rufener.
 Zwei Spieler verbinden sich mit einem zentralen Server. Der Server
 entscheidet über jede Aktion und verteilt nach jedem Zug die vollständige,
-für den jeweiligen Spieler erlaubte Sicht an beide Clients — die eigene
-Flotte bleibt dabei stets verborgen.
+für die jeweilige Rolle erlaubte Sicht an Spieler und Zuschauer. Die eigene
+Flotte bleibt vor anderen Verbindungen verborgen.
+
+**Meilenstein 7 — Zuschauer:** Sind A und B belegt, wird jeder weitere
+beitretende Client Zuschauer ohne Spielerplatz. Er erhält sofort den aktuellen
+öffentlichen Stand und danach alle Zustände sowie `gameStart`, `gameOver` und
+`opponentLeft`. `place` und `shoot` werden nur ihm mit `SPECTATOR_ONLY`
+abgelehnt; `getState` und `leave` bleiben erlaubt. Ein Zuschauer wird nie
+automatisch Spieler. Sein Abgang setzt die Partie nicht zurück.
+
+Der GUI-Client bleibt gemäss Auftrag unverändert. Links zeigt ein Zuschauer
+Schüsse von B auf A, rechts Schüsse von A auf B, niemals eine Flotte.
+Die bestehenden Spielerbeschriftungen und Gewinn-/Verlusttexte sind dafür
+teilweise unpassend; eine gesonderte Rollenanzeige ist nicht umgesetzt.
 
 **Vor der Abgabe selbst ergänzen:** [persönliche Reflexion](docs/report/meine_reflexion.md).
 
@@ -29,6 +41,16 @@ python3 src/server.py
 python3 src/client_gui.py 127.0.0.1 Alice
 python3 src/client_gui.py 127.0.0.1 Bob
 ```
+
+Für Meilenstein 7 nach dem Beitritt beider Spieler in einem **vierten**
+Terminal denselben Client starten, auch während einer laufenden Partie:
+
+```bash
+python3 src/client_gui.py 127.0.0.1 Carla
+```
+
+Die Rolle bestimmt der Server anhand belegter Plätze, nicht der Name oder
+ein Client-Schalter. Bei einem anderen Port auch Carla mit `--port` starten.
 
 Der Server verwendet ohne Angabe Port 5000; die Clients verbinden sich
 ebenfalls mit Port 5000. `PORT=5099 python3 src/server.py` wählt unter
@@ -66,7 +88,7 @@ docs/
   protocol/                   Strukturierter Nachrichtenkatalog
   report/                     Technischer Entwurf, persönliche Reflexion, Vorführung
 REGELN.md                     Verbindliche Spielregeln
-PROTOKOLL.md                  Lesbarer Nachrichtenkatalog, Protokoll 0.6
+PROTOKOLL.md                  Lesbarer Nachrichtenkatalog, Protokoll 0.7
 ```
 
 ## Tests
@@ -116,6 +138,19 @@ Unter macOS ergänzt `--screenshot` eine Aufnahme beider Fenster, wenn sie
 nebeneinander auf den Bildschirm passen. Ohne Ausgabeangabe entsteht ein
 neuer zeitgestempelter Ordner; vorhandene Ordner werden nicht
 überschrieben.
+
+Für den Zuschauer-Nachweis mit drei Fenstern:
+
+```bash
+python3 tools/run_gui_demo.py --spectator --screenshot --final-screenshot --output "<neuer_zuschauernachweisordner>"
+```
+
+Der Ablauf muss die öffentliche Sicht aller drei Fenster vergleichen und
+die Zuschauerablehnung, gemeinsame Zugansicht sowie Serverausgabe desselben
+Laufs sichern. Fehlgeschlagene Bilder sind kein vollständiger Nachweis,
+auch wenn die Partie funktional durchläuft. Diese Anleitung behauptet
+keinen bestandenen Meilenstein-7-Abnahmelauf; echte Ergebnisse werden separat
+vom Hauptagenten in `docs/report/Meilenstein7_Abnahme.md` dokumentiert.
 
 ## Bild, Nachrichtenlogs und Abgabepaket
 

@@ -58,12 +58,12 @@ class ProtocolTests(unittest.TestCase):
         expected_types = {
             "join", "welcome", "waiting", "gameStart", "place", "placeAck",
             "shoot", "result", "getState", "state", "leave", "opponentLeft",
-            "gameOver", "error",
+            "gameOver", "error", "spectator",
         }
         self.assertEqual(
-            set(self.required), expected_types, "Der Katalog hat 14 Spielnachrichtentypen"
+            set(self.required), expected_types, "Der Katalog hat 15 Spielnachrichtentypen"
         )
-        self.assertEqual(self.protocol["version"], "0.6", "Das Spiel verwendet Protokollversion 0.6")
+        self.assertEqual(self.protocol["version"], "0.7", "Das Spiel verwendet Protokollversion 0.7")
         self.assertIn(
             f'Protokoll {self.protocol["version"]}', self.markdown,
             "Markdown- und JSON-Version müssen übereinstimmen",
@@ -123,6 +123,40 @@ class ProtocolTests(unittest.TestCase):
             "Für jeden Typ ist ein vollständiges JSON-Beispiel nötig",
         )
         self.assert_message_complete(self.protocol["stateExample"], "JSON stateExample")
+
+    def test_spectator_catalog_matches_private_server_replies(self):
+        outgoing = []
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        game = server.new_game(log_file=Path(temp.name) / "spectator.jsonl")
+        self.addCleanup(game["event_log"].close)
+        connection = {"slot": None, "leaving": False}
+        spectator = RecordingSocket("Z", outgoing)
+        with redirect_stdout(io.StringIO()):
+            for slot in ("A", "B"):
+                server.handle({"type": "join", "player": slot}, {"slot": None}, game,
+                              RecordingSocket(slot, outgoing))
+            outgoing.clear()
+            server.handle({"type": "join", "player": "Zuschauer"}, connection, game, spectator)
+            self.assertEqual(outgoing[0], ("Z", {"type": "spectator", "player": "Zuschauer", "phase": "placing"}))
+            self.assertEqual(outgoing[1], ("Z", {"type": "state", "phase": "placing", "turn": None,
+                                               "ownShips": [], "shotsAtSelf": {},
+                                               "shotsAtOpponent": {}, "winner": None}))
+            self.assertEqual(len(outgoing), 2)
+            self.assertEqual(self.required["spectator"], {"type", "player", "phase"})
+            for recipient, message in outgoing:
+                self.assert_message_complete(message, recipient)
+            for kind in ("place", "shoot"):
+                outgoing.clear()
+                server.handle({"type": kind}, connection, game, spectator)
+                self.assertEqual(len(outgoing), 1)
+                recipient, error = outgoing[0]
+                self.assertEqual(recipient, "Z")
+                self.assertEqual(error["code"], "SPECTATOR_ONLY")
+                self.assert_message_complete(error, recipient)
+                example = self.protocol["messages"]["error"]["spectatorExample"]
+                self.assert_message_complete(example, "Zuschauer-Fehlerbeispiel")
+                self.assertEqual((example["type"], example["code"]), (error["type"], error["code"]))
 
     def test_complete_documented_game_preserves_recipients_order_and_reset(self):
         heading = "## Ablaufbeispiel einer vollständigen Partie"

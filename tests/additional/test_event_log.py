@@ -45,6 +45,19 @@ class EventLogTests(unittest.TestCase):
             self.assertNotIn('EVIL', path.read_text())
             self.assertEqual(rows[0]['slot'], 'A')
 
+    def test_spectator_metadata_keeps_role_and_error_without_private_name(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'spectator.jsonl'
+            log = self.event_log(path)
+            self.addCleanup(log.close)
+            log.record('->', 'peer-3', {'type': 'spectator', 'player': 'PRIVATE_NAME', 'phase': 'placing'})
+            log.record('->', 'peer-3', {'type': 'error', 'code': 'SPECTATOR_ONLY', 'message': 'PRIVATE_TEXT'})
+            rows = self.entries(path)
+            self.assertEqual([row['type'] for row in rows], ['spectator', 'error'])
+            self.assertEqual(rows[1]['code'], 'SPECTATOR_ONLY')
+            self.assertTrue(all(row['slot'] is None for row in rows))
+            self.assertNotIn('PRIVATE', path.read_text())
+
     def test_parallel_messages_form_complete_independent_lines(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'parallel.jsonl'

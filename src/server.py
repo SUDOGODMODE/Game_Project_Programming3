@@ -31,7 +31,8 @@ def log_message(direction: str, peer, message: dict, game=None, slot=None) -> No
 def new_game(log_file=None) -> dict:
     """Legt die gemeinsame Serververwaltung fuer alle Verbindungsworker an.
 
-    players speichert Sockets und Namen, taken die belegten Slots. core
+    players speichert Sockets und Namen, taken die belegten Slots. spectators
+    enthaelt die Zuschauerverbindungen unter derselben Sperre. core
     verwaltet die eigentlichen Spielregeln, Flotten und Schuesse. lock
     schuetzt gemeinsame Aenderungen und die zugehoerige Nachrichtenfolge.
     """
@@ -43,6 +44,7 @@ def new_game(log_file=None) -> dict:
         "lock": threading.Lock(),
         "core": spiel.BattleshipGame(),
         "taken": [],
+        "spectators": [],
         "players": {
             slot: {
                 "sock": None,
@@ -66,16 +68,29 @@ def send_to(game: dict, slot: str, message: dict) -> None:
         pass  # Der Empfangsthread entfernt die Verbindung in finally.
 
 
+def send_spectator(game: dict, connection: dict, message: dict) -> None:
+    """Sendet ohne Spielerslot; ein verschwundener Zuschauer stoppt keinen Rundruf."""
+    try:
+        send(connection["sock"], message)
+        log_message("->", connection.get("peer", "Zuschauer"), message, game)
+    except OSError:
+        pass  # Der Empfangsthread entfernt die Verbindung in finally.
+
+
 def broadcast(game: dict, message: dict) -> None:
-    """Schickt an alle angemeldeten Spieler. Die Spielsperre ist bereits gehalten."""
+    """Schickt an Spieler und Zuschauer. Die Spielsperre ist bereits gehalten."""
     for slot in list(game["taken"]):
         send_to(game, slot, message)
+    for connection in game["spectators"]:
+        send_spectator(game, connection, message)
 
 
 def send_states(game: dict) -> None:
-    """Schickt jedem Spieler seine vollstaendige Sicht; Spielsperre ist gehalten."""
+    """Schickt private Spielersichten und die oeffentliche Sicht unter der Sperre."""
     for slot in list(game["taken"]):
         send_to(game, slot, {"type": "state", **game["core"].state(slot)})
+    for connection in game["spectators"]:
+        send_spectator(game, connection, {"type": "state", **game["core"].public_state()})
 
 
 def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
@@ -84,13 +99,15 @@ def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
     core = game["core"]
 
     if msg_type == "join":
-        if connection["slot"] is not None:
-            return {"type": "error", "code": "ALREADY_JOINED", "message": "diese Verbindung ist bereits einem Spieler zugeordnet"}
-        if len(game["taken"]) >= len(SLOTS):
-            return {"type": "error", "code": "GAME_FULL", "message": "es sind bereits zwei Spieler verbunden"}
+        if connection["slot"] is not None or connection.get("spectator"):
+            return {"type": "error", "code": "ALREADY_JOINED", "message": "diese Verbindung ist bereits angemeldet"}
         name = message.get("player")
         if not isinstance(name, str) or not name.strip():
             return {"type": "error", "code": "MISSING_PLAYER", "message": "Name fehlt"}
+        if len(game["taken"]) >= len(SLOTS):
+            connection.update(spectator=True, sock=sock)
+            game["spectators"].append(connection)
+            return {"type": "spectator", "player": name, "phase": core.phase}
 
         slot = next(s for s in SLOTS if s not in game["taken"])
         game["taken"].append(slot)
@@ -101,15 +118,18 @@ def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
         return {"type": "welcome", "slot": slot, "player": name, "phase": core.phase}
 
     slot = connection["slot"]
-    if slot is None and msg_type in ("place", "shoot", "getState", "leave"):
+    spectator = connection.get("spectator", False)
+    if slot is None and not spectator and msg_type in ("place", "shoot", "getState", "leave"):
         return {"type": "error", "code": "NOT_JOINED", "message": "bitte zuerst mit 'join' beitreten"}
+    if spectator and msg_type in ("place", "shoot"):
+        return {"type": "error", "code": "SPECTATOR_ONLY", "message": "Zuschauer duerfen nicht platzieren oder schiessen"}
 
     if msg_type == "place":
         return {"type": "placeAck", **core.place_fleet(slot, message.get("ships"))}
     if msg_type == "shoot":
         return {"type": "result", **core.shoot(slot, message.get("field"))}
     if msg_type == "getState":
-        return {"type": "state", **core.state(slot)}
+        return {"type": "state", **(core.public_state() if spectator else core.state(slot))}
     if msg_type == "leave":
         connection["leaving"] = True
         return None
@@ -121,7 +141,7 @@ def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
 def handle(message: dict, connection: dict, game: dict, sock) -> None:
     """Sendet die direkte Antwort, dann gegebenenfalls die gefilterten Sichten.
 
-    Nach dem letzten Schuss folgen auf result beide state und erst danach
+    Nach dem letzten Schuss folgen auf result alle state und erst danach
     gameOver. Abgelehnte Aktionen erhalten nur ihre private Fehlerantwort.
     """
     # Die Sperre schuetzt den gesamten Spielkern: pruefen, aendern und senden
@@ -143,6 +163,8 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
         else:
             send_to(game, slot, response)
 
+        if response["type"] == "spectator":
+            send_spectator(game, connection, {"type": "state", **game["core"].public_state()})
         if response["type"] == "welcome":
             if len(game["taken"]) < len(SLOTS):
                 send_to(game, slot, {"type": "waiting", "reason": "warte auf Gegner"})
@@ -158,7 +180,7 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
         if response["type"] in ("welcome", "placeAck", "result"):
             send_states(game)
         if response["type"] == "result" and game["core"].winner is not None:
-            # Nach dem letzten Zug sehen beide erst ihren bestaetigten Zustand.
+            # Nach dem letzten Zug sehen alle erst ihren bestaetigten Zustand.
             broadcast(game, {
                 "type": "gameOver",
                 "winner": game["core"].winner,
@@ -167,11 +189,15 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
 
 
 def remove_player(connection: dict, game: dict) -> None:
-    """Gibt den Platz genau einmal frei und verwirft die abgebrochene Partie."""
-    slot = connection["slot"]
-    if slot is None:
-        return
+    """Entfernt Zuschauer still; nur ein Spielerabgang verwirft die Partie."""
     with game["lock"]:
+        if connection.get("spectator"):
+            game["spectators"].remove(connection)
+            connection["spectator"] = False
+            return
+        slot = connection["slot"]
+        if slot is None:
+            return
         player = game["players"][slot]
         name = player["name"]
         player.update(sock=None, name=None)

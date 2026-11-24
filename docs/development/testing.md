@@ -2,6 +2,17 @@
 
 ## Gemeinsamer Teststart
 
+Der Abgabebefehl aus dem Bewertungsraster lautet im Projektordner:
+
+```bash
+python3 -m unittest discover
+```
+
+Die gemeldete Baseline vor Meilenstein 7 beträgt 189/189 erfolgreiche Tests
+(Angabe des Hauptagenten, hier nicht erneut ausgeführt). Sie ist kein
+Nachweis der Zuschauererweiterung. Die folgenden Befehle und Prüfpunkte
+beschreiben den Prüfumfang, keine neuen bestandenen Läufe.
+
 Im Projektordner mit aktivierter Umgebung. Die Bash-Beispiele verwenden
 `python3`; unter Windows nach Aktivierung der `.venv` stattdessen `python`
 verwenden (siehe [Setup](../guides/setup.md)):
@@ -139,6 +150,48 @@ auch nach einer durchgespielten Partie gespeichert, falls die abschliessende
 Serverlogprüfung fehlschlägt. Für neue Läufe einen neuen Ausgabeordner
 verwenden und alte Rohlogs erhalten.
 
+## Meilenstein 7: Zuschauer und drei Fenster
+
+```bash
+python3 tools/run_gui_demo.py --spectator --screenshot --final-screenshot --output "<neuer_zuschauernachweisordner>"
+```
+
+`--spectator` ergänzt den dritten unveränderten Client; `--screenshot` und
+`--final-screenshot` fordern die Aufnahmen des Ablaufs und des Endstands an.
+Die Verfügbarkeit eines Schalters ist kein Nachweis gelungener Bilder.
+Fehlgeschlagene Aufnahmen dürfen nicht als PASS der vollständigen Abnahme
+geführt werden. Vorhandene Rohlogs und Bilder erhalten; jeden neuen Lauf
+in einen neuen Ordner schreiben.
+
+Die Bildprüfung rechnet Bildschirmpunkte mit dem Faktor Bildbreite/Regionsbreite
+in Pixel um (Retina: 2). Ohne diese Umrechnung verwarf sie korrekte Aufnahmen.
+
+Zu prüfen sind insbesondere:
+
+- Dritter und weiterer Beitritt, auch mitten in der Partie: `spectator`
+  ohne `slot`, danach sofort aktueller öffentlicher `state`.
+- Jede Zuschauersicht: `ownShips == []`, `shotsAtSelf` entspricht B auf A,
+  `shotsAtOpponent` entspricht A auf B; keine Schiffsfelder, auch am Ende.
+- Nach jedem gültigen Zug gleiche öffentliche Daten: Zuschauer-links =
+  A-links = B-rechts; Zuschauer-rechts = A-rechts = B-links. Private
+  `ownShips` werden nicht auf Gleichheit zwischen Spielern geprüft.
+- Zuschauer-`place` und -`shoot`: nur dieser Absender erhält
+  `error/SPECTATOR_ONLY`; keine Zustandsänderung und kein Rundruf.
+- Zuschauer-`getState`: nur seine öffentliche Sicht; `leave`: nur diese
+  Verbindung entfernen. Abbruch oder fehlgeschlagener Zuschauerversand
+  darf die Spieler nicht stören.
+- `gameStart`, `gameOver` und `opponentLeft` erreichen Zuschauer;
+  Spielerabgang setzt ihre Sicht zurück. Ersatzbeitritt befördert keinen
+  bestehenden Zuschauer; doppeltes `join` ergibt `ALREADY_JOINED`.
+- JSON- und Markdown-Katalog: Version **0.7**, **15 Nachrichtentypen**,
+  vollständige Beispiele einschliesslich `spectator` und `SPECTATOR_ONLY`.
+
+Für die Abgabe braucht es ein Bild aller drei Fenster nach demselben Zug,
+ein Bild der privaten Zuschauerablehnung nach einem Klick sowie die
+Server-Terminalausgabe **desselben Laufs**. Ein Metadatenlog allein beweist
+keine Flottengeheimhaltung. Die echten Ergebnisse hält der Hauptagent in
+`docs/report/Meilenstein7_Abnahme.md` fest.
+
 ## Paket
 
 `python3 tools/build_submission.py --output "<neues_abgabearchiv.zip>"`
@@ -153,12 +206,12 @@ versehentlich die ursprüngliche Arbeitskopie importieren.
 
 ## Änderungen durchführen
 
-1. `AGENTS.md` und README lesen; Git-Status prüfen und vorhandene
-   Änderungen erhalten.
+1. README lesen; Git-Status prüfen und vorhandene Änderungen erhalten.
 2. Erwartetes Verhalten festhalten. Bei funktionalen Änderungen zuerst einen
    aussagekräftigen fehlschlagenden Test ergänzen.
-3. Kleinste passende Änderung umsetzen. Protokolländerungen gemeinsam in
-   Server, Clients, JSON-Katalog und lesbarem Katalog nachführen.
+3. Kleinste passende Änderung umsetzen. Protokolländerungen in Server,
+   JSON-Katalog und lesbarem Katalog nachführen. Für Meilenstein 7 bleibt
+   der Client gemäss Auftrag unverändert.
 4. Betroffene Tests, dann die gemeinsame Suite ausführen. Für GUI und
    Netzwerk den tatsächlichen Bedienweg und Datenfluss prüfen.
 5. Befehl, Umgebung und Grenzen dokumentieren; README aktualisieren.

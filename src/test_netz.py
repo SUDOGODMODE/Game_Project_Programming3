@@ -144,10 +144,13 @@ class NetzTest(unittest.TestCase):
             self.assertEqual((start["phase"], start["turn"], start["ownShips"]),
                              ("placing", None, []))
 
-    def test_dritter_spieler_bekommt_game_full(self):
+    def test_dritter_client_bekommt_zuschauerrolle_und_sofort_den_zustand(self):
         self.zwei_spieler()
         carla = self.verbinde("Carla")
-        self.meldung(carla, "error", code="GAME_FULL")
+        antwort = self.meldung(carla, "spectator", player="Carla", phase="placing")
+        self.assertEqual(set(antwort), {"type", "player", "phase"})
+        self.meldung(carla, "state", phase="placing", ownShips=[],
+                     shotsAtSelf={}, shotsAtOpponent={})
 
     def test_join_ohne_namen_bekommt_missing_player(self):
         namenlos = self.verbinde()

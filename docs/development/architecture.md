@@ -8,10 +8,12 @@ Verbindungen und verteilt ausschliesslich die vom Kern erzeugten Sichten.
 flowchart LR
     A[GUI A] -->|Ausgangsqueue und Sendethread| S[Server mit Spielsperre]
     B[GUI B] -->|Ausgangsqueue und Sendethread| S
+    Z[GUI Zuschauer, unverändert] -->|Anfragen über TCP| S
     S --> K[spiel.BattleshipGame]
     K --> S
     S -->|Sicht A über TCP, Empfangsqueue, after| A
     S -->|Sicht B über TCP, Empfangsqueue, after| B
+    S -->|Öffentliche Sicht über TCP, Empfangsqueue, after| Z
 ```
 
 | Datei | Aufgabe |
@@ -19,7 +21,7 @@ flowchart LR
 | `src/spiel.py` | Koordinaten, Flottenprüfung, Platzierung, Schüsse, Zugfolge, Sieg, gefilterte Kopien; keine Netz-, Tk- oder Threadimporte |
 | `src/board.py` | Kompatibilitätseinstieg für ältere Importe; keine zweite Regelimplementierung |
 | `src/netz.py` | UTF-8-JSON-Zeilen senden/lesen, ungültige Objekte markieren, Verbindungsende behandeln |
-| `src/server.py` | Spieler an Verbindungen binden, Sperre, private Antworten, Zustandsverteilung, Reset |
+| `src/server.py` | Spieler und separate Zuschauer an Verbindungen binden, gemeinsame Sperre, private Antworten, Zustandsverteilung, Reset bei Spielerabgang |
 | `src/event_log.py` | Exklusiv erzeugtes JSONL-Metadatenlog, Schreibsperre, Flush und geschütztes Schliessen |
 | `src/client_gui.py` | Eingaben senden, bestätigte Zustände vollständig anzeigen, GUI-Lebenszyklus |
 | `src/gui/client_view.py` | Brettzeichen und Schiffsausschnitte rein aus dem bestätigten Zustand berechnen; ohne Tk |
@@ -49,9 +51,18 @@ Der erste freie Platz A/B wird serverseitig vergeben. Spätere Nachrichten
 verwenden die Identität der Verbindung; zusätzliche Slotfelder wählen keinen
 anderen Spieler. Direkte Antworten gehen vor den dazugehörigen Zuständen
 hinaus. Nach join, place, shoot und Reset folgt die vollständige erlaubte
-Sicht jedes verbundenen Spielers. Beim siegreichen Schuss gehen nach `result`
-zuerst die individuellen Endzustände an beide, danach `gameOver` an beide.
+Sicht jedes verbundenen Spielers und die öffentliche Sicht an alle Zuschauer.
+Beim siegreichen Schuss gehen nach `result` zuerst die gefilterten
+Endzustände an Spieler und Zuschauer, danach `gameOver` an alle.
 Fehler gehen nur an den Absender und verändern den Spielzustand nicht.
+
+Meilenstein 7 ergänzt eine separate Zuschauerliste unter derselben
+Spielsperre. Sind A und B belegt, erhält ein neuer Client `spectator` mit
+`player` und aktueller `phase`, ohne `slot`, danach sofort den öffentlichen
+`state`. Zuschauer stehen nie in der Spielerliste und werden auch nach
+Spielerabgang nicht befördert. `place` und `shoot` lehnt der Server privat
+mit `SPECTATOR_ONLY` ab; `getState` und `leave` bleiben erlaubt. Rundrufe
+für `gameStart`, `gameOver` und `opponentLeft` umfassen Zuschauer.
 
 ## Geheimhaltung
 
@@ -62,8 +73,13 @@ Fehler gehen nur an den Absender und verändern den Spielzustand nicht.
 - `shotsAtSelf`: alle gegnerischen Schüsse auf das eigene Raster;
 - `phase`, `turn`, `winner`: gemeinsamer Ablauf.
 
-Die vollständige Gegnerflotte wird nicht übertragen. Beide Clients zeigen
+Die vollständige Gegnerflotte wird nicht übertragen. Die Spieler zeigen
 denselben öffentlichen Verlauf und unterschiedliche private Flotten.
+Die dritte Sicht nutzt dasselbe `state`-Format: `ownShips = []`,
+`shotsAtSelf` = B auf A (links), `shotsAtOpponent` = A auf B (rechts).
+Sie enthält auch nach Spielende keine Flotten. Unbeschossene Felder sind
+unbekannt, nicht Wasser. Ein später Zuschauerbeitritt erhält diese Sicht
+sofort; eine reine Kopie eines Spielerzustands wäre eine Datenfreigabe.
 Serverlogs enthalten nur bekannte Typnamen, Adressen, Slots und eigene
 Fehlercodes. Isolierte Testmitschnitte mit beiden Testsichten sind als
 Testdaten gekennzeichnet.
@@ -122,11 +138,20 @@ Fensternutzung. `close` löst die Widgetzuordnung und gibt `PhotoImage` noch
 im Tk-Hauptthread frei, bevor es das Root zerstört. Netzwerkworker erhalten
 weiterhin keine Referenz auf das Fenster oder auf Tk-Objekte.
 
-Das Fensterkreuz schliesst den Socket und das Fenster. Der Server räumt den
-Platz einmalig auf und setzt die ganze Partie zurück. Der verbleibende Client
-wartet; ein Ersatzspieler startet eine frische Platzierung. Kein Reconnect
-und keine Wiederherstellung einer abgebrochenen Partie.
+Der Client bleibt für Meilenstein 7 unverändert: Queue, `after`, Zeichnen
+und Klickversand gelten auch für das Zuschauerfenster. Spielerbezogene
+Raster-, Status- und Endtexte sind dort teilweise unpassend. Die angefragte
+Anzeigeänderung ist nicht freigegeben; die Rolle wird nur serverseitig entschieden.
 
-Vorgesehen ist ein Zweipersonenspiel im Unterrichtsnetz. Authentifizierung,
+Das Fensterkreuz schliesst Socket und Fenster. Bei einem **Spieler** räumt
+der Server den Platz einmalig auf und setzt die Partie zurück. Verbliebener
+Spieler und Zuschauer erhalten `opponentLeft` und den leeren `waiting`-Zustand;
+ein neuer Spieler startet eine frische Platzierung. Zuschauer bleiben in
+ihrer Rolle. Ein **Zuschauerabgang** entfernt nur dessen Listeneintrag, ohne
+Reset oder Nachricht an Spieler. Ein fehlgeschlagener Zuschauerversand darf
+die Zustellung an Spieler nicht abbrechen. Kein Reconnect und keine
+Wiederherstellung einer abgebrochenen Partie.
+
+Vorgesehen ist ein Zweipersonenspiel mit Zuschauern im Unterrichtsnetz. Authentifizierung,
 Verschlüsselung, mehrere Tische und persistente Partien sind nicht
 Bestandteil des Projekts.
