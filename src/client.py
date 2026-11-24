@@ -21,7 +21,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Beitreten und Servermeldungen anzeigen")
     parser.add_argument("host", nargs="?", default="127.0.0.1")
     parser.add_argument("name", nargs="?", default="Alice")
-    parser.add_argument("--port", type=int, default=5000)
+    parser.add_argument("--port", type=int, default=5100)
     args = parser.parse_args()
     try:
         with socket.create_connection((args.host, args.port), timeout=5) as sock:

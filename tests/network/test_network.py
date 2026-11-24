@@ -260,7 +260,7 @@ class NetworkTests(unittest.TestCase):
     def assert_state(self, peer, phase, **fields):
         state = self.assert_message(peer, "state", phase=phase, **fields)
         self.assertEqual(set(state), {"type", "phase", "turn", "ownShips",
-                                     "shotsAtOpponent", "shotsAtSelf", "winner"})
+                                     "shotsAtOpponent", "shotsAtSelf", "winner", "score"})
         return state
 
     def assert_lobby(self, peer, message_type, **fields):
@@ -670,7 +670,8 @@ class NetworkTests(unittest.TestCase):
         alice_state = self.state(alice, "shooting", turn="B", shotsAtOpponent={"A1": "hit"}, winner=None)
         bob_state = self.state(bob, "shooting", turn="B", shotsAtOpponent={}, winner=None)
         for state in (alice_state, bob_state):
-            self.assertEqual(set(state), {"type", "phase", "turn", "ownShips", "shotsAtOpponent", "shotsAtSelf", "winner"})
+            self.assertEqual(set(state), {"type", "phase", "turn", "ownShips", "shotsAtOpponent", "shotsAtSelf",
+                                          "winner", "score"})
             self.assertEqual(len(state["ownShips"]), 5)
             self.assertEqual(state["ownShips"][0]["cells"], ["A1", "B1", "C1", "D1", "E1"])
         self.assertEqual(alice_state["ownShips"][0]["hits"], [])
@@ -815,7 +816,8 @@ class NetworkTests(unittest.TestCase):
             if event.get("type") == "state":
                 self.assertEqual(event, {"type": "state", "phase": "waiting", "turn": None,
                                          "ownShips": [], "shotsAtOpponent": {},
-                                         "shotsAtSelf": {}, "winner": None})
+                                         "shotsAtSelf": {}, "winner": None,
+                                         "score": [{"slot": "A", "player": "Alice", "wins": 0}]})
                 break
             self.assertEqual(event.get("type"), "error", event)
             self.assertEqual(event.get("code"), "WRONG_PHASE", event)

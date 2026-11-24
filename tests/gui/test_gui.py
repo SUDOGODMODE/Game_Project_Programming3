@@ -143,6 +143,31 @@ class GuiTests(GuiTestCase):
         self.assertEqual(self.peer.read(), {"type": "getState"})
         self.assertEqual(self.board_snapshot(), before)
 
+    def test_rematch_button_works_only_after_end_and_only_sends(self):
+        score = [{"slot": "A", "player": "Alice", "wins": 1}, {"slot": "B", "player": "Bob", "wins": 0}]
+        self.window.draw_state(state(turn="A", score=score))
+        self.assertEqual(str(self.window.rematch_button.cget("state")), "disabled")
+        self.window.draw_state(state(phase="finished", turn=None, winner="A", score=score,
+                                     shotsAtOpponent={"F1": "sunk"}))
+        self.assertEqual(self.window.score_label.cget("text"), "Alice 1 : 0 Bob")
+        self.assertEqual(str(self.window.rematch_button.cget("state")), "normal")
+        before = self.board_snapshot()
+        self.window.rematch_button.invoke()
+        self.assertEqual(self.peer.read(), {"type": "rematch"})
+        self.assertEqual(self.board_snapshot(), before)
+
+    def test_opponent_rematch_wish_and_new_slot_are_shown(self):
+        self.window.draw_state(state(phase="finished", turn=None, winner="A"))
+        self.window.process_message({"type": "rematchRequested", "slot": "B", "player": "Bob"})
+        self.assertIn("Bob will eine Revanche", self.window.status_var.get())
+        self.window.process_message({"type": "rematchRequested", "slot": "A", "player": "Alice"})
+        self.assertIn("warte auf den Gegner", self.window.status_var.get())
+        self.window.process_message({"type": "welcome", "slot": "B", "player": "Alice", "phase": "placing"})
+        self.assertEqual(self.window.slot, "B")
+        self.window.process_message(state(phase="placing", turn=None, ownShips=[]))
+        self.assertEqual(str(self.window.rematch_button.cget("state")), "disabled")
+        self.assertEqual(str(self.window.place_button.cget("state")), "normal")
+
     def test_waiting_turn_and_winner_status(self):
         self.window.draw_state(state(phase="waiting", turn=None, ownShips=[]))
         self.assertIn("Warte", self.window.status_var.get())

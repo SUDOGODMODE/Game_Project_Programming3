@@ -85,7 +85,7 @@ class DemoEvidenceTests(unittest.TestCase):
 
     def spectator_messages(self):
         state = {"type": "state", "phase": "shooting", "turn": "B", "ownShips": [],
-                 "shotsAtOpponent": {"B6": "hit"}, "shotsAtSelf": {}, "winner": None}
+                 "shotsAtOpponent": {"B6": "hit"}, "shotsAtSelf": {}, "winner": None, "score": []}
         messages = []
         for step in range(3):
             if step == 1:
@@ -113,6 +113,21 @@ class DemoEvidenceTests(unittest.TestCase):
                     run_gui_demo.verify_spectator_updates(broken, {"checks": []})
         with self.assertRaises(AssertionError):
             run_gui_demo.verify_spectator_updates(messages[:5] + messages[6:], {"checks": []})
+
+    def test_spectator_audit_follows_swapped_slots_after_rematch(self):
+        messages = self.spectator_messages()
+        swapped = {"type": "state", "phase": "shooting", "turn": "B", "ownShips": [],
+                   "shotsAtOpponent": {"A1": "hit"}, "shotsAtSelf": {}, "winner": None, "score": []}
+        messages += [{"recipient": "Alice", "message": {"type": "welcome", "slot": "B"}},
+                     {"recipient": "Bob", "message": {"type": "welcome", "slot": "A"}}]
+        for name in ("Alice", "Bob", "Zuschauer"):
+            view = deepcopy(swapped)
+            if name == "Alice":
+                view["shotsAtSelf"], view["shotsAtOpponent"] = view["shotsAtOpponent"], view["shotsAtSelf"]
+            messages.append({"recipient": name, "message": view})
+        report = {"checks": []}
+        run_gui_demo.verify_spectator_updates(messages, report)
+        self.assertEqual(report["spectator_states_compared"], 4)
 
     def test_spectator_fleet_is_rejected_even_when_other_fields_are_valid(self):
         messages = self.spectator_messages()

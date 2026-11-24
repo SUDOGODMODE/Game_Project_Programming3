@@ -7,12 +7,13 @@ import threading
 MESSAGE_TYPES = frozenset({
     "join", "place", "shoot", "getState", "leave", "broken", "welcome",
     "waiting", "gameStart", "placeAck", "result", "state", "opponentLeft",
-    "gameOver", "error", "spectator",
+    "gameOver", "error", "spectator", "rematch", "rematchRequested",
 })
 ERROR_CODES = frozenset({
     "ALREADY_JOINED", "SPECTATOR_ONLY", "MISSING_PLAYER", "NOT_JOINED",
     "INVALID_JSON", "UNKNOWN_TYPE", "CELL_OUT_OF_BOUNDS", "DUPLICATE_SHOT",
     "INVALID_PLACEMENT", "INVALID_PLAYER", "NOT_YOUR_TURN", "WRONG_PHASE",
+    "DUPLICATE_REMATCH",
 })
 
 

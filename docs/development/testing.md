@@ -192,6 +192,20 @@ Server-Terminalausgabe **desselben Laufs**. Ein Metadatenlog allein beweist
 keine Flottengeheimhaltung. Die echten Ergebnisse hält der Hauptagent in
 `docs/report/Meilenstein7_Abnahme.md` fest.
 
+## Meilenstein 8: Revanche
+
+```bash
+python3 tools/run_gui_demo.py --rematch --screenshot --output "<neuer_revanchenachweisordner>"
+```
+
+`--rematch` spielt zwei Partien in einem Serverprozess mit zwei Spielern und
+einem Zuschauer. Geprüft werden die drei Ablehnungen (`WRONG_PHASE` bei
+laufender Partie, `SPECTATOR_ONLY`, `DUPLICATE_REMATCH`), der Slottausch,
+leere Bretter für alle und der Punktestand. Den Wunsch während der laufenden
+Partie legt das Werkzeug direkt in die Sendewarteschlange von Alices Fenster,
+weil der Knopf dann gesperrt ist; alle übrigen Revanchewünsche sind echte
+Knopfklicks. Der bestandene Lauf liegt in `docs/evidence/meilenstein8_20261124_03/`.
+
 ## Paket
 
 `python3 tools/build_submission.py --output "<neues_abgabearchiv.zip>"`

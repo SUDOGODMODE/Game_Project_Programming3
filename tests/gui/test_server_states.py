@@ -64,7 +64,8 @@ class StateTests(unittest.TestCase):
         self.assertEqual([m["type"] for m in messages], ["welcome", "waiting", "state"])
         self.assertEqual(messages[-1], {"type": "state", "phase": "waiting", "turn": None,
                                        "ownShips": [], "shotsAtOpponent": {},
-                                       "shotsAtSelf": {}, "winner": None})
+                                       "shotsAtSelf": {}, "winner": None,
+                                       "score": [{"slot": "A", "player": "Alice", "wins": 0}]})
         self.handle({"type": "join", "player": "Bob"}, self.b, self.bob)
         self.assertEqual([m["type"] for m in self.alice.take()], ["gameStart", "state"])
         self.assertEqual([m["type"] for m in self.bob.take()], ["welcome", "gameStart", "state"])
@@ -113,7 +114,8 @@ class StateTests(unittest.TestCase):
         self.assertEqual([m["type"] for m in messages], ["opponentLeft", "state"])
         self.assertEqual(messages[-1], {"type": "state", "phase": "waiting", "turn": None,
                                        "ownShips": [], "shotsAtOpponent": {},
-                                       "shotsAtSelf": {}, "winner": None})
+                                       "shotsAtSelf": {}, "winner": None,
+                                       "score": [{"slot": "A", "player": "Alice", "wins": 0}]})
         replacement = {"slot": None, "leaving": False}
         self.handle({"type": "join", "player": "Carol"}, replacement, self.bob)
         messages = self.alice.take()

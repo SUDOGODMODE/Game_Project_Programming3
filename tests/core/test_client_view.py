@@ -2,7 +2,7 @@
 from copy import deepcopy
 import unittest
 
-from gui.client_view import board_symbols
+from gui.client_view import board_symbols, score_text
 
 
 class BoardSymbolsTests(unittest.TestCase):
@@ -33,6 +33,16 @@ class BoardSymbolsTests(unittest.TestCase):
         })
         self.assertEqual(segments["C2"], ("Cruiser", 0, 3, True))
         self.assertEqual(segments["C4"], ("Cruiser", 2, 3, True))
+
+
+class ScoreTextTests(unittest.TestCase):
+    def test_score_shows_both_names_with_wins_in_slot_order(self):
+        score = [{"slot": "A", "player": "Alice", "wins": 2}, {"slot": "B", "player": "Bob", "wins": 1}]
+        self.assertEqual(score_text(score), "Alice 2 : 1 Bob")
+
+    def test_score_with_one_or_no_player(self):
+        self.assertEqual(score_text([{"slot": "A", "player": "Alice", "wins": 0}]), "Alice 0")
+        self.assertEqual(score_text([]), "")
 
 
 if __name__ == "__main__":

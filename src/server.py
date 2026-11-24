@@ -12,7 +12,7 @@ from netz import send, read_messages
 from event_log import EventLog, MESSAGE_TYPES
 
 HOST = "0.0.0.0"
-PORT = int(os.environ.get("PORT", "5000"))
+PORT = int(os.environ.get("PORT", "5100"))
 SLOTS = ("A", "B")
 
 
@@ -31,9 +31,10 @@ def log_message(direction: str, peer, message: dict, game=None, slot=None) -> No
 def new_game(log_file=None) -> dict:
     """Legt die gemeinsame Serververwaltung fuer alle Verbindungsworker an.
 
-    players speichert Sockets und Namen, taken die belegten Slots. spectators
-    enthaelt die Zuschauerverbindungen unter derselben Sperre. core
-    verwaltet die eigentlichen Spielregeln, Flotten und Schuesse. lock
+    players speichert Sockets, Namen, Verbindung und Siege, taken die belegten
+    Slots. spectators enthaelt die Zuschauerverbindungen unter derselben Sperre.
+    rematch enthaelt die Slots mit offenem Revanchewunsch. core verwaltet die
+    eigentlichen Spielregeln, Flotten und Schuesse der laufenden Partie. lock
     schuetzt gemeinsame Aenderungen und die zugehoerige Nachrichtenfolge.
     """
     if log_file is None:
@@ -45,10 +46,13 @@ def new_game(log_file=None) -> dict:
         "core": spiel.BattleshipGame(),
         "taken": [],
         "spectators": [],
+        "rematch": set(),
         "players": {
             slot: {
                 "sock": None,
                 "name": None,
+                "connection": None,
+                "wins": 0,
             }
             for slot in SLOTS
         },
@@ -85,12 +89,54 @@ def broadcast(game: dict, message: dict) -> None:
         send_spectator(game, connection, message)
 
 
+def state_for(game: dict, slot) -> dict:
+    """Gefilterte Sicht des Kerns plus Punktestand; slot None ist die Zuschauersicht."""
+    view = game["core"].public_state() if slot is None else game["core"].state(slot)
+    score = [
+        {"slot": s, "player": game["players"][s]["name"], "wins": game["players"][s]["wins"]}
+        for s in SLOTS if s in game["taken"]
+    ]
+    return {"type": "state", **view, "score": score}
+
+
 def send_states(game: dict) -> None:
     """Schickt private Spielersichten und die oeffentliche Sicht unter der Sperre."""
     for slot in list(game["taken"]):
-        send_to(game, slot, {"type": "state", **game["core"].state(slot)})
+        send_to(game, slot, state_for(game, slot))
     for connection in game["spectators"]:
-        send_spectator(game, connection, {"type": "state", **game["core"].public_state()})
+        send_spectator(game, connection, state_for(game, None))
+
+
+def send_game_start(game: dict) -> None:
+    """Gleiche Startmeldung mit beiden Spielern an Spieler und Zuschauer."""
+    broadcast(game, {
+        "type": "gameStart",
+        "phase": game["core"].phase,
+        "players": [
+            {"slot": s, "player": game["players"][s]["name"]}
+            for s in SLOTS
+        ],
+    })
+
+
+def start_rematch(game: dict) -> None:
+    """Neue Partie als neues Kernobjekt; die Slots tauschen, damit der andere beginnt.
+
+    Der Kern laesst immer A beginnen. Wer zuletzt B war, wird deshalb A.
+    Jeder Spieler erfaehrt seinen neuen Slot ueber ein erneutes welcome.
+    """
+    game["rematch"].clear()
+    players = game["players"]
+    players["A"], players["B"] = players["B"], players["A"]
+    for slot in SLOTS:
+        players[slot]["connection"]["slot"] = slot
+    game["core"] = spiel.BattleshipGame()
+    game["core"].start()
+    for slot in SLOTS:
+        send_to(game, slot, {"type": "welcome", "slot": slot, "player": players[slot]["name"],
+                             "phase": game["core"].phase})
+    send_game_start(game)
+    send_states(game)
 
 
 def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
@@ -112,14 +158,14 @@ def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
         slot = next(s for s in SLOTS if s not in game["taken"])
         game["taken"].append(slot)
         connection["slot"] = slot
-        game["players"][slot].update(sock=sock, name=name)
+        game["players"][slot].update(sock=sock, name=name, connection=connection)
         if len(game["taken"]) == len(SLOTS):
             core.start()
         return {"type": "welcome", "slot": slot, "player": name, "phase": core.phase}
 
     slot = connection["slot"]
     spectator = connection.get("spectator", False)
-    if slot is None and not spectator and msg_type in ("place", "shoot", "getState", "leave"):
+    if slot is None and not spectator and msg_type in ("place", "shoot", "getState", "leave", "rematch"):
         return {"type": "error", "code": "NOT_JOINED", "message": "bitte zuerst mit 'join' beitreten"}
     if spectator and msg_type in ("place", "shoot"):
         return {"type": "error", "code": "SPECTATOR_ONLY", "message": "Zuschauer duerfen nicht platzieren oder schiessen"}
@@ -129,7 +175,17 @@ def process(message: dict, connection: dict, game: dict, sock) -> dict | None:
     if msg_type == "shoot":
         return {"type": "result", **core.shoot(slot, message.get("field"))}
     if msg_type == "getState":
-        return {"type": "state", **(core.public_state() if spectator else core.state(slot))}
+        return state_for(game, None if spectator else slot)
+    if msg_type == "rematch":
+        if spectator:
+            return {"type": "error", "code": "SPECTATOR_ONLY", "message": "Zuschauer koennen keine Revanche verlangen"}
+        if core.phase != "finished":
+            return {"type": "error", "code": "WRONG_PHASE",
+                    "message": f"aktuelle Phase ist {core.phase}; Revanche erst nach Spielende"}
+        if slot in game["rematch"]:
+            return {"type": "error", "code": "DUPLICATE_REMATCH", "message": "Revanche bereits verlangt"}
+        game["rematch"].add(slot)
+        return {"type": "rematchRequested", "slot": slot, "player": game["players"][slot]["name"]}
     if msg_type == "leave":
         connection["leaving"] = True
         return None
@@ -155,6 +211,13 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
             response = {"type": "error", "code": exc.code, "message": str(exc)}
         if response is None:
             return
+        if response["type"] == "rematchRequested":
+            # Der erste Wunsch geht an alle; der zweite startet sofort die neue Partie.
+            if len(game["rematch"]) < len(SLOTS):
+                broadcast(game, response)
+            else:
+                start_rematch(game)
+            return
 
         slot = connection["slot"]
         if slot is None:
@@ -164,19 +227,15 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
             send_to(game, slot, response)
 
         if response["type"] == "spectator":
-            send_spectator(game, connection, {"type": "state", **game["core"].public_state()})
+            send_spectator(game, connection, state_for(game, None))
         if response["type"] == "welcome":
             if len(game["taken"]) < len(SLOTS):
                 send_to(game, slot, {"type": "waiting", "reason": "warte auf Gegner"})
             else:
-                broadcast(game, {
-                    "type": "gameStart",
-                    "phase": game["core"].phase,
-                    "players": [
-                        {"slot": s, "player": game["players"][s]["name"]}
-                        for s in SLOTS
-                    ],
-                })
+                send_game_start(game)
+        if response["type"] == "result" and game["core"].winner is not None:
+            # Der Punkt steht schon in den Endzustaenden; es gibt kein Unentschieden.
+            game["players"][game["core"].winner]["wins"] += 1
         if response["type"] in ("welcome", "placeAck", "result"):
             send_states(game)
         if response["type"] == "result" and game["core"].winner is not None:
@@ -189,7 +248,7 @@ def handle(message: dict, connection: dict, game: dict, sock) -> None:
 
 
 def remove_player(connection: dict, game: dict) -> None:
-    """Entfernt Zuschauer still; nur ein Spielerabgang verwirft die Partie."""
+    """Entfernt Zuschauer still; ein Spielerabgang verwirft Partie, Wuensche und Punktestand."""
     with game["lock"]:
         if connection.get("spectator"):
             game["spectators"].remove(connection)
@@ -200,9 +259,12 @@ def remove_player(connection: dict, game: dict) -> None:
             return
         player = game["players"][slot]
         name = player["name"]
-        player.update(sock=None, name=None)
+        player.update(sock=None, name=None, connection=None)
         game["taken"].remove(slot)
         connection["slot"] = None
+        game["rematch"].clear()
+        for entry in game["players"].values():
+            entry["wins"] = 0
         game["core"].reset()
         broadcast(game, {"type": "opponentLeft", "slot": slot, "player": name})
         send_states(game)
@@ -229,11 +291,29 @@ def handle_connection(sock: socket.socket, address, game: dict) -> None:
         print("getrennt:", address, flush=True)
 
 
+def bind_listener(host: str, port: int, attempts: int = 1) -> socket.socket:
+    """Bindet den ersten freien Port ab port; nach attempts Versuchen gilt der letzte Fehler."""
+    for candidate in range(port, port + attempts):
+        listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if os.name != "nt":
+            # Unter Windows liesse SO_REUSEADDR einen belegten Port mitbenutzen.
+            listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            listener.bind((host, candidate))
+            return listener
+        except OSError:
+            listener.close()
+            if candidate == port + attempts - 1:
+                raise
+    raise ValueError("attempts muss mindestens 1 sein")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Schiffe-versenken-Server")
     parser.add_argument("--host", default=HOST, help="Bindeadresse (Standard: alle Netzwerkkarten)")
-    parser.add_argument("--port", type=int, default=PORT,
-                        help="TCP-Port (Standard: PORT-Umgebungsvariable oder 5000)")
+    parser.add_argument("--port", type=int,
+                        help="TCP-Port (Standard: PORT-Umgebungsvariable oder 5100; "
+                             "ist 5100 belegt, der naechste freie)")
     parser.add_argument("--log-file", type=Path, help="Neue JSONL-Datei; vorhandene Dateien werden abgelehnt")
     args = parser.parse_args()
     try:
@@ -242,12 +322,17 @@ def main() -> None:
         parser.exit(1, f"Nachrichtenlog konnte nicht angelegt werden: {exc}\n")
     connections = []
     print("Nachrichtenlog:", game["event_log"].path, flush=True)
+    # Nur der Standardport weicht aus; einen selbst gewaehlten Port nimmt der Server genau.
+    chosen = args.port is None and "PORT" not in os.environ
+    port = PORT if args.port is None else args.port
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
-            listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            listener.bind((args.host, args.port))
+        with bind_listener(args.host, port, attempts=20 if chosen else 1) as listener:
             listener.listen()
-            print("Server wartet auf Port", listener.getsockname()[1], flush=True)
+            actual = listener.getsockname()[1]
+            print("Server wartet auf Port", actual, flush=True)
+            if actual != port:
+                print(f"Port {port} ist belegt. Clients mit --port {actual} starten, etwa:\n"
+                      f"  python3 src/client_gui.py 127.0.0.1 Alice --port {actual}", flush=True)
             while True:
                 sock, address = listener.accept()
                 worker = threading.Thread(target=handle_connection, args=(sock, address, game), daemon=True)

@@ -248,7 +248,8 @@ def verify_private_states(messages, report):
         message = entry["message"]
         if message.get("type") != "state":
             continue
-        assert set(message) == {"type", "phase", "turn", "ownShips", "shotsAtOpponent", "shotsAtSelf", "winner"}
+        assert set(message) == {"type", "phase", "turn", "ownShips", "shotsAtOpponent", "shotsAtSelf", "winner",
+                                "score"}
         assert not any(key in message for key in ("opponentShips", "players", "ships"))
         own_cells = {c for ship in message["ownShips"] for c in ship["cells"]}
         if entry["recipient"] == "Zuschauer":
@@ -272,13 +273,17 @@ def public_state(state, slot="A"):
 def verify_spectator_updates(messages, report):
     """Vergleicht die gesamten Zustandsfolgen ab B6, nicht nur den Endzustand."""
     views = {name: [] for name in ("Alice", "Bob", "Zuschauer")}
+    # Nach einer Revanche tauschen die Slots; welcome nennt den neuen Slot.
+    slots = {"Alice": "A", "Bob": "B", "Zuschauer": "A"}
     for entry in messages:
         name, state = entry["recipient"], entry["message"]
+        if name in slots and state.get("type") == "welcome":
+            slots[name] = state["slot"]
         if name not in views or state.get("type") != "state":
             continue
         if name == "Zuschauer":
             assert state["ownShips"] == []
-        view = public_state(state, "B" if name == "Bob" else "A")
+        view = public_state(state, slots[name])
         if not views[name] and view["shotsAtOpponent"].get("B6") != "hit":
             continue
         if not views[name] or views[name][-1] != view:
@@ -288,6 +293,53 @@ def verify_spectator_updates(messages, report):
     assert views["Bob"] and views["Bob"] == views["Zuschauer"][:len(views["Bob"])], "Zuschauerfolge weicht von Bob ab"
     report["spectator_states_compared"] = len(views["Zuschauer"])
     report["checks"].append("Alle oeffentlichen Zustandsfolgen ab B6 einschliesslich Spielende und Reset verglichen")
+
+
+def play_rematch(alice, bob, spectator, until, process, report, capture):
+    """Revanche ueber echte Knoepfe: Ablehnungen, Start ohne Neustart und erster Zug.
+
+    capture(name, apps) nimmt eine Montage auf. Bob war in der ersten Partie B
+    und ist nach dem Slottausch A, also der erste Schuetze der zweiten Partie.
+    """
+    trio = (alice, bob, spectator)
+    expected_score = "Alice 1 : 0 Bob"
+    assert all(a.score_label.cget("text") == expected_score for a in trio)
+    assert all(str(a.rematch_button.cget("state")) == "normal" for a in trio)
+    report["checks"].append(f"Punktestand nach der ersten Partie in allen drei Fenstern: {expected_score}")
+
+    before = [deepcopy(a.last_state) for a in trio]
+    spectator.rematch_button.invoke()
+    until(lambda: "SPECTATOR_ONLY" in spectator.status_var.get())
+    spectator_rejection = spectator.status_var.get()
+    alice.rematch_button.invoke()
+    until(lambda: "Alice will eine Revanche" in bob.status_var.get()
+          and "Alice will eine Revanche" in spectator.status_var.get()
+          and "warte auf den Gegner" in alice.status_var.get())
+    alice.rematch_button.invoke()
+    until(lambda: "DUPLICATE_REMATCH" in alice.status_var.get())
+    assert [a.last_state for a in trio] == before, "Ein einzelner Wunsch darf keine Partie starten"
+    report["rematch_rejections"] = {"Zuschauer": spectator_rejection, "Alice doppelt": alice.status_var.get()}
+    report["checks"].append("Revanche vom Zuschauer und doppelter Wunsch privat abgelehnt; ein Wunsch startet nichts")
+
+    bob.rematch_button.invoke()
+    until(lambda: alice.slot == "B" and bob.slot == "A"
+          and all(a.last_state["phase"] == "placing" for a in trio))
+    assert all(not a.last_state["ownShips"] and not a.last_state["shotsAtOpponent"]
+               and not a.last_state["shotsAtSelf"] for a in trio)
+    assert len({str(a.last_state["score"]) for a in trio}) == 1
+    assert all(a.score_label.cget("text") == "Bob 0 : 1 Alice" for a in trio)
+    assert process.poll() is None
+    report["checks"].append("Zweiter Wunsch startet die Revanche ohne Serverneustart: leere Bretter, "
+                            "gleicher Punktestand fuer alle, Bob jetzt A")
+
+    place_individual_fleets(alice, bob, until, report)
+    assert all(a.last_state["turn"] == "A" for a in (alice, bob))
+    bob.target_buttons["A1"].invoke()
+    until(lambda: bob.last_state["shotsAtOpponent"].get("A1") == "hit"
+          and alice.last_state["shotsAtSelf"].get("A1") == "hit")
+    until(lambda: not any(a.effects.active for a in (alice, bob)))
+    report["checks"].append("Erster Zug der Revanche von Bob, der in der ersten Partie nicht begonnen hat")
+    capture("rematch_first_move.png", trio)
 
 
 def main():
@@ -304,7 +356,11 @@ def main():
                         help="Unter macOS beide Fenster nach Spielende aufnehmen")
     parser.add_argument("--pause-for-capture", action="store_true",
                         help="Nach B6 bis zur Datei capture_continue oder maximal 180 s weiterzeichnen")
+    parser.add_argument("--rematch", action="store_true",
+                        help="Meilenstein 8: mit Zuschauer, Revanche-Ablehnungen und zweiter Partie ohne Neustart")
     args = parser.parse_args()
+    if args.rematch:
+        args.spectator = args.final_screenshot = True
     try:
         args.output.mkdir(parents=True, exist_ok=False)
     except FileExistsError:
@@ -316,6 +372,8 @@ def main():
               "server_profile": args.server_profile or "direct", "checks": [], "result": "FAIL"}
     if args.spectator:
         report["scope"] = "Automatisierte lokale TCP-Partie mit zwei Spielern und einem unveraenderten Zuschauerfenster"
+    if args.rematch:
+        report["scope"] = "Zwei Partien hintereinander mit Revanche, zwei Spielern und einem Zuschauer, ein Serverprozess"
     completed = False
 
     class RecordedWindow(BattleshipWindow):
@@ -483,6 +541,37 @@ def main():
                         "client_messages.jsonl enthaelt die aufgezeichneten Testsichten; result.json die Pruefungen.\n",
                         encoding="utf-8")
 
+            def capture_montage(name, capture_apps):
+                if not args.screenshot:
+                    return
+                layout, error = capture_game_montage(root, capture_apps, args.output / name,
+                                                     width, height, screen_width)
+                if layout:
+                    report.setdefault("rematch_screenshots", []).append(name)
+                else:
+                    report[f"{Path(name).stem}_screenshot_unavailable"] = error
+
+            if args.rematch:
+                # Der Knopf ist waehrend der Partie gesperrt; der Wunsch geht deshalb
+                # direkt in die Sendewarteschlange, wie bei einem veralteten Client.
+                # Zuschauerstatus aus dem Serverzustand neu zeichnen, damit kein alter Fehlertext im Bild steht.
+                spectator.refresh_button.invoke()
+                until(lambda: messages[-1]["recipient"] == "Zuschauer" and messages[-1]["message"]["type"] == "state")
+                before = [deepcopy(a.last_state) for a in (alice, bob, spectator)]
+                notices = [a.status_var.get() for a in (bob, spectator)]
+                assert str(alice.rematch_button.cget("state")) == "disabled"
+                alice._request({"type": "rematch"})
+                until(lambda: "WRONG_PHASE" in alice.status_var.get())
+                report["rematch_running_rejection"] = alice.status_var.get()
+                capture_montage("rematch_rejection_running.png", (alice, bob, spectator))
+                # getState danach ist eine TCP-Barriere hinter der Ablehnung.
+                alice.refresh_button.invoke()
+                until(lambda: messages[-1]["recipient"] == "Alice" and messages[-1]["message"]["type"] == "state")
+                assert [a.last_state for a in (alice, bob, spectator)] == before
+                assert [a.status_var.get() for a in (bob, spectator)] == notices
+                assert not any(e["message"].get("type") == "rematchRequested" for e in messages)
+                report["checks"].append("Revanche waehrend laufender Partie nur Alice mit WRONG_PHASE abgelehnt")
+
             finish_match(alice, bob, until, process, report)
             if spectator is not None:
                 until(lambda: any(e["recipient"] == "Zuschauer" and e["message"].get("type") == "gameOver"
@@ -505,17 +594,34 @@ def main():
                 else:
                     report["final_screenshot_unavailable"] = error
 
-            before_rejected = [deepcopy(a.last_state) for a in (alice, bob)]
-            alice_notice = alice.status_var.get()
-            assert "H10" not in bob.last_state["shotsAtOpponent"]
-            assert bob.target_buttons["H10"].cget("state") == "normal"
-            bob.target_buttons["H10"].invoke()
-            until(lambda: "WRONG_PHASE" in bob.status_var.get())
-            assert [a.last_state for a in (alice, bob)] == before_rejected
-            assert alice.status_var.get() == alice_notice
-            assert process.poll() is None, "Server hat die Ablehnung nach Spielende nicht ueberlebt"
-            report["post_game_rejection"] = bob.status_var.get()
-            report["checks"].append("Echter Klick nach Spielende wird privat ohne Zustandsaenderung abgelehnt")
+            if args.rematch:
+                play_rematch(alice, bob, spectator, until, process, report, capture_montage)
+                report["capture_note"] = (
+                    "Montagen echter Einzelaufnahmen (screencapture), links Alice, mittig Bob, rechts Zuschauer. "
+                    "three_windows_finished.png: Ende der ersten Partie mit Punktestand Alice 1 : 0 Bob. "
+                    "rematch_first_move.png: nach Bobs erstem Schuss A1 der zweiten Partie; Bob ist nach dem "
+                    "Slottausch A. rematch_rejection_running.png: Alices Revanchewunsch waehrend der laufenden "
+                    "ersten Partie, privat mit WRONG_PHASE abgelehnt. Der Knopf ist dann gesperrt; das Werkzeug "
+                    "legt den Wunsch deshalb direkt in Alices Sendewarteschlange. Alle anderen Revanchewuensche "
+                    "sind echte Knopfklicks."
+                )
+                (args.output / "README.md").write_text(
+                    "# Meilenstein 8: lokaler GUI-Nachweis der Revanche\n\n" + report["capture_note"] +
+                    "\n\nserver.txt und server_messages.jsonl stammen aus demselben Serverprozess fuer beide "
+                    "Partien. client_messages.jsonl enthaelt die aufgezeichneten Fenstersichten; result.json "
+                    "die Pruefungen.\n", encoding="utf-8")
+            else:
+                before_rejected = [deepcopy(a.last_state) for a in (alice, bob)]
+                alice_notice = alice.status_var.get()
+                assert "H10" not in bob.last_state["shotsAtOpponent"]
+                assert bob.target_buttons["H10"].cget("state") == "normal"
+                bob.target_buttons["H10"].invoke()
+                until(lambda: "WRONG_PHASE" in bob.status_var.get())
+                assert [a.last_state for a in (alice, bob)] == before_rejected
+                assert alice.status_var.get() == alice_notice
+                assert process.poll() is None, "Server hat die Ablehnung nach Spielende nicht ueberlebt"
+                report["post_game_rejection"] = bob.status_var.get()
+                report["checks"].append("Echter Klick nach Spielende wird privat ohne Zustandsaenderung abgelehnt")
 
             # WM_DELETE_WINDOW verwendet exakt diesen registrierten Handler.
             bob.root.tk.call(bob.root.protocol("WM_DELETE_WINDOW"))
@@ -523,7 +629,9 @@ def main():
             assert not alice.last_state["ownShips"] and not alice.last_state["shotsAtSelf"]
             assert "verlassen" in alice.status_var.get()
             carol = new_window("Carol")
-            until(lambda: carol.slot == "B" and all(a.last_state["phase"] == "placing" for a in (alice, carol)))
+            # Nach der Revanche war Bob A; sein freier Slot geht an Carol.
+            free_slot = "A" if args.rematch else "B"
+            until(lambda: carol.slot == free_slot and all(a.last_state["phase"] == "placing" for a in (alice, carol)))
             assert all(not a.last_state["ownShips"] for a in (alice, carol))
             report["checks"].append("Fensterkreuz, Abbruchanzeige, leerer Reset und Ersatzbeitritt")
 

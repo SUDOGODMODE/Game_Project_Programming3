@@ -1,6 +1,8 @@
 """Der Server lässt sich für isolierte Netztests auf einen Port setzen."""
+import ast
 import os
 from pathlib import Path
+import re
 import socket
 import subprocess
 import sys
@@ -54,6 +56,30 @@ class ServerPortTests(unittest.TestCase):
 
     def test_cli_port_hat_vorrang(self):
         self.check_server_listens(free_port(), free_port())
+
+    def test_belegter_standardport_weicht_auf_den_naechsten_freien_aus(self):
+        import server
+        with socket.socket() as fremd:
+            fremd.bind(("127.0.0.1", 0))
+            fremd.listen()
+            belegt = fremd.getsockname()[1]
+            with server.bind_listener("127.0.0.1", belegt, attempts=20) as listener:
+                self.assertGreater(listener.getsockname()[1], belegt)
+            with self.assertRaises(OSError):
+                server.bind_listener("127.0.0.1", belegt, attempts=1)
+
+    def test_server_und_clients_teilen_einen_standardport_ausser_5000(self):
+        # Port 5000 belegt unter macOS der AirPlay-Empfaenger.
+        source = SERVER.parent
+        server_default = re.search(r'os\.environ\.get\("PORT", "(\d+)"\)',
+                                   (source / "server.py").read_text(encoding="utf-8")).group(1)
+        defaults = {"server.py": int(server_default)}
+        for name in ("client_gui.py", "client.py", "play.py"):
+            for node in ast.walk(ast.parse((source / name).read_text(encoding="utf-8"))):
+                if (isinstance(node, ast.Call) and node.args
+                        and isinstance(node.args[0], ast.Constant) and node.args[0].value == "--port"):
+                    defaults[name] = next(k.value.value for k in node.keywords if k.arg == "default")
+        self.assertEqual(defaults, dict.fromkeys(("server.py", "client_gui.py", "client.py", "play.py"), 5100))
 
 
 if __name__ == "__main__":

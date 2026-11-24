@@ -61,7 +61,10 @@ Desktop.ini
 # Lokale Arbeitsdateien (Agent-Übergabe, Planung, verworfene Nachweisläufe)
 docs/development/Übergabe_*.md
 docs/development/Meilenstein7_Plan.md
+docs/development/Meilenstein8_Plan.md
 docs/evidence/meilenstein7_20261124_01/
 docs/evidence/meilenstein7_20261124_diagnose/
+docs/evidence/meilenstein8_20261124_01/
+docs/evidence/meilenstein8_20261124_02/
 AGENTS.md
 CLAUDE.md

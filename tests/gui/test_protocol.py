@@ -12,6 +12,7 @@ import tempfile
 import unittest
 
 import server
+from tests.fixtures import FLEET, MISSES
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -58,12 +59,12 @@ class ProtocolTests(unittest.TestCase):
         expected_types = {
             "join", "welcome", "waiting", "gameStart", "place", "placeAck",
             "shoot", "result", "getState", "state", "leave", "opponentLeft",
-            "gameOver", "error", "spectator",
+            "gameOver", "error", "spectator", "rematch", "rematchRequested",
         }
         self.assertEqual(
-            set(self.required), expected_types, "Der Katalog hat 15 Spielnachrichtentypen"
+            set(self.required), expected_types, "Der Katalog hat 17 Spielnachrichtentypen"
         )
-        self.assertEqual(self.protocol["version"], "0.7", "Das Spiel verwendet Protokollversion 0.7")
+        self.assertEqual(self.protocol["version"], "0.8", "Das Spiel verwendet Protokollversion 0.8")
         self.assertIn(
             f'Protokoll {self.protocol["version"]}', self.markdown,
             "Markdown- und JSON-Version müssen übereinstimmen",
@@ -141,7 +142,9 @@ class ProtocolTests(unittest.TestCase):
             self.assertEqual(outgoing[0], ("Z", {"type": "spectator", "player": "Zuschauer", "phase": "placing"}))
             self.assertEqual(outgoing[1], ("Z", {"type": "state", "phase": "placing", "turn": None,
                                                "ownShips": [], "shotsAtSelf": {},
-                                               "shotsAtOpponent": {}, "winner": None}))
+                                               "shotsAtOpponent": {}, "winner": None,
+                                               "score": [{"slot": "A", "player": "A", "wins": 0},
+                                                         {"slot": "B", "player": "B", "wins": 0}]}))
             self.assertEqual(len(outgoing), 2)
             self.assertEqual(self.required["spectator"], {"type", "player", "phase"})
             for recipient, message in outgoing:
@@ -157,6 +160,57 @@ class ProtocolTests(unittest.TestCase):
                 example = self.protocol["messages"]["error"]["spectatorExample"]
                 self.assert_message_complete(example, "Zuschauer-Fehlerbeispiel")
                 self.assertEqual((example["type"], example["code"]), (error["type"], error["code"]))
+
+    def test_documented_rematch_and_rejections_match_the_server(self):
+        section = self.markdown.split("### rematch\n", 1)[1].split("### rematchRequested", 1)[0]
+        blocks = re.findall(r"```text\n(.*?)```", section, re.DOTALL)
+        self.assertEqual(len(blocks), 1, "Der rematch-Abschnitt braucht genau ein Ablaufbeispiel")
+        outgoing = []
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        game = server.new_game(log_file=Path(temp.name) / "rematch.jsonl")
+        self.addCleanup(game["event_log"].close)
+        sockets = {name: RecordingSocket(name, outgoing) for name in ("Alice", "Bob", "Zuschauer")}
+        connections = {name: {"slot": None, "leaving": False} for name in sockets}
+        other = [dict(ship, start="F" + ship["start"][1:]) for ship in FLEET]
+        targets = ("F1", "G1", "H1", "I1", "J1", "F2", "G2", "H2", "I2",
+                   "F3", "G3", "H3", "F4", "G4", "H4", "F5", "G5")
+        examples = self.protocol["messages"]["error"]["rematchExamples"]
+
+        def send(name, message):
+            server.handle(message, connections[name], game, sockets[name])
+
+        with redirect_stdout(io.StringIO()):
+            for name in sockets:
+                send(name, {"type": "join", "player": name})
+            send("Alice", {"type": "place", "ships": FLEET})
+            send("Bob", {"type": "place", "ships": other})
+            outgoing.clear()
+            send("Alice", {"type": "rematch"})
+            self.assertEqual(outgoing, [("Alice", examples[0])])
+            for target, miss in zip(targets[:-1], MISSES):
+                send("Alice", {"type": "shoot", "field": target})
+                send("Bob", {"type": "shoot", "field": miss})
+            send("Alice", {"type": "shoot", "field": targets[-1]})
+            outgoing.clear()
+            send("Zuschauer", {"type": "rematch"})
+            self.assertEqual(outgoing, [("Zuschauer", examples[1])])
+            outgoing.clear()
+            # Der dokumentierte Ablauf hat keinen Zuschauer; dieser verlaesst die Runde vorher still.
+            server.remove_player(connections["Zuschauer"], game)
+            for line in blocks[0].splitlines():
+                route, encoded = re.split(r"\s{2,}", line, 1)
+                message = json.loads(encoded)
+                sender, recipient = [part.strip() for part in route.split("→")]
+                if recipient == "S":
+                    self.assertEqual(outgoing, [], f"Vor {line} blieben unerwartete Antworten übrig")
+                    send(sender, message)
+                else:
+                    self.assertTrue(outgoing, f"Die dokumentierte Antwort fehlt: {line}")
+                    self.assertEqual(outgoing.pop(0), (recipient, message), line)
+            self.assertEqual(outgoing, [], "Der Revancheablauf lässt Antworten undokumentiert")
+        self.assertIn(examples[2], [json.loads(line.split("  ", 1)[1].strip())
+                                    for line in blocks[0].splitlines() if "DUPLICATE_REMATCH" in line])
 
     def test_complete_documented_game_preserves_recipients_order_and_reset(self):
         heading = "## Ablaufbeispiel einer vollständigen Partie"
@@ -240,7 +294,7 @@ class ProtocolTests(unittest.TestCase):
                     }
                     expected_responses = [(row["slot"], expected_result)]
                     expected_responses.extend(
-                        (slot, {"type": "state", **game["core"].state(slot)})
+                        (slot, server.state_for(game, slot))
                         for slot in ("A", "B")
                     )
                     self.assertEqual(

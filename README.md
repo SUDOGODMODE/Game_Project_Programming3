@@ -1,40 +1,22 @@
 # Schiffe versenken
 
-Python-Netzwerkspiel im Modul Programming 3 an der HFTM, Max Rufener.
-Zwei Spieler verbinden sich mit einem zentralen Server. Der Server
-entscheidet über jede Aktion und verteilt nach jedem Zug die vollständige,
-für die jeweilige Rolle erlaubte Sicht an Spieler und Zuschauer. Die eigene
-Flotte bleibt vor anderen Verbindungen verborgen.
+Netzwerkspiel in Python für das Modul Programming 3 an der HFTM, Max Rufener.
 
-**Meilenstein 7 — Zuschauer:** Sind A und B belegt, wird jeder weitere
-beitretende Client Zuschauer ohne Spielerplatz. Er erhält sofort den aktuellen
-öffentlichen Stand und danach alle Zustände sowie `gameStart`, `gameOver` und
-`opponentLeft`. `place` und `shoot` werden nur ihm mit `SPECTATOR_ONLY`
-abgelehnt; `getState` und `leave` bleiben erlaubt. Ein Zuschauer wird nie
-automatisch Spieler. Sein Abgang setzt die Partie nicht zurück.
+Zwei Spieler verbinden sich mit einem zentralen Server und spielen Schiffe
+versenken auf einem 10×10-Raster. Der Server entscheidet über jeden Zug und
+schickt danach jedem Fenster genau die Sicht, die ihm zusteht: die eigene
+Flotte und alle Schüsse, nie die gegnerische Flotte. Weitere Clients schauen
+als Zuschauer zu. Nach dem Spielende können beide eine Revanche verlangen;
+der Server zählt die Siege.
 
-Der GUI-Client bleibt gemäss Auftrag unverändert. Links zeigt ein Zuschauer
-Schüsse von B auf A, rechts Schüsse von A auf B, niemals eine Flotte.
-Die bestehenden Spielerbeschriftungen und Gewinn-/Verlusttexte sind dafür
-teilweise unpassend; eine gesonderte Rollenanzeige ist nicht umgesetzt.
+Benötigt wird nur Python **3.12 oder neuer** mit tkinter, keine weiteren Pakete.
 
-**Vor der Abgabe selbst ergänzen:** [persönliche Reflexion](docs/report/meine_reflexion.md).
+## Schnellstart
 
-## Variante wählen
-
-Die beiden Startprofile verwenden denselben Spielkern, Server, GUI-Client,
-Bilder und dasselbe Protokoll. Sie unterscheiden sich darin, wo die drei
-Prozesse laufen und an welche Adresse sie sich binden beziehungsweise
-verbinden. Python **3.12 oder neuer** mit tkinter ist erforderlich; weitere
-Python-Pakete braucht das Spiel nicht.
-
-| Variante | Geräte | Startanleitung |
-|---|---|---|
-| **localhost** | Server und zwei Spielfenster auf einem Gerät, auch ohne LAN | [Auf einem Gerät starten](varianten/localhost/START.md) |
-| **zwei Rechner** | Server und erster Client auf Rechner 1, zweiter Client auf Rechner 2 | [Auf zwei Rechnern starten](varianten/zwei_rechner/START.md) |
-
-Für einen schnellen Start auf **einem Gerät** im Projektordner drei
-Terminals öffnen und die Befehle in dieser Reihenfolge ausführen:
+Im Projektordner drei Terminals öffnen und in dieser Reihenfolge starten.
+Fehlt dem installierten Python tkinter (`ModuleNotFoundError: _tkinter`),
+vorher in jedem Terminal die [virtuelle Umgebung](docs/guides/setup.md)
+aktivieren: `source .venv/bin/activate` (Windows: `.venv\Scripts\Activate.ps1`).
 
 ```bash
 python3 src/server.py
@@ -42,170 +24,165 @@ python3 src/client_gui.py 127.0.0.1 Alice
 python3 src/client_gui.py 127.0.0.1 Bob
 ```
 
-Für Meilenstein 7 nach dem Beitritt beider Spieler in einem **vierten**
-Terminal denselben Client starten, auch während einer laufenden Partie:
+Ein vierter Client wird Zuschauer, auch während einer laufenden Partie:
 
 ```bash
 python3 src/client_gui.py 127.0.0.1 Carla
 ```
 
-Die Rolle bestimmt der Server anhand belegter Plätze, nicht der Name oder
-ein Client-Schalter. Bei einem anderen Port auch Carla mit `--port` starten.
-
-Der Server verwendet ohne Angabe Port 5000; die Clients verbinden sich
-ebenfalls mit Port 5000. `PORT=5099 python3 src/server.py` wählt unter
-macOS/Linux einen anderen Serverport. Dann brauchen **beide** Clients
-zusätzlich `--port 5099`. Für zwei Rechner die tatsächliche IPv4-Adresse
-des Serverrechners einsetzen; die verlinkte Anleitung erklärt die
-Einrichtung und Windows-Befehle.
-
-Im Repository liegen die beiden Einstiege unter `varianten/localhost/` und
-`varianten/zwei_rechner/`; die [gemeinsame Einrichtung](docs/guides/setup.md)
-erklärt Python, virtuelle Umgebung und tkinter.
-
-## Projektstruktur
+Server und Clients verwenden unter macOS, Windows und Linux standardmässig
+Port **5100** (nicht 5000, den unter macOS der AirPlay-Empfänger belegt).
+Ist 5100 auf einem Rechner schon belegt, nimmt der Server selbst den
+nächsten freien Port und zeigt den passenden Client-Befehl an, etwa:
 
 ```text
-src/                          Spielprogramme und Netzwerk; spiel.py ist der Regelkern,
-                              board.py bietet den älteren Importnamen an
-  gui/                        Interne Brett-, SVG- und Effektmodule; client_gui.py bleibt Einstieg
-tests/
-  fixtures.py                 Gemeinsame feste Testdaten
-  core/                       Brett, Spielkern, lokale Partie
-  network/                    Transport, Lobby, TCP/CLI
-  gui/                        Zustandsverteilung, echte GUI-Tests, Teststarter
-  integration/                Regelkern-Endfolge und Startvarianten
-  graphics/                   Netz-/Porttests, Bildanzeige, SVG-Flotte, Effekte
-  additional/                 Zusatzprüfungen für Nachrichtenlog und Abgabepaket
-tools/                        Gemeinsamer Teststart und lokale Nachweise
-varianten/
-  localhost/                 Startprofil und Anleitung für ein Gerät
-  zwei_rechner/              Startprofil und Anleitung für zwei Geräte
-bilder/                       Schiffsbild, Herkunft und SVG-Flotte
-docs/
-  guides/                     Einrichtung und Bedienung
-  development/                Architektur, Tests und Weiterentwicklung
-  protocol/                   Strukturierter Nachrichtenkatalog
-  report/                     Technischer Entwurf, persönliche Reflexion, Vorführung
-REGELN.md                     Verbindliche Spielregeln
-PROTOKOLL.md                  Lesbarer Nachrichtenkatalog, Protokoll 0.7
+Server wartet auf Port 5101
+Port 5100 ist belegt. Clients mit --port 5101 starten, etwa:
+  python3 src/client_gui.py 127.0.0.1 Alice --port 5101
 ```
+
+Wer selbst einen Port wählt (`--port 5200` beim Server und bei jedem
+Client), bekommt genau diesen oder eine klare Fehlermeldung.
+
+Für zwei Rechner statt `127.0.0.1` die IPv4-Adresse des
+Serverrechners einsetzen; die Anleitungen [Auf einem Gerät](varianten/localhost/START.md)
+und [Auf zwei Rechnern](varianten/zwei_rechner/START.md) erklären auch
+Windows-Befehle und Firewall, die [Einrichtung](docs/guides/setup.md)
+virtuelle Umgebung und tkinter.
+
+## Bedienung
+
+| Schritt | Im Fenster |
+|---|---|
+| Flotte setzen | Unter «Flotte planen» je Schiff Startfeld und Richtung (`h` nach rechts, `v` nach unten) eintragen oder «Neu mischen» drücken, dann «Flotte senden». Die Flotte: Carrier 5, Battleship 4, Cruiser 3, Submarine 3, Destroyer 2. |
+| Schiessen | Wer am Zug ist, klickt ein Feld im «Zielraster». Wasser erscheint als Punkt, Treffer als X, ein versenkendes Feld mit Doppelring. Nach jedem gültigen Schuss ist der andere am Zug, auch nach einem Treffer. |
+| Spielende | Wer zuerst alle gegnerischen Schiffe versenkt, gewinnt. Ein Unentschieden gibt es nicht. |
+| Revanche | Der Knopf «Revanche» ist erst nach dem Spielende bedienbar. Erst wenn beide ihn gedrückt haben, startet der Server eine neue Partie; es beginnt, wer zuletzt nicht begonnen hat. Der Punktestand steht oben rechts, etwa «Alice 2 : 1 Bob». |
+| Zuschauen | Ein Zuschauer sieht beide Schusslisten, aber keine Flotte. Seine Klicks lehnt der Server mit `SPECTATOR_ONLY` ab. |
+
+Jeder Zug ist nur ein Wunsch an den Server. Lehnt er ab (zum Beispiel
+ausser der Reihe oder auf ein schon beschossenes Feld), sieht nur der
+Absender die Meldung, und das Brett bleibt unverändert.
+
+## Aufbau
+
+```text
+ Fenster Alice            Server (server.py)                Fenster Bob
+ client_gui.py            ─────────────────                 client_gui.py
+ ┌──────────────┐  JSON   ┌───────────────────────────┐  JSON  ┌──────────────┐
+ │ Empfangs-    │ ◄────── │ ein Thread je Verbindung  │ ─────► │ Empfangs-    │
+ │ Thread→Queue │ ──────► │ with game["lock"]:        │ ◄───── │ Thread→Queue │
+ │ Tk zeichnet  │  Zeile  │   prüfen → ändern → senden│  Zeile │ Tk zeichnet  │
+ └──────────────┘         │            │              │        └──────────────┘
+                          │            ▼              │
+                          │  Spielkern spiel.py       │ ◄── Zuschauer:
+                          │  Regeln und Zustand,      │     nur öffentliche Sicht
+                          │  ohne Netz und Fenster    │
+                          └───────────────────────────┘
+```
+
+- **Der Server entscheidet.** Alle Regeln stehen in `src/spiel.py`. Der
+  Client prüft nichts, er schickt Wünsche und zeichnet nur, was der Server
+  im Spielstand schickt. «Neu mischen» schlägt eine Flotte vor; ob sie gilt,
+  entscheidet auch hier der Server.
+- **Verborgene Information bleibt auf dem Server.** `state()` liefert einem
+  Spieler nur seine Flotte, `public_state()` dem Zuschauer gar keine.
+- **Threads.** Der Empfangsthread des Clients schreibt nur in eine Queue;
+  das Tk-Fenster holt sie im Hauptthread ab und zeichnet an einer Stelle.
+- **Sperre.** Im Server liegen Prüfen, Ändern und Versenden in derselben
+  Sperre, damit zwei gleichzeitige Züge sich nicht überholen.
+- **Robustheit.** Schliesst ein Spieler hart, erfährt es der andere
+  (`opponentLeft`) und der Server nimmt einen neuen Spieler an. Kaputtes
+  JSON und unbekannte Nachrichten werden abgelehnt, nicht abgestürzt.
+
+Nachrichten, Pflichtfelder und Beispiele stehen in [PROTOKOLL.md](PROTOKOLL.md)
+(Version 0.8, maschinenlesbar in [protocol.json](docs/protocol/protocol.json)),
+die Spielregeln in [REGELN.md](REGELN.md).
 
 ## Tests
 
-Wenn du den Code kennenlernen willst, beginne mit dem kurzen Kernlauf. Er
-prüft Brett, Platzierung, Schüsse und Zugfolge ohne Netzwerk, Tk-Fenster
-oder fremde Prozesse. Danach prüfst du den geänderten Teil und zum Schluss
-die vollständige Anwendung. Die [Lesereihenfolge durch den Code](docs/development/code_lesen.md)
-führt von einer Spielaktion über Server und Client bis zu den Tests.
+Alle Tests laufen mit der Standardbibliothek vom Projektordner aus:
 
 ```bash
-python3 tools/run_tests.py --core
-python3 tools/run_tests.py --group network
 python3 -m unittest discover
-python3 tools/run_tests.py --group graphics --require-gui
-python3 tools/run_tests.py
-python3 tools/run_tests.py --require-gui
 ```
 
-Die beiden eigenständigen Testdateien lassen sich auch direkt im Ordner
-`src/` ausführen:
+Sie prüfen den Spielkern ohne Netz (`tests/core/`) und den echten Server
+über TCP-Verbindungen (`tests/network/`, `tests/integration/`), unter
+anderem Ablehnungen, harte Verbindungsabbrüche, kaputtes JSON, Zuschauer
+und Revanche. Ein Test spielt die Beispiele aus `PROTOKOLL.md` gegen den
+Server ab, damit Protokoll und Code übereinstimmen. Die Fenstertests
+brauchen eine grafische Sitzung; ohne sie werden sie übersprungen.
 
 ```bash
-cd src
-python3 -m unittest -v test_spiel test_netz
-cd ..
+python3 tools/run_tests.py --core          # schneller Kernlauf ohne Netz und Fenster
+python3 tools/run_tests.py --require-gui   # alles, Fenstertests dürfen nicht fehlen
 ```
 
-`test_spiel.py` prüft die Spielregeln, `test_netz.py` den Server über
-echte TCP-Verbindungen mit einem eigenen Serverprozess pro Fall.
+Die beiden eigenständigen Testdateien aus Meilenstein 6 laufen auch direkt
+in `src/`: `cd src && python3 -m unittest -v test_spiel test_netz`.
 
-`--core` ist die schnelle Rückmeldung beim Lernen und Ändern der Regeln.
-Für Änderungen an Server oder Oberfläche reicht ein Kernlauf nicht; die
-Gesamtsuite braucht lokale TCP-Ports und für `--require-gui` eine
-grafische Sitzung. Ein übersprungener GUI-Test gilt nicht als bestandener
-GUI-Nachweis. Die [Testanleitung](docs/development/testing.md) nennt
-gezielte Befehle und eine vollständige lokale Partie mit zwei echten
-Fenstern.
+Nachweisläufe mit echten Fenstern und Bildschirmaufnahmen sowie das
+Abgabepaket beschreibt die [Testanleitung](docs/development/testing.md).
 
-Reproduzierbare vollständige lokale TCP-Partie mit zwei echten Fenstern:
+## Dateiverzeichnis
 
-```bash
-python3 tools/run_gui_demo.py --output "<neuer_ausgabeordner>"
+```text
+Game_Project_Programming3/
+├── README.md                    diese Datei
+├── REGELN.md                    verbindliche Spielregeln
+├── PROTOKOLL.md                 Nachrichtenkatalog mit Beispielen (Version 0.8)
+│
+├── src/                         ── das Spiel ──
+│   ├── spiel.py                 Spielkern: Regeln und Zustand, ohne Netz und Fenster
+│   ├── server.py                Spielserver: Verbindungen, Sperre, Zuschauer, Revanche
+│   ├── netz.py                  eine JSON-Nachricht pro Zeile über TCP
+│   ├── client_gui.py            grafischer Client (Tk)
+│   ├── gui/                     Bausteine des Fensters
+│   │   ├── client_view.py         Brettzeichen und Punktestand aus dem Serverzustand
+│   │   ├── sea_cell.py            ein Feld im Raster
+│   │   ├── ship_art.py            Schiffsgrafiken aus SVG
+│   │   └── ship_effects.py        Sprengungseffekt beim Versenken
+│   ├── fleet_setup.py           Flottenvorschlag für «Neu mischen»
+│   ├── event_log.py             Nachrichtenprotokoll des Servers (logs/*.jsonl)
+│   ├── play.py                  Konsolenclient
+│   ├── local_game.py            Partie ohne Netz an einer Tastatur
+│   ├── client.py                einfacher Beitrittsclient (Meilenstein 3)
+│   ├── board.py                 alter Importname für spiel.py
+│   ├── testclient.py            fensterloser Client für test_netz.py
+│   ├── test_spiel.py            Regeltests (Meilenstein 5/6)
+│   └── test_netz.py             Netztests mit eigenem Serverprozess (Meilenstein 6)
+│
+├── tests/                       ── python3 -m unittest discover ──
+│   ├── fixtures.py              feste Testflotten
+│   ├── core/                    Spielkern, Flottenvorschlag, Brettanzeige
+│   ├── network/                 Server über echte TCP-Verbindungen, Angriffe
+│   ├── integration/             Revanche, ganze Partien, Startvarianten
+│   ├── gui/                     Fenster, Zustandsverteilung, Protokollabgleich
+│   ├── graphics/                Bilder, SVG-Flotte, Effekte, Port
+│   └── additional/              Nachrichtenlog und Abgabepaket
+│
+├── bilder/                      Schiffsbild und SVG-Flotte, mit Herkunft
+├── varianten/                   Startprofile: localhost/ und zwei_rechner/
+├── tools/                       Teststarter, Fenster-Nachweislauf, Abgabepaket
+└── docs/
+    ├── protocol/protocol.json   Nachrichtenkatalog maschinenlesbar
+    ├── guides/                  Einrichtung, Bedienung, Rückfall
+    ├── development/             Architektur, Lesereihenfolge, Testanleitung
+    ├── report/                  Abschlussbericht, Vorführung, Abnahme M7
+    └── evidence/                Rohnachweise der Fensterläufe M7 und M8
 ```
 
-Unter macOS ergänzt `--screenshot` eine Aufnahme beider Fenster, wenn sie
-nebeneinander auf den Bildschirm passen. Ohne Ausgabeangabe entsteht ein
-neuer zeitgestempelter Ordner; vorhandene Ordner werden nicht
-überschrieben.
+Jeder Serverstart schreibt ein neues Nachrichtenprotokoll nach `logs/`
+(Zeit, Richtung, Slot und Typ, keine Inhalte). `logs/`, `dist/` und lokale
+Arbeitsdateien schliesst `.gitignore` aus.
 
-Für den Zuschauer-Nachweis mit drei Fenstern:
+## Was nicht geht
 
-```bash
-python3 tools/run_gui_demo.py --spectator --screenshot --final-screenshot --output "<neuer_zuschauernachweisordner>"
-```
-
-Der Ablauf muss die öffentliche Sicht aller drei Fenster vergleichen und
-die Zuschauerablehnung, gemeinsame Zugansicht sowie Serverausgabe desselben
-Laufs sichern. Fehlgeschlagene Bilder sind kein vollständiger Nachweis,
-auch wenn die Partie funktional durchläuft. Diese Anleitung behauptet
-keinen bestandenen Meilenstein-7-Abnahmelauf; echte Ergebnisse werden separat
-vom Hauptagenten in `docs/report/Meilenstein7_Abnahme.md` dokumentiert.
-
-## Bild, Nachrichtenlogs und Abgabepaket
-
-Das dekorative [Schiffsbild](bilder/README.md) ist 256×256 Pixel gross und
-wird mit 64×64 Pixeln im Tk-Hauptthread angezeigt; Herkunft und Hashes
-stehen in `bilder/`. Es ist keine Flotten- oder Zuganzeige.
-
-Die Oberfläche in Meerblau zeigt die eigene bestätigte Flotte mit fünf
-SVG-Schiffstypen aus `bilder/flotte/`. Ein kleiner Canvas-Renderer zeichnet
-deren Grundformen ohne zusätzliche Pakete. Wasser erscheint als Punkt,
-Treffer als X und der versenkende Treffer mit einem Doppelring. Auf dem
-Zielraster bleibt die Gegnerflotte verborgen.
-
-Wird ein eigenes Schiff neu vollständig getroffen, läuft dort einmalig ein
-rund 1,15 Sekunden langer Sprengungseffekt. "Sprengungseffekte" schaltet
-die Animationen aus und ein; Reset, Verbindungsende und Fensterschliessen
-räumen laufende Effekte auf.
-
-Jeder Serverstart erzeugt eine neue JSONL-Datei unter `logs/` im Projekt.
-Optional:
-
-```bash
-python3 -u src/server.py --host 127.0.0.1 --port 5100 --log-file "<neuer_logpfad.jsonl>"
-python3 tools/build_submission.py --output "<neues_abgabearchiv.zip>"
-```
-
-Logs enthalten für jede empfangene und erfolgreich gesendete Nachricht
-UTC-ISO-Zeit, Richtung, Verbindung/Slot, bekannten Typ und bei
-Serverfehlern einen bekannten Code. Keine Payloads, Namen oder freien
-Clienttexte. Vorhandene Logs werden nicht überschrieben.
-
-Ohne `--output` erzeugt das Abgabewerkzeug einen Zeitstempelnamen in
-`dist/`. Das Paket enthält Programmcode, Bilder, Tests, Tools,
-Dokumentation, vorhandene Nachweise und die benachbarten
-Originalunterlagen `Dokumente/`. Es schliesst `.git`, virtuelle
-Umgebungen, Caches, lokale Geheimnisse, Laufzeitlogs sowie lokales
-Entwicklungswerkzeug aus. `SHA256SUMS.json` enthält die Hashes aller
-übrigen ZIP-Dateien, `ABGABESTATUS.md` die offenen menschlichen Aufgaben.
-Der [Vorführleitfaden](docs/report/vorfuehrung.md) beschreibt die Abnahme.
-
-## Weitere Programme
-
-`src/local_game.py` spielt ohne Netz an einer Tastatur. `src/play.py` ist
-der Konsolen-Spielclient mit Standardflotte; `src/client.py` bleibt als
-Lobby-/Nachrichtenclient erhalten.
-
-[Architektur](docs/development/architecture.md),
-[Entwicklungs- und Testablauf](docs/development/testing.md),
-[Regeln](REGELN.md) und [Protokoll](PROTOKOLL.md) gehören zusammen.
-Änderungen nur lokal durchführen; Commits, Pushes und GitHub-Schritte
-übernimmt der Projektverantwortliche.
-
-## Offen
-
-Menschliches Gegenlesen von Regeln und Protokoll, eine reale Partie mit
-zwei Personen an einer Tastatur, ein echter Lauf über zwei getrennte
-Rechner mit Server-Terminalausgabe sowie die Livevorführung bleiben dem
-Projektverantwortlichen vorbehalten.
+- Ein Server führt genau einen Tisch mit zwei Spielern; weitere Clients werden Zuschauer.
+- Kein Wiederverbinden: Geht ein Spieler, wird die Partie verworfen, ohne Sieger und ohne Wartefrist. Ein physischer Verbindungsverlust fällt erst auf, wenn die Socket-Schicht ihn meldet.
+- Der Punktestand gilt nur für die aktuelle Paarung im laufenden Server. Er beginnt nach einem Spielerabgang bei 0 und wird nicht gespeichert.
+- Das Zuschauerfenster verwendet die Spielertexte des Clients (etwa «Verloren»); eine eigene Rollenanzeige fehlt.
+- Der Konsolenclient `src/play.py` kann keine Revanche verlangen; das geht nur im grafischen Client.
+- Die Verbindung ist unverschlüsseltes TCP ohne Anmeldung; gedacht für das lokale Netz.
+- Geprüft ist das Spiel lokal über `127.0.0.1`; ein Lauf über zwei getrennte Rechner ist nicht nachgewiesen.

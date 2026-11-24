@@ -1,0 +1,55 @@
+{
+  "started": "2026-11-24T16:21:52.362793+01:00",
+  "scope": "Zwei Partien hintereinander mit Revanche, zwei Spielern und einem Zuschauer, ein Serverprozess",
+  "server_profile": "direct",
+  "checks": [
+    "Beitritt, Warten und ungefragter Spielstart",
+    "Individuelle Flotten und serverbestaetigte Platzierung",
+    "Klick B6 aktualisiert beide Fenster ohne getState",
+    "Spaeter Zuschauerbeitritt nach B6: spectator ohne Slot, sofort oeffentliche Sicht",
+    "Beide Ablehnungen privat; beide Zustaende unveraendert",
+    "Echter Zuschauerklick privat mit SPECTATOR_ONLY abgelehnt; drei Zustaende unveraendert",
+    "Revanche waehrend laufender Partie nur Alice mit WRONG_PHASE abgelehnt",
+    "Vollstaendige 33-Schuss-Partie, Sieg und Niederlage in beiden Fenstern",
+    "Server laeuft nach dem Spielende weiter",
+    "Echter Screenshot beider Fenster nach Spielende",
+    "Punktestand nach der ersten Partie in allen drei Fenstern: Alice 1 : 0 Bob",
+    "Revanche vom Zuschauer und doppelter Wunsch privat abgelehnt; ein Wunsch startet nichts",
+    "Zweiter Wunsch startet die Revanche ohne Serverneustart: leere Bretter, gleicher Punktestand fuer alle, Bob jetzt A",
+    "Individuelle Flotten und serverbestaetigte Platzierung",
+    "Erster Zug der Revanche von Bob, der in der ersten Partie nicht begonnen hat",
+    "Fensterkreuz, Abbruchanzeige, leerer Reset und Ersatzbeitritt",
+    "Alle oeffentlichen Zustandsfolgen ab B6 einschliesslich Spielende und Reset verglichen",
+    "Alle echten Zustandsnachrichten enthalten ausschliesslich die jeweilige eigene Flotte"
+  ],
+  "result": "PASS",
+  "server_port": 53264,
+  "window_size": [
+    784,
+    899
+  ],
+  "out_of_turn": "Fehler NOT_YOUR_TURN: Spieler A ist nicht am Zug",
+  "duplicate_shot": "Fehler DUPLICATE_SHOT: auf B6 wurde bereits geschossen",
+  "screenshot_layout": "Montage echter Einzelaufnahmen (screencapture), unveraendert nebeneinander",
+  "screenshot": "three_windows.png",
+  "spectator_rejection": "Fehler SPECTATOR_ONLY: Zuschauer duerfen nicht platzieren oder schiessen",
+  "spectator_screenshot": "spectator_rejection.png",
+  "capture_note": "Montagen echter Einzelaufnahmen (screencapture), links Alice, mittig Bob, rechts Zuschauer. three_windows_finished.png: Ende der ersten Partie mit Punktestand Alice 1 : 0 Bob. rematch_first_move.png: nach Bobs erstem Schuss A1 der zweiten Partie; Bob ist nach dem Slottausch A. rematch_rejection_running.png: Alices Revanchewunsch waehrend der laufenden ersten Partie, privat mit WRONG_PHASE abgelehnt. Der Knopf ist dann gesperrt; das Werkzeug legt den Wunsch deshalb direkt in Alices Sendewarteschlange. Alle anderen Revanchewuensche sind echte Knopfklicks.",
+  "rematch_running_rejection": "Fehler WRONG_PHASE: aktuelle Phase ist shooting; Revanche erst nach Spielende",
+  "rematch_screenshots": [
+    "rematch_rejection_running.png",
+    "rematch_first_move.png"
+  ],
+  "end_status": {
+    "Alice": "Gewonnen!",
+    "Bob": "Verloren. Partie beendet."
+  },
+  "final_screenshot": "three_windows_finished.png",
+  "final_screenshot_layout": "Montage echter Einzelaufnahmen (screencapture), unveraendert nebeneinander",
+  "rematch_rejections": {
+    "Zuschauer": "Fehler SPECTATOR_ONLY: Zuschauer koennen keine Revanche verlangen",
+    "Alice doppelt": "Fehler DUPLICATE_REMATCH: Revanche bereits verlangt"
+  },
+  "spectator_states_compared": 38,
+  "finished": "2026-11-24T16:22:01.962837+01:00"
+}

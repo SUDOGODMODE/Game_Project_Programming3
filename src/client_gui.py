@@ -22,7 +22,7 @@ from spiel import COLUMNS, FLEET
 from netz import read_messages, send
 from gui.ship_art import draw_svg, SHIP_NAMES
 from gui.ship_effects import ShipEffects
-from gui.client_view import board_symbols
+from gui.client_view import board_symbols, score_text
 from fleet_setup import random_placement
 
 SHIP_IMAGE_PATH = Path(__file__).resolve().parents[1] / "bilder" / "schiff.png"
@@ -140,7 +140,11 @@ class BattleshipWindow:
         header.columnconfigure(1, weight=1)
         self.phase_label = tk.Label(header, text="Verbinden", background="#18445a", foreground=ACCENT,
                                     font=(self.font, 10, "bold"), padx=12, pady=6)
-        self.phase_label.grid(row=0, column=2, rowspan=2, sticky="e")
+        self.phase_label.grid(row=0, column=2, sticky="e")
+        self.score_label = tk.Label(header, text="", background=NAVY, foreground=TEXT,
+                                    font=(self.font, 10, "bold"), anchor="e")
+        # Nicht hoeher als die Untertitelzeile, damit das Fensterlayout gleich bleibt.
+        self.score_label.grid(row=1, column=2, sticky="e")
         self.status_var = tk.StringVar(root, "Verbunden; Anmeldung wird gesendet …")
         tk.Label(root, textvariable=self.status_var, anchor="w", justify="left", wraplength=700,
                  background="#174156", foreground=TEXT, font=(self.font, 11), padx=14, pady=10).grid(
@@ -198,6 +202,10 @@ class BattleshipWindow:
         self.refresh_button = ttk.Button(actions, text="Zustand abfragen", style="Naval.TButton",
                                          command=lambda: self._request({"type": "getState"}))
         self.refresh_button.pack(side="left")
+        # Nur ein Wunsch: die neue Partie zeichnet erst der naechste Serverzustand.
+        self.rematch_button = ttk.Button(actions, text="Revanche", style="Launch.Naval.TButton",
+                                         command=lambda: self._request({"type": "rematch"}))
+        self.rematch_button.pack(side="left", padx=(8, 0))
         self.effects_enabled = tk.BooleanVar(root, True)
         ttk.Checkbutton(actions, text="Sprengungseffekte", variable=self.effects_enabled, style="Naval.TCheckbutton",
                         command=self._toggle_effects).pack(side="left", padx=16)
@@ -348,6 +356,8 @@ class BattleshipWindow:
         self.place_button.configure(state="normal" if can_place else "disabled")
         self.randomize_button.configure(state="normal" if can_place else "disabled")
         self.refresh_button.configure(state="normal" if self.connected else "disabled")
+        self.rematch_button.configure(state="normal" if self.connected and phase == "finished" else "disabled")
+        self.score_label.configure(text=score_text(state.get("score", [])))
         if phase == "waiting":
             status = self._waiting_notice or "Warte auf Gegner."
         elif phase == "placing":
@@ -385,6 +395,11 @@ class BattleshipWindow:
             self.status_var.set(f"Schuss auf {message.get('field')}: {message.get('result')}. Warte auf Serverzustand.")
         elif kind == "gameOver":
             self.status_var.set("Gewonnen!" if message.get("winner") == self.slot else "Verloren. Partie beendet.")
+        elif kind == "rematchRequested":
+            if message.get("slot") == self.slot:
+                self.status_var.set("Revanche verlangt; warte auf den Gegner.")
+            else:
+                self.status_var.set(f"{message.get('player', 'Gegner')} will eine Revanche.")
         elif kind == "disconnected":
             self.connected = False
             self._stop_connection()
@@ -426,7 +441,7 @@ class BattleshipWindow:
         self._placement_widgets.clear()
         self.own_buttons.clear()
         self.target_buttons.clear()
-        self.place_button = self.randomize_button = self.refresh_button = None
+        self.place_button = self.randomize_button = self.refresh_button = self.rematch_button = None
         self.root = None
 
 
@@ -434,7 +449,7 @@ def main():
     parser = argparse.ArgumentParser(description="Schiffe versenken mit zwei grafischen Rastern")
     parser.add_argument("host", nargs="?", default="127.0.0.1")
     parser.add_argument("name", nargs="?", default="Spieler")
-    parser.add_argument("--port", type=int, default=5000)
+    parser.add_argument("--port", type=int, default=5100)
     args = parser.parse_args()
     if tk is None:
         parser.exit(1, "tkinter fehlt. Python mit Tk-Unterstuetzung installieren und python3 -m tkinter pruefen.\n")

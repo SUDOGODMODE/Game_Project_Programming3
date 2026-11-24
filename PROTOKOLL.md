@@ -1,16 +1,18 @@
 # Schiffe versenken — Protokoll
 
-Katalog des lokalen A/B-Protokolls mit Zuschauern, Protokoll 0.7;
+Katalog des lokalen A/B-Protokolls mit Zuschauern und Revanche, Protokoll 0.8;
 strukturierte Fassung: [protocol.json](docs/protocol/protocol.json).
-Die Beispiele erläutern das vereinbarte Format für Meilenstein 7 und sind
-keine Ausführungsnachweise. Version 0.7 ergänzt `spectator` und
+Die Beispiele erläutern das vereinbarte Format für Meilenstein 8 und sind
+keine Ausführungsnachweise. Version 0.7 ergänzte `spectator` und
 `SPECTATOR_ONLY`; ein voller Tisch führt nicht mehr zu `GAME_FULL`.
+Version 0.8 ergänzt `rematch`, `rematchRequested`, den Fehlercode
+`DUPLICATE_REMATCH` und das Pflichtfeld `score` im `state`.
 
 ## Transport und Identität
 
 TCP/IPv4, UTF-8, JSON Lines: Ein JSON-Objekt pro Zeile, abgeschlossen mit einem LF-Byte (`\n`). Ein `recv()` kann Teile einer Nachricht oder mehrere Nachrichten enthalten; `netz.read_messages` setzt Zeilen zusammen. Leere Zeilen werden ignoriert. Jedes Objekt enthält `type`. Ungültiges JSON und JSON-Werte, die keine Objekte sind, führen zu `error`/`INVALID_JSON`; `broken` ist nur der interne Transportmarker.
 
-Standardport: 5000. Server: `0.0.0.0`, Clients lokal: `127.0.0.1`; Host und Port sind Startargumente. Für fremde Rechner ist die echte Serveradresse nötig. Der Server vergibt den ersten freien Slot `A`, dann `B`. Der Name aus `join` ist keine Zug-Identität: weitere Aktionen gehören zur bestehenden Verbindung, zusätzliche Slot-/Spielerfelder wählen keinen anderen Spieler.
+Standardport: 5100 (5000 belegt unter macOS der AirPlay-Empfänger); ist 5100 belegt und kein Port vorgegeben, nimmt der Server den nächsten freien und nennt ihn. Server: `0.0.0.0`, Clients lokal: `127.0.0.1`; Host und Port sind Startargumente. Für fremde Rechner ist die echte Serveradresse nötig. Der Server vergibt den ersten freien Slot `A`, dann `B`. Der Name aus `join` ist keine Zug-Identität: weitere Aktionen gehören zur bestehenden Verbindung, zusätzliche Slot-/Spielerfelder wählen keinen anderen Spieler.
 
 Sind A und B belegt, wird jeder weitere beitretende Client Zuschauer.
 Er bekommt `spectator` ohne `slot`, Spielernummer oder Symbol und direkt
@@ -52,19 +54,21 @@ Alle genannten Felder sind Pflichtfelder für den beschriebenen Nachrichtentyp; 
 | Typ | Richtung | Pflichtfelder ausser `type` | Anlass / Empfänger | Ungefragt |
 |---|---|---|---|---|
 | `join` | C → S | `player` | Ein neuer Client meldet sich auf seiner TCP-Verbindung an. | nein |
-| `welcome` | S → C | `slot`, `player`, `phase` | Direkte Antwort auf join auf einen freien Spielerplatz; nur an diesen Client. | nein |
+| `welcome` | S → C | `slot`, `player`, `phase` | Direkte Antwort auf join auf einen freien Spielerplatz; nur an diesen Client. Beim Start einer Revanche erneut an jeden Spieler mit seinem neuen Slot. | nein, bei Revanche ja |
 | `spectator` | S → C | `player`, `phase`; kein slot-Feld | Antwort auf join bei zwei belegten Spielerplätzen; nur an den neuen Zuschauer. | nein |
 | `waiting` | S → C | `reason` | Nach welcome an den ersten/alleinigen beigetretenen Spieler. | ja |
-| `gameStart` | S → C | `phase`, `players` | Nach welcome des zweiten Spielers an Spieler und bereits verbundene Zuschauer. | ja |
+| `gameStart` | S → C | `phase`, `players` | Nach welcome des zweiten Spielers und beim Start einer Revanche an Spieler und bereits verbundene Zuschauer. | ja |
 | `place` | C → S | `ships` | Ein beigetretener Spieler platziert in phase placing einmal seine vollständige Flotte. | nein |
 | `placeAck` | S → C | `phase` | Direkte Bestätigung einer erfolgreichen place-Anfrage; nur an den Absender. | nein |
 | `shoot` | C → S | `field` | Der Spieler am Zug wählt in phase shooting ein noch nicht beschossenes Feld. | nein |
 | `result` | S → C | `field`, `result`, `sunk`, `turn` | Direkte Antwort auf eine erfolgreiche shoot-Anfrage; nur an den Schützen. | nein |
 | `getState` | C → S | keine | Ein bereits beigetretener Client fragt seinen aktuellen, gefilterten Zustand ab. | nein |
-| `state` | S → C | `phase`, `turn`, `ownShips`, `shotsAtOpponent`, `shotsAtSelf`, `winner` | Nach Spielerbeitritt, Platzierung, Schuss oder Reset an Spieler und Zuschauer; nach Zuschauerbeitritt sofort an diesen; auf getState nur an den Anfragenden. Nach Rolle gefiltert. | ja, auch Antwort auf getState |
+| `state` | S → C | `phase`, `turn`, `ownShips`, `shotsAtOpponent`, `shotsAtSelf`, `winner`, `score` | Nach Spielerbeitritt, Platzierung, Schuss, Reset oder Start einer Revanche an Spieler und Zuschauer; nach Zuschauerbeitritt sofort an diesen; auf getState nur an den Anfragenden. Nach Rolle gefiltert; der Punktestand ist für alle gleich. | ja, auch Antwort auf getState |
 | `leave` | C → S | keine | Ein beigetretener Client verlässt die Runde bewusst. | nein |
 | `opponentLeft` | S → C | `slot`, `player` | Ein Spieler geht; einmal an verbliebenen Spieler und alle Zuschauer. Nicht bei Zuschauerabgang. | ja |
 | `gameOver` | S → C | `winner`, `reason` | Nach den gefilterten Endzuständen an Spieler und Zuschauer beim letzten erfolgreichen Schuss. | ja |
+| `rematch` | C → S | keine | Ein Spieler wünscht nach dem Spielende eine neue Partie. | nein |
+| `rematchRequested` | S → C | `slot`, `player` | Erster gültiger Revanchewunsch; an beide Spieler und alle Zuschauer. Der zweite Wunsch startet stattdessen die neue Partie. | ja |
 | `error` | S → C | `code`, `message` | Eine Anfrage ist ungültig oder passt nicht zum aktuellen Zustand; nur an ihren Absender. | nein |
 
 ### join
@@ -86,6 +90,8 @@ Antwort: `welcome`, `spectator` oder `error`. Slotvergabe und Identität sind un
 `type`: string, genau welcome; `slot`: A oder B; `player`: string, übernommener Name; `phase`: waiting oder placing
 
 Ein alleiniger Spieler bekommt phase waiting. Der zweite bekommt phase placing. welcome steht auf seiner Verbindung vor waiting bzw. gameStart und dem anschliessenden state.
+
+Beim Start einer Revanche erhält jeder Spieler ungefragt ein neues welcome mit phase placing und seinem **neuen** Slot, siehe «rematch». Der Client übernimmt den Slot aus jedem welcome.
 
 ### spectator
 
@@ -175,10 +181,12 @@ Für Spieler und Zuschauer erlaubt. Antwort: genau ein `state` in der erlaubten 
 ### state
 
 ```json
-{"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
+{"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
 ```
 
-`type`: string, genau state; `phase`: waiting, placing, shooting oder finished; `turn`: A/B oder null; `ownShips`: Liste eigener Schiffe: {type, cells: Feldliste, hits: Feldliste}; `shotsAtOpponent`: Objekt Feld -> miss/hit/sunk für eigene Schüsse; `shotsAtSelf`: Objekt Feld -> miss/hit/sunk für **alle** gegnerischen Schüsse auf das eigene Raster, einschliesslich Fehlschüssen; `winner`: A/B oder null.
+`type`: string, genau state; `phase`: waiting, placing, shooting oder finished; `turn`: A/B oder null; `ownShips`: Liste eigener Schiffe: {type, cells: Feldliste, hits: Feldliste}; `shotsAtOpponent`: Objekt Feld -> miss/hit/sunk für eigene Schüsse; `shotsAtSelf`: Objekt Feld -> miss/hit/sunk für **alle** gegnerischen Schüsse auf das eigene Raster, einschliesslich Fehlschüssen; `winner`: A/B oder null; `score`: Liste der belegten Slots, sortiert A dann B, je {slot: A/B, player: string, wins: ganze Zahl ab 0}.
+
+`score` ist der Punktestand über alle Partien derselben zwei Spieler. Der Server zählt ihn, der Client zeigt ihn nur an (etwa «Alice 2 : 1 Bob»). Beim letzten Schuss bekommt der Sieger einen Punkt, bevor die Endzustände verschickt werden; ein Unentschieden gibt es nach den Regeln nicht, es gäbe niemandem einen Punkt. Die Siege gehören zum Spieler, nicht zum Slot: Nach dem Slottausch einer Revanche wandern sie mit. Geht ein Spieler, beginnt der Punktestand für die neue Paarung bei 0. Mit nur einem Spieler enthält `score` einen Eintrag.
 
 Dies ist immer die vollständige erlaubte Sicht, keine Änderungsnachricht. Beide Raster haben 100 Felder A1–J10; es wird kein öffentliches board mit Gegnerflotte übertragen. Die folgende Feldbeschreibung gilt für Spieler; die Zuschauersicht steht danach.
 
@@ -195,10 +203,10 @@ Ein unbeschossenes Feld bleibt unbekannt; aus `ownShips: []` darf ein
 Zuschauer kein Wasser ableiten. Beispiel nach A auf A6 und B auf F1:
 
 ```json
-{"type":"state","phase":"shooting","turn":"A","ownShips":[],"shotsAtOpponent":{"A6":"hit"},"shotsAtSelf":{"F1":"miss"},"winner":null}
+{"type":"state","phase":"shooting","turn":"A","ownShips":[],"shotsAtOpponent":{"A6":"hit"},"shotsAtSelf":{"F1":"miss"},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
 ```
 
-Nach opponentLeft folgt an verbliebenen Spieler und Zuschauer ein state mit phase waiting, leeren ownShips, shotsAtOpponent und shotsAtSelf sowie turn und winner jeweils null. Ein Client zeichnet aus jeder Zustandsnachricht beide Raster vollständig neu.
+Nach opponentLeft folgt an verbliebenen Spieler und Zuschauer ein state mit phase waiting, leeren ownShips, shotsAtOpponent und shotsAtSelf sowie turn und winner jeweils null; `score` enthält nur noch den verbliebenen Spieler mit 0 Siegen. Ein Client zeichnet aus jeder Zustandsnachricht beide Raster vollständig neu.
 
 ### leave
 
@@ -230,6 +238,65 @@ Der Server gibt den Slot frei und setzt die Runde zurück; siehe «Reihenfolge u
 
 Spieler und Zuschauer erhalten zuerst ihren gefilterten Endzustand mit demselben `winner`, danach je eine `gameOver`-Nachricht. Der Gewinner kann das Ende bereits an `result` mit `turn: null` erkennen. Eine zusätzliche `getState`-Abfrage bleibt für alle möglich.
 
+Nach `gameOver` bleibt der Server offen; die Verbindungen bleiben bestehen. Eine neue Partie beginnt nur über zwei Revanchewünsche.
+
+### rematch
+
+```json
+{"type":"rematch"}
+```
+
+Richtung C → S. Pflichtfeld nur `type`: string, genau rematch. Zusätzliche
+Felder werden ignoriert; der Wunsch gehört zur Verbindung.
+
+Ein Klick auf «Revanche» ist ein Wunsch, kein Neustart. Der Server prüft in
+dieser Reihenfolge: vor join `NOT_JOINED`, vom Zuschauer `SPECTATOR_ONLY`,
+ausserhalb von phase finished `WRONG_PHASE`, derselbe Spieler ein zweites Mal
+`DUPLICATE_REMATCH`. Jede Ablehnung geht nur an den Absender und ändert nichts.
+
+Erster gültiger Wunsch: `rematchRequested` an beide Spieler und alle Zuschauer.
+Zweiter gültiger Wunsch (vom anderen Spieler): Der Server legt ein **neues**
+Spielkern-Objekt an und startet es, löscht die Wünsche und tauscht die Slots
+der beiden Spieler. Der Spielkern lässt immer `A` beginnen; durch den Tausch
+beginnt der Spieler, der in der letzten Partie nicht begonnen hat. Danach
+folgen ungefragt je Spieler ein `welcome` mit seinem neuen Slot, `gameStart`
+an alle und der gefilterte `state` an alle. Ein zusätzliches `rematchRequested`
+für den zweiten Wunsch gibt es nicht. Geht ein Spieler, verfallen alle offenen
+Wünsche.
+
+Beispiel nach Alices Sieg in der ersten Partie, ohne Zuschauer. Die Pfeile
+nennen hier Namen, weil sich die Slots ändern:
+
+```text
+Alice → S  {"type":"rematch"}
+S → Alice  {"type":"rematchRequested","slot":"A","player":"Alice"}
+S → Bob    {"type":"rematchRequested","slot":"A","player":"Alice"}
+Alice → S  {"type":"rematch"}
+S → Alice  {"type":"error","code":"DUPLICATE_REMATCH","message":"Revanche bereits verlangt"}
+Bob → S    {"type":"rematch"}
+S → Bob    {"type":"welcome","slot":"A","player":"Bob","phase":"placing"}
+S → Alice  {"type":"welcome","slot":"B","player":"Alice","phase":"placing"}
+S → Bob    {"type":"gameStart","phase":"placing","players":[{"slot":"A","player":"Bob"},{"slot":"B","player":"Alice"}]}
+S → Alice  {"type":"gameStart","phase":"placing","players":[{"slot":"A","player":"Bob"},{"slot":"B","player":"Alice"}]}
+S → Bob    {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Bob","wins":0},{"slot":"B","player":"Alice","wins":1}]}
+S → Alice  {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Bob","wins":0},{"slot":"B","player":"Alice","wins":1}]}
+```
+
+Ein Zuschauer erhält dieselben `rematchRequested`- und `gameStart`-Nachrichten
+und den öffentlichen `state` mit demselben `score`, aber kein `welcome`.
+
+### rematchRequested
+
+```json
+{"type":"rematchRequested","slot":"A","player":"Alice"}
+```
+
+Richtung S → C, ungefragt an beide Spieler und alle Zuschauer. Pflichtfelder:
+`type`: genau rematchRequested; `slot`: A oder B, Slot des Spielers, der die
+Revanche verlangt; `player`: dessen Name als string. So erfährt der Gegner vom
+Wunsch; der Absender sieht damit, dass sein Wunsch angenommen wurde. Der Stand
+ändert sich dadurch nicht, deshalb folgt kein `state`.
+
 ### error
 
 ```json
@@ -251,11 +318,24 @@ Pflichtfelder sind `type`, `code` und `message`. Der Text ist ein lesbares
 Formatbeispiel; ausgewertet wird `code`. Weder Spieler noch andere Zuschauer
 erhalten diese Ablehnung oder einen dadurch ausgelösten `state`.
 
+Ablehnungen eines `rematch`, Richtung S → C, jeweils ausschliesslich an den
+Absender, ohne `state` und ohne Änderung der Partie oder der Wünsche:
+
+```json
+{"type":"error","code":"WRONG_PHASE","message":"aktuelle Phase ist shooting; Revanche erst nach Spielende"}
+{"type":"error","code":"SPECTATOR_ONLY","message":"Zuschauer koennen keine Revanche verlangen"}
+{"type":"error","code":"DUPLICATE_REMATCH","message":"Revanche bereits verlangt"}
+```
+
+Die erste Zeile gilt für eine laufende Partie (in phase placing steht dort
+placing, nach einem Spielerabgang waiting), die zweite für einen Zuschauer, die
+dritte für einen zweiten Wunsch desselben Spielers vor dem Start der Revanche.
+
 ## Flotte und Spielregeln
 
 Raster 10×10, ausgegebene Koordinaten kanonisch `A1`–`J10`. Eingaben wie `a01` werden zu `A1` normalisiert; Kleinbuchstaben und führende ASCII-Nullen sind erlaubt, Unicode-Ziffern nicht. Doppelbeschuss wird nach Normalisierung geprüft. Platzierung: `h` nach rechts, `v` nach unten. Je ein Carrier (5), Battleship (4), Cruiser (3), Submarine (3) und Destroyer (2), insgesamt 17 Felder. Keine Überlappung oder Überschreitung des Rasters; angrenzende Schiffe sind erlaubt. Diese klassische Flotte ist im [Regelblatt](REGELN.md) festgelegt.
 
-Phasen: `waiting` → `placing` → `shooting` → `finished`. Nach beiden gültigen Platzierungen beginnt `A`; jeder gültige Schuss wechselt den Spieler. Treffer erlauben keinen Extrazug. Doppelbeschuss ist ungültig. Sind alle gegnerischen Schiffe versenkt, gewinnt der Schütze; kein Unentschieden. Spieler erhalten nur ihre eigene Flotte und beide Schusslisten; Zuschauer erhalten nur beide Schusslisten ohne Flotten.
+Phasen: `waiting` → `placing` → `shooting` → `finished`. Nach beiden gültigen Platzierungen beginnt `A`; jeder gültige Schuss wechselt den Spieler. Treffer erlauben keinen Extrazug. Doppelbeschuss ist ungültig. Sind alle gegnerischen Schiffe versenkt, gewinnt der Schütze; kein Unentschieden. Nach `finished` beginnt eine neue Partie nur, wenn beide Spieler `rematch` senden; dann beginnt der Spieler, der zuletzt nicht begonnen hat (Slottausch, siehe «rematch»). Spieler erhalten nur ihre eigene Flotte und beide Schusslisten; Zuschauer erhalten nur beide Schusslisten ohne Flotten.
 
 ## Reihenfolge und Abbruch
 
@@ -268,6 +348,10 @@ Phasen: `waiting` → `placing` → `shooting` → `finished`. Nach beiden gült
 - getState: ein individueller state ausschliesslich an den Anfragenden.
 - Spielerabgang: einmal opponentLeft an verbliebenen Spieler und jeden Zuschauer, danach deren zurückgesetzte states. Kein zusätzlicher waiting-Nachrichtentyp.
 - Zuschauerabgang: nur aus der separaten Liste entfernen; kein Reset und keine Benachrichtigung anderer Clients. Ein fehlgeschlagener Versand an einen Zuschauer darf die Zustellung an Spieler nicht abbrechen.
+- Spielende: Der Sieger bekommt einen Punkt, danach folgen die Endzustände mit `score` und `gameOver`. Der Server läuft weiter.
+- Erster Revanchewunsch: rematchRequested an beide Spieler und alle Zuschauer, kein state.
+- Zweiter Revanchewunsch: neues Spielkern-Objekt, Wünsche gelöscht, Slots getauscht; je Spieler welcome mit neuem Slot, danach gameStart und gefilterte states an Spieler und Zuschauer.
+- Spielerabgang verwirft zusätzlich alle offenen Revanchewünsche und setzt den Punktestand zurück.
 
 Prüfen, Ändern und Senden sowie Spieler- und Zuschauerliste liegen unter derselben Spielsperre. Zustände sind unabhängige Kopien der erlaubten Sicht. Die beschriebene Ereignisreihenfolge gilt je TCP-Verbindung. Eine Reihenfolge zwischen verschiedenen Clientverbindungen und eine zeitgleiche Anzeige auf verschiedenen Rechnern werden nicht zugesichert.
 
@@ -277,14 +361,15 @@ Bei `leave`, `q`, EOF oder erkanntem Socket-Abbruch eines **Spielers** wird sein
 
 | Code | Anlass |
 |---|---|
-| `SPECTATOR_ONLY` | Ein Zuschauer sendet place oder shoot; nur privat abgelehnt. |
+| `SPECTATOR_ONLY` | Ein Zuschauer sendet place, shoot oder rematch; nur privat abgelehnt. |
 | `ALREADY_JOINED` | Diese Verbindung ist bereits als Spieler oder Zuschauer angemeldet. |
 | `MISSING_PLAYER` | join ohne gültigen nichtleeren Namen. |
-| `NOT_JOINED` | place, shoot, getState oder leave vor join. |
+| `NOT_JOINED` | place, shoot, getState, leave oder rematch vor join. |
 | `NOT_YOUR_TURN` | shoot vom falschen Spieler. |
 | `CELL_OUT_OF_BOUNDS` | shoot-Feld fehlt, hat ein ungültiges Format oder liegt ausserhalb A1-J10. |
 | `DUPLICATE_SHOT` | Dieses Feld wurde vom Schützen bereits beschossen. |
-| `WRONG_PHASE` | Aktion in der falschen Phase oder erneute Platzierung desselben Spielers. |
+| `WRONG_PHASE` | Aktion in der falschen Phase, erneute Platzierung desselben Spielers oder rematch vor dem Spielende. |
+| `DUPLICATE_REMATCH` | Derselbe Spieler verlangt die Revanche ein zweites Mal, bevor sie startet. |
 | `INVALID_PLACEMENT` | Flotte, Schiffstypen, Start/Richtung, Überlappung oder Rasterüberstand sind ungültig. |
 | `INVALID_JSON` | Zeile ist kein gültiges JSON-Objekt (auch Listen/Skalare). |
 | `UNKNOWN_TYPE` | type fehlt oder hat keinen bekannten Nachrichtennamen. |
@@ -301,20 +386,20 @@ Dies ist ein nachvollziehbares Protokollbeispiel **ohne Zuschauer**, kein Ausfü
 A → S  {"type":"join","player":"Alice"}
 S → A  {"type":"welcome","slot":"A","player":"Alice","phase":"waiting"}
 S → A  {"type":"waiting","reason":"warte auf Gegner"}
-S → A  {"type":"state","phase":"waiting","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
+S → A  {"type":"state","phase":"waiting","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0}]}
 B → S  {"type":"join","player":"Bob"}
 S → B  {"type":"welcome","slot":"B","player":"Bob","phase":"placing"}
 S → A/B  {"type":"gameStart","phase":"placing","players":[{"slot":"A","player":"Alice"},{"slot":"B","player":"Bob"}]}
-S → A  {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
-S → B  {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
+S → A  {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
+S → B  {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
 A → S  {"type":"place","ships":[{"type":"Carrier","start":"A1","direction":"h"},{"type":"Battleship","start":"A2","direction":"h"},{"type":"Cruiser","start":"A3","direction":"h"},{"type":"Submarine","start":"A4","direction":"h"},{"type":"Destroyer","start":"A5","direction":"h"}]}
 S → A  {"type":"placeAck","phase":"placing"}
-S → A  {"type":"state","phase":"placing","turn":null,"ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
-S → B  {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
+S → A  {"type":"state","phase":"placing","turn":null,"ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
+S → B  {"type":"state","phase":"placing","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
 B → S  {"type":"place","ships":[{"type":"Carrier","start":"A6","direction":"h"},{"type":"Battleship","start":"A7","direction":"h"},{"type":"Cruiser","start":"A8","direction":"h"},{"type":"Submarine","start":"A9","direction":"h"},{"type":"Destroyer","start":"A10","direction":"h"}]}
 S → B  {"type":"placeAck","phase":"shooting"}
-S → A  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
-S → B  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":[]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":[]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":[]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":[]},{"type":"Destroyer","cells":["A10","B10"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
+S → A  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
+S → B  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":[]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":[]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":[]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":[]},{"type":"Destroyer","cells":["A10","B10"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
 ```
 
 Nach jedem erfolgreichen Ereignis treffen die beiden state-Nachrichten ohne getState ein. Bereits nach Alices Platzierung sehen beide phase placing, aber nur Alice kennt ihre Schiffe. Nach Bobs Platzierung beginnt A. Die Namen/Slots stehen in gameStart; unbeschossene Schiffe des Gegners fehlen in jeder eigenen Ansicht.
@@ -366,12 +451,12 @@ Der state nach Zeile n ist vollständig festgelegt: phase ist shooting und turn 
 ```text
 A → S  {"type":"shoot","field":"A6"}
 S → A  {"type":"result","field":"A6","result":"hit","sunk":null,"turn":"B"}
-S → A  {"type":"state","phase":"shooting","turn":"B","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{"A6":"hit"},"shotsAtSelf":{},"winner":null}
-S → B  {"type":"state","phase":"shooting","turn":"B","ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":["A6"]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":[]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":[]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":[]},{"type":"Destroyer","cells":["A10","B10"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{"A6":"hit"},"winner":null}
+S → A  {"type":"state","phase":"shooting","turn":"B","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{"A6":"hit"},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
+S → B  {"type":"state","phase":"shooting","turn":"B","ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":["A6"]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":[]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":[]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":[]},{"type":"Destroyer","cells":["A10","B10"],"hits":[]}],"shotsAtOpponent":{},"shotsAtSelf":{"A6":"hit"},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
 B → S  {"type":"shoot","field":"F1"}
 S → B  {"type":"result","field":"F1","result":"miss","sunk":null,"turn":"A"}
-S → A  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{"A6":"hit"},"shotsAtSelf":{"F1":"miss"},"winner":null}
-S → B  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":["A6"]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":[]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":[]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":[]},{"type":"Destroyer","cells":["A10","B10"],"hits":[]}],"shotsAtOpponent":{"F1":"miss"},"shotsAtSelf":{"A6":"hit"},"winner":null}
+S → A  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{"A6":"hit"},"shotsAtSelf":{"F1":"miss"},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
+S → B  {"type":"state","phase":"shooting","turn":"A","ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":["A6"]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":[]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":[]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":[]},{"type":"Destroyer","cells":["A10","B10"],"hits":[]}],"shotsAtOpponent":{"F1":"miss"},"shotsAtSelf":{"A6":"hit"},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0},{"slot":"B","player":"Bob","wins":0}]}
 ```
 
 Bob sieht Alices ersten Treffer auf A6 in shotsAtSelf und seiner eigenen Flotte. Alice kennt dadurch ausschliesslich das getroffene Feld, nicht Bobs übrige Schiffsfelder. Bobs Fehlschuss F1 erscheint danach bei Alice in shotsAtSelf und bei Bob in shotsAtOpponent.
@@ -383,13 +468,13 @@ Nach den Tabellenzeilen 1–32 folgt ohne zusätzliche Zustandsabfrage:
 ```text
 A → S  {"type":"shoot","field":"B10"}
 S → A  {"type":"result","field":"B10","result":"sunk","sunk":"Destroyer","turn":null}
-S → A  {"type":"state","phase":"finished","turn":null,"ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{"A6":"hit","B6":"hit","C6":"hit","D6":"hit","E6":"sunk","A7":"hit","B7":"hit","C7":"hit","D7":"sunk","A8":"hit","B8":"hit","C8":"sunk","A9":"hit","B9":"hit","C9":"sunk","A10":"hit","B10":"sunk"},"shotsAtSelf":{"F1":"miss","G1":"miss","H1":"miss","I1":"miss","J1":"miss","F2":"miss","G2":"miss","H2":"miss","I2":"miss","J2":"miss","F3":"miss","G3":"miss","H3":"miss","I3":"miss","J3":"miss","F4":"miss"},"winner":"A"}
-S → B  {"type":"state","phase":"finished","turn":null,"ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":["A6","B6","C6","D6","E6"]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":["A7","B7","C7","D7"]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":["A8","B8","C8"]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":["A9","B9","C9"]},{"type":"Destroyer","cells":["A10","B10"],"hits":["A10","B10"]}],"shotsAtOpponent":{"F1":"miss","G1":"miss","H1":"miss","I1":"miss","J1":"miss","F2":"miss","G2":"miss","H2":"miss","I2":"miss","J2":"miss","F3":"miss","G3":"miss","H3":"miss","I3":"miss","J3":"miss","F4":"miss"},"shotsAtSelf":{"A6":"hit","B6":"hit","C6":"hit","D6":"hit","E6":"sunk","A7":"hit","B7":"hit","C7":"hit","D7":"sunk","A8":"hit","B8":"hit","C8":"sunk","A9":"hit","B9":"hit","C9":"sunk","A10":"hit","B10":"sunk"},"winner":"A"}
+S → A  {"type":"state","phase":"finished","turn":null,"ownShips":[{"type":"Carrier","cells":["A1","B1","C1","D1","E1"],"hits":[]},{"type":"Battleship","cells":["A2","B2","C2","D2"],"hits":[]},{"type":"Cruiser","cells":["A3","B3","C3"],"hits":[]},{"type":"Submarine","cells":["A4","B4","C4"],"hits":[]},{"type":"Destroyer","cells":["A5","B5"],"hits":[]}],"shotsAtOpponent":{"A6":"hit","B6":"hit","C6":"hit","D6":"hit","E6":"sunk","A7":"hit","B7":"hit","C7":"hit","D7":"sunk","A8":"hit","B8":"hit","C8":"sunk","A9":"hit","B9":"hit","C9":"sunk","A10":"hit","B10":"sunk"},"shotsAtSelf":{"F1":"miss","G1":"miss","H1":"miss","I1":"miss","J1":"miss","F2":"miss","G2":"miss","H2":"miss","I2":"miss","J2":"miss","F3":"miss","G3":"miss","H3":"miss","I3":"miss","J3":"miss","F4":"miss"},"winner":"A","score":[{"slot":"A","player":"Alice","wins":1},{"slot":"B","player":"Bob","wins":0}]}
+S → B  {"type":"state","phase":"finished","turn":null,"ownShips":[{"type":"Carrier","cells":["A6","B6","C6","D6","E6"],"hits":["A6","B6","C6","D6","E6"]},{"type":"Battleship","cells":["A7","B7","C7","D7"],"hits":["A7","B7","C7","D7"]},{"type":"Cruiser","cells":["A8","B8","C8"],"hits":["A8","B8","C8"]},{"type":"Submarine","cells":["A9","B9","C9"],"hits":["A9","B9","C9"]},{"type":"Destroyer","cells":["A10","B10"],"hits":["A10","B10"]}],"shotsAtOpponent":{"F1":"miss","G1":"miss","H1":"miss","I1":"miss","J1":"miss","F2":"miss","G2":"miss","H2":"miss","I2":"miss","J2":"miss","F3":"miss","G3":"miss","H3":"miss","I3":"miss","J3":"miss","F4":"miss"},"shotsAtSelf":{"A6":"hit","B6":"hit","C6":"hit","D6":"hit","E6":"sunk","A7":"hit","B7":"hit","C7":"hit","D7":"sunk","A8":"hit","B8":"hit","C8":"sunk","A9":"hit","B9":"hit","C9":"sunk","A10":"hit","B10":"sunk"},"winner":"A","score":[{"slot":"A","player":"Alice","wins":1},{"slot":"B","player":"Bob","wins":0}]}
 S → A  {"type":"gameOver","winner":"A","reason":"sunk"}
 S → B  {"type":"gameOver","winner":"A","reason":"sunk"}
 B → S  {"type":"leave"}
 S → A  {"type":"opponentLeft","slot":"B","player":"Bob"}
-S → A  {"type":"state","phase":"waiting","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null}
+S → A  {"type":"state","phase":"waiting","turn":null,"ownShips":[],"shotsAtOpponent":{},"shotsAtSelf":{},"winner":null,"score":[{"slot":"A","player":"Alice","wins":0}]}
 ```
 
 Bob bekommt keine direkte Antwort auf leave; seine Verbindung endet. Alice erhält opponentLeft und danach den leeren waiting-Zustand automatisch. Ein Ersatzspieler erhält den freien Slot B, beide bekommen gameStart und ihren neuen placing-Zustand. Auch nach Spielende enthält Alices state keine unbeschossene gegnerische Flotte.

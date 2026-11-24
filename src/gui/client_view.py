@@ -37,3 +37,11 @@ def board_symbols(state: dict) -> tuple[dict, dict, dict]:
             target_symbols[field] = SHOT_SYMBOLS[result]
 
     return own_symbols, target_symbols, segments
+
+
+def score_text(score: list) -> str:
+    """Punktestand aus state.score, etwa «Alice 2 : 1 Bob»; der Server zaehlt."""
+    if len(score) == 2:
+        first, second = score
+        return f"{first['player']} {first['wins']} : {second['wins']} {second['player']}"
+    return " ".join(f"{entry['player']} {entry['wins']}" for entry in score)

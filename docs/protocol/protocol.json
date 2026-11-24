@@ -1,21 +1,23 @@
 {
   "protocol": "BattleshipGame",
-  "version": "0.7",
-  "status": "Protokoll 0.7. Gegenlesen und fremde Rechnernachweise ausstehend; aktueller Stand siehe README.md.",
+  "version": "0.8",
+  "status": "Protokoll 0.8 (Revanche und Punktestand). Gegenlesen und fremde Rechnernachweise ausstehend; aktueller Stand siehe README.md.",
   "transport": {
     "protocol": "TCP/IPv4",
     "encoding": "UTF-8",
     "framing": "JSON Lines: genau ein JSON-Objekt pro Zeile, abgeschlossen mit LF (\\n). Leerzeilen werden ignoriert.",
     "defaultHost": "0.0.0.0 (Server), 127.0.0.1 (Clients)",
-    "defaultPort": 5000,
+    "defaultPort": 5100,
     "internalMarker": "netz.read_messages liefert broken intern für ungültiges JSON oder Nicht-Objekte. broken ist keine reguläre Spielnachricht; die Antwort über TCP ist error/INVALID_JSON.",
     "clientReading": "Ein Client liest dauerhaft und unterscheidet nach type. Ungefragte individuell gefilterte state-Nachrichten folgen auf Beitritt, erfolgreiche Platzierung, erfolgreichen Schuss und Reset. getState bleibt eine zusätzliche private Abfrage. Die nächste Nachricht ist nicht zwingend die direkte Antwort auf die letzte Anfrage.",
     "disconnectReading": "Ein erkannter harter Socket-Abbruch beendet read_messages wie EOF.",
-    "serverLogging": "Neue exklusive JSONL-Datei pro Serverstart unter logs/ oder --log-file. Jede empfangene/erfolgreich gesendete Nachricht: UTC-ISO-Zeit mit Zeitzone, Richtung, Verbindung/Slot, bekannter Typ (sonst unknown); nur bei ausgehenden Fehlern bekannter Servercode. Zuschauer haben slot null; spectator und SPECTATOR_ONLY gehören zu den bekannten Metadaten. Sofortiger Flush, serialisierte Schreiber, kein Anhängen/Überschreiben. Keine Namen, freien Clienttexte, Flotten oder vollständigen Zustands-Payloads. Protokollversion 0.7."
+    "serverLogging": "Neue exklusive JSONL-Datei pro Serverstart unter logs/ oder --log-file. Jede empfangene/erfolgreich gesendete Nachricht: UTC-ISO-Zeit mit Zeitzone, Richtung, Verbindung/Slot, bekannter Typ (sonst unknown); nur bei ausgehenden Fehlern bekannter Servercode. Zuschauer haben slot null; spectator, SPECTATOR_ONLY, rematch, rematchRequested und DUPLICATE_REMATCH gehören zu den bekannten Metadaten. Sofortiger Flush, serialisierte Schreiber, kein Anhängen/Überschreiben. Keine Namen, freien Clienttexte, Flotten oder vollständigen Zustands-Payloads. Protokollversion 0.8."
   },
   "rules": {
     "grid": "10x10; ausgegebene Felder kanonisch A1-J10. Eingaben akzeptieren ASCII-Kleinbuchstaben und führende Nullen (a01 -> A1); Unicode-Ziffern werden abgelehnt. Doppelbeschuss wird mit kanonischen Feldern geprüft.",
-    "players": "Genau zwei Spieler; der Server vergibt den ersten freien Slot A, dann B. Sind beide belegt, wird jeder weitere beitretende Client Zuschauer ohne Slot. Nach Spielerabgang ist derselbe Slot für einen neuen Beitritt frei; bestehende Zuschauer werden nie befördert.",
+    "players": "Genau zwei Spieler; der Server vergibt den ersten freien Slot A, dann B. Sind beide belegt, wird jeder weitere beitretende Client Zuschauer ohne Slot. Nach Spielerabgang ist derselbe Slot für einen neuen Beitritt frei; bestehende Zuschauer werden nie befördert. Beim Start einer Revanche tauschen die beiden Spieler ihre Slots; jeder erhält dazu ein neues welcome.",
+    "rematch": "Nach finished bleibt der Server offen. Eine neue Partie beginnt erst, wenn beide Spieler rematch gesendet haben: neues Spielkern-Objekt, Wünsche gelöscht, Slots getauscht, damit der Spieler beginnt, der zuletzt nicht begonnen hat. Ein Spielerabgang verwirft offene Wünsche.",
+    "score": "Der Server zählt Siege über alle Partien derselben zwei Spieler und schickt sie in jedem state als score. Der Sieger bekommt beim letzten Schuss einen Punkt; ein Unentschieden gäbe niemandem einen Punkt (nach den Regeln gibt es keins). Ein Spielerabgang setzt den Punktestand auf 0.",
     "hiddenInformation": "Spieler erhalten nur ihre eigene Flotte mit Treffern und beide Schusslisten. Zuschauer erhalten eine dritte, öffentliche Sicht ohne Flotten: ownShips [], shotsAtSelf = Schüsse von B auf A, shotsAtOpponent = Schüsse von A auf B. Unbeschossene Schiffsfelder bleiben auch nach Partieende verborgen.",
     "identity": "Die Verbindung bestimmt Spielerplatz oder Zuschauerrolle. Zusätzliche Felder player oder slot ändern den Handelnden nicht. Ein Zuschauer hat weder Spielernummer noch Symbol und steht nie in der Spielerliste.",
     "spectators": "Separate Zuschauerliste unter derselben Spielsperre wie Spieler. place und shoot werden privat mit SPECTATOR_ONLY abgelehnt; getState und leave sind erlaubt. Zustände, gameStart, gameOver und opponentLeft gehen auch an Zuschauer. Zuschauerabgang entfernt nur dessen Verbindung; kein Reset, keine Nachricht an Spieler. Ein fehlgeschlagener Zuschauerversand darf den Versand an Spieler nicht abbrechen.",
@@ -67,7 +69,14 @@
     "ownShips": [],
     "shotsAtOpponent": {},
     "shotsAtSelf": {},
-    "winner": null
+    "winner": null,
+    "score": [
+      {
+        "slot": "A",
+        "player": "Alice",
+        "wins": 0
+      }
+    ]
   },
   "stateExampleNote": "Ungefragte eigene Ansicht direkt nach opponentLeft; derselbe Zustand kann zusätzlich mit getState abgefragt werden.",
   "messages": {
@@ -89,7 +98,7 @@
     "welcome": {
       "from": "Server -> Client",
       "direction": "server_to_client",
-      "trigger": "Direkte Antwort auf einen erfolgreichen join auf einen freien Spielerplatz; nur an diesen Client.",
+      "trigger": "Direkte Antwort auf einen erfolgreichen join auf einen freien Spielerplatz; nur an diesen Client. Beim Start einer Revanche erneut ungefragt an jeden Spieler mit seinem neuen Slot und phase placing.",
       "requiredFields": {
         "type": "string, genau welcome",
         "slot": "A oder B",
@@ -140,7 +149,7 @@
     "gameStart": {
       "from": "Server -> Client",
       "direction": "server_to_client",
-      "trigger": "Der zweite Spieler hat erfolgreich join abgeschlossen. Nach dessen welcome an beide Spieler und alle bereits verbundenen Zuschauer.",
+      "trigger": "Der zweite Spieler hat erfolgreich join abgeschlossen oder beide Spieler haben rematch verlangt. Nach den welcome-Nachrichten an beide Spieler und alle bereits verbundenen Zuschauer.",
       "requiredFields": {
         "type": "string, genau gameStart",
         "phase": "placing",
@@ -271,7 +280,7 @@
     "state": {
       "from": "Server -> Client",
       "direction": "server_to_client",
-      "trigger": "Nach Spielerbeitritt, erfolgreicher Platzierung, erfolgreichem Schuss oder Reset an Spieler und Zuschauer, nach Zuschauerbeitritt sofort an den neuen Zuschauer; auf getState nur an den Anfragenden. Immer nach Rolle gefiltert.",
+      "trigger": "Nach Spielerbeitritt, erfolgreicher Platzierung, erfolgreichem Schuss, Reset oder Start einer Revanche an Spieler und Zuschauer, nach Zuschauerbeitritt sofort an den neuen Zuschauer; auf getState nur an den Anfragenden. Immer nach Rolle gefiltert.",
       "requiredFields": {
         "type": "string, genau state",
         "phase": "waiting, placing, shooting oder finished",
@@ -279,7 +288,8 @@
         "ownShips": "Spieler: Liste eigener Schiffe {type, cells: Feldliste, hits: Feldliste}; Zuschauer: immer []",
         "shotsAtOpponent": "Objekt Feld -> miss/hit/sunk; Spieler: eigene Schüsse; Zuschauer: Schüsse von A auf B (rechts)",
         "shotsAtSelf": "Objekt Feld -> miss/hit/sunk, auch Fehlschüsse; Spieler: gegnerische Schüsse; Zuschauer: Schüsse von B auf A (links)",
-        "winner": "A/B oder null"
+        "winner": "A/B oder null",
+        "score": "Liste der belegten Slots, sortiert A dann B, je {slot: A/B, player: string, wins: ganze Zahl ab 0}; für Spieler und Zuschauer gleich"
       },
       "example": {
         "type": "state",
@@ -336,7 +346,19 @@
         ],
         "shotsAtOpponent": {},
         "shotsAtSelf": {},
-        "winner": null
+        "winner": null,
+        "score": [
+          {
+            "slot": "A",
+            "player": "Alice",
+            "wins": 0
+          },
+          {
+            "slot": "B",
+            "player": "Bob",
+            "wins": 0
+          }
+        ]
       },
       "unsolicited": true,
       "spectatorExample": {
@@ -346,9 +368,13 @@
         "ownShips": [],
         "shotsAtOpponent": {"A6": "hit"},
         "shotsAtSelf": {"F1": "miss"},
-        "winner": null
+        "winner": null,
+        "score": [
+          {"slot": "A", "player": "Alice", "wins": 0},
+          {"slot": "B", "player": "Bob", "wins": 0}
+        ]
       },
-      "note": "Vollständige erlaubte Sicht im bestehenden state-Format, keine Gegnerflotte. spectatorExample zeigt den Stand nach A auf A6 und B auf F1. Siehe stateSemantics. Nach opponentLeft folgt automatisch waiting mit leeren ownShips, shotsAtOpponent und shotsAtSelf, turn und winner null."
+      "note": "Vollständige erlaubte Sicht im bestehenden state-Format, keine Gegnerflotte. spectatorExample zeigt den Stand nach A auf A6 und B auf F1. Siehe stateSemantics. Nach opponentLeft folgt automatisch waiting mit leeren ownShips, shotsAtOpponent und shotsAtSelf, turn und winner null; score enthält nur noch den verbliebenen Spieler mit 0 Siegen. Beim letzten Schuss steht der neue Punkt des Siegers bereits im Endzustand."
     },
     "leave": {
       "from": "Client -> Server",
@@ -395,7 +421,37 @@
         "reason": "sunk"
       },
       "unsolicited": true,
-      "note": "Spieler und Zuschauer erhalten zuerst ihren vollständigen gefilterten Endzustand mit winner, danach je gameOver. Der Gewinner kann das Ende bereits an result.turn null erkennen. getState bleibt für alle möglich."
+      "note": "Spieler und Zuschauer erhalten zuerst ihren vollständigen gefilterten Endzustand mit winner, danach je gameOver. Der Gewinner kann das Ende bereits an result.turn null erkennen. getState bleibt für alle möglich. Der Server bleibt danach offen; eine neue Partie beginnt nur über rematch beider Spieler."
+    },
+    "rematch": {
+      "from": "Client -> Server",
+      "direction": "client_to_server",
+      "trigger": "Ein Spieler wünscht nach dem Spielende (phase finished) eine neue Partie.",
+      "requiredFields": {
+        "type": "string, genau rematch"
+      },
+      "example": {
+        "type": "rematch"
+      },
+      "unsolicited": false,
+      "note": "Ein Wunsch, kein Neustart. Prüfreihenfolge: vor join NOT_JOINED, Zuschauer SPECTATOR_ONLY, ausserhalb finished WRONG_PHASE, zweiter Wunsch desselben Spielers DUPLICATE_REMATCH; jeweils nur an den Absender. Erster gültiger Wunsch: rematchRequested an beide Spieler und alle Zuschauer. Zweiter gültiger Wunsch: neues Spielkern-Objekt, Wünsche gelöscht, Slots getauscht; je Spieler welcome mit neuem Slot, danach gameStart und gefilterte states an alle. Ein Spielerabgang verwirft offene Wünsche."
+    },
+    "rematchRequested": {
+      "from": "Server -> Client",
+      "direction": "server_to_client",
+      "trigger": "Erster gültiger Revanchewunsch; an beide Spieler und alle Zuschauer.",
+      "requiredFields": {
+        "type": "string, genau rematchRequested",
+        "slot": "A oder B, Slot des wünschenden Spielers",
+        "player": "string, Name des wünschenden Spielers"
+      },
+      "example": {
+        "type": "rematchRequested",
+        "slot": "A",
+        "player": "Alice"
+      },
+      "unsolicited": true,
+      "note": "So erfährt der Gegner vom Wunsch. Kein state, weil sich die Partie nicht ändert. Der zweite Wunsch startet direkt die neue Partie ohne weiteres rematchRequested."
     },
     "error": {
       "from": "Server -> Client",
@@ -417,16 +473,34 @@
         "code": "SPECTATOR_ONLY",
         "message": "Zuschauer duerfen nicht platzieren oder schiessen"
       },
-      "note": "Ungültige JSON-Zeilen und JSON-Werte ohne Objektstruktur werden mit INVALID_JSON abgelehnt. spectatorExample ist ein vollständiges Formatbeispiel für die private Ablehnung von place oder shoot; message ist lesbarer Text, kein maschineller Identifikator.",
+      "rematchExamples": [
+        {
+          "type": "error",
+          "code": "WRONG_PHASE",
+          "message": "aktuelle Phase ist shooting; Revanche erst nach Spielende"
+        },
+        {
+          "type": "error",
+          "code": "SPECTATOR_ONLY",
+          "message": "Zuschauer koennen keine Revanche verlangen"
+        },
+        {
+          "type": "error",
+          "code": "DUPLICATE_REMATCH",
+          "message": "Revanche bereits verlangt"
+        }
+      ],
+      "note": "Ungültige JSON-Zeilen und JSON-Werte ohne Objektstruktur werden mit INVALID_JSON abgelehnt. spectatorExample ist ein vollständiges Formatbeispiel für die private Ablehnung von place oder shoot; rematchExamples zeigen die Ablehnungen eines rematch bei laufender Partie, vom Zuschauer und doppelt. message ist lesbarer Text, kein maschineller Identifikator.",
       "codes": {
-        "SPECTATOR_ONLY": "Ein angemeldeter Zuschauer sendet place oder shoot; Ablehnung nur an ihn, kein Zustandswechsel oder Rundruf.",
+        "SPECTATOR_ONLY": "Ein angemeldeter Zuschauer sendet place, shoot oder rematch; Ablehnung nur an ihn, kein Zustandswechsel oder Rundruf.",
         "ALREADY_JOINED": "Diese Verbindung ist bereits als Spieler oder Zuschauer angemeldet.",
         "MISSING_PLAYER": "join ohne gültigen nichtleeren Namen.",
-        "NOT_JOINED": "place, shoot, getState oder leave vor join.",
+        "NOT_JOINED": "place, shoot, getState, leave oder rematch vor join.",
         "NOT_YOUR_TURN": "shoot vom falschen Spieler.",
         "CELL_OUT_OF_BOUNDS": "shoot-Feld fehlt, hat ein ungültiges Format oder liegt ausserhalb A1-J10.",
         "DUPLICATE_SHOT": "Dieses Feld wurde vom Schützen bereits beschossen.",
-        "WRONG_PHASE": "Aktion in der falschen Phase oder erneute Platzierung desselben Spielers.",
+        "WRONG_PHASE": "Aktion in der falschen Phase, erneute Platzierung desselben Spielers oder rematch vor dem Spielende.",
+        "DUPLICATE_REMATCH": "Derselbe Spieler verlangt die Revanche ein zweites Mal, bevor sie startet.",
         "INVALID_PLACEMENT": "Flotte, Schiffstypen, Start/Richtung, Überlappung oder Rasterüberstand sind ungültig.",
         "INVALID_JSON": "Zeile ist kein gültiges JSON-Objekt (auch Listen/Skalare).",
         "UNKNOWN_TYPE": "type fehlt oder hat keinen bekannten Nachrichtennamen."
@@ -441,7 +515,9 @@
     "Erfolgreiches shoot: result nur an den Akteur, danach je ein gefilterter state an Spieler und Zuschauer; beim Sieg anschliessend gameOver an alle.",
     "Ablehnung: nur error an den Absender; kein state-Push und keine Zustandsänderung.",
     "getState: genau ein individueller state nur an den Anfragenden.",
-    "Spielerabgang: genau ein opponentLeft an verbliebenen Spieler und jeden Zuschauer, danach ihre zurückgesetzten states; kein zusätzlicher waiting-Nachrichtentyp. Zuschauerabgang: nur entfernen, keine Partierücksetzung oder Benachrichtigung anderer Clients.",
+    "Spielende: Punkt für den Sieger, danach gefilterte Endzustände mit score und gameOver an alle. Der Server läuft weiter.",
+    "Erster rematch: rematchRequested an beide Spieler und alle Zuschauer, kein state. Zweiter rematch: neues Spielkern-Objekt, Slots getauscht, je Spieler welcome mit neuem Slot, danach gameStart und gefilterte states an alle.",
+    "Spielerabgang: genau ein opponentLeft an verbliebenen Spieler und jeden Zuschauer, danach ihre zurückgesetzten states; offene Revanchewünsche verfallen, der Punktestand beginnt bei 0; kein zusätzlicher waiting-Nachrichtentyp. Zuschauerabgang: nur entfernen, keine Partierücksetzung oder Benachrichtigung anderer Clients.",
     "Prüfen, Ändern und Senden unter derselben Spielsperre. Individuelle Zustände sind unabhängige Kopien der erlaubten Sicht. Ereignisreihenfolge je TCP-Verbindung; keine Zusage einer Reihenfolge zwischen Clientverbindungen oder einer zeitgleichen Anzeige."
   ],
   "openQuestions": [
@@ -455,7 +531,8 @@
     "shotsAtOpponent": "Feld -> miss/hit/sunk; Spieler: eigene Schüsse; Zuschauer: A auf B. Fehlender Schlüssel bedeutet unbeschossen und unbekannt, nicht Wasser.",
     "shotsAtSelf": "Feld -> miss/hit/sunk, auch Fehlschüsse; Spieler: gegnerische Schüsse; Zuschauer: B auf A. Fehlender Schlüssel bedeutet noch nicht beschossen.",
     "results": "miss: Wasser; hit: Schiff getroffen; sunk: genau dieser Schuss versenkte ein Schiff. Frühere hit-Einträge werden nicht nachträglich zu sunk geändert.",
-    "emptyReset": "phase waiting; ownShips [], shotsAtOpponent {}, shotsAtSelf {}, turn null, winner null.",
+    "emptyReset": "phase waiting; ownShips [], shotsAtOpponent {}, shotsAtSelf {}, turn null, winner null; score nur mit dem verbliebenen Spieler und 0 Siegen.",
+    "score": "Liste {slot, player, wins} der belegten Slots, sortiert A dann B. Der Server zählt, der Client zeigt nur an. Die Siege gehören zum Spieler und wandern beim Slottausch der Revanche mit.",
     "rendering": "Client zeichnet beide Raster vollständig aus jedem state; Klicks ändern keinen lokalen Spielstand."
   }
 }
